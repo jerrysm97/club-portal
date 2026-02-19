@@ -41,5 +41,5 @@ export async function GET(request: NextRequest) {
 
     // After session is created, redirect to dashboard
     // The middleware will then check their member status and redirect accordingly
-    return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
+    return NextResponse.redirect(new URL('/portal/dashboard', requestUrl.origin))
 }

@@ -7,12 +7,13 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function Sidebar() {
     // Track which page is active to highlight the correct nav link
     const pathname = usePathname()
+    const router = useRouter()
     // Track if mobile menu is open or closed
     const [mobileOpen, setMobileOpen] = useState(false)
     // Track if the current user is an admin (to show/hide admin link)
@@ -37,14 +38,15 @@ export default function Sidebar() {
     // Sign the user out and redirect to login
     const handleSignOut = async () => {
         await supabase.auth.signOut()
-        window.location.href = '/login'
+        router.push('/portal/login')
+        router.refresh()
     }
 
     // Navigation links — shown to all approved members
     const navLinks = [
         {
             name: 'Posts',
-            href: '/dashboard',
+            href: '/portal/dashboard',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
@@ -53,7 +55,7 @@ export default function Sidebar() {
         },
         {
             name: 'Documents',
-            href: '/dashboard/documents',
+            href: '/portal/dashboard/documents',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -62,7 +64,7 @@ export default function Sidebar() {
         },
         {
             name: 'Profile',
-            href: '/dashboard/profile',
+            href: '/portal/dashboard/profile',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -136,11 +138,11 @@ export default function Sidebar() {
                         <>
                             <div className="my-3 border-t border-white/10" />
                             <Link
-                                href="/admin"
+                                href="/portal/admin"
                                 onClick={() => setMobileOpen(false)}
                                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
-                  ${pathname === '/admin'
+                  ${pathname === '/portal/admin'
                                         ? 'bg-purple-600 text-white'
                                         : 'text-purple-300 hover:bg-white/10 hover:text-white'
                                     }

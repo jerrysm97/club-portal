@@ -1,58 +1,71 @@
 // middleware.ts
-// Runs BEFORE every page load for matched routes.
-// Checks login status and member status, then redirects accordingly.
-// IMPORTANT: Uses the service role key to bypass RLS for status checks.
+// Route protection middleware — ONLY protects /portal/dashboard/* and /portal/admin/* routes.
+// Public routes (/, /about, /events, /contact) pass through with NO checks.
+// /portal/login and /portal/pending are also open (no auth needed).
+// Uses service_role key to bypass RLS when checking member status.
 
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
-    let res = NextResponse.next()
+export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl
 
-    // Create a Supabase client with the user's cookies (for session checking)
+    // =====================================================
+    // STEP 1: Only protect portal dashboard and admin routes
+    // Everything else passes through freely (public website, login, pending)
+    // =====================================================
+    const protectedPaths = ['/portal/dashboard', '/portal/admin']
+    const isProtected = protectedPaths.some((path) => pathname.startsWith(path))
+
+    if (!isProtected) {
+        return NextResponse.next()
+    }
+
+    // =====================================================
+    // STEP 2: Create Supabase client to check user session
+    // This client uses the anon key and reads cookies from the request
+    // =====================================================
+    let response = NextResponse.next({
+        request: { headers: request.headers },
+    })
+
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
                 getAll() {
-                    return req.cookies.getAll()
+                    return request.cookies.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value }) => {
-                        req.cookies.set(name, value)
-                    })
-                    res = NextResponse.next({ request: req })
-                    cookiesToSet.forEach(({ name, value, options }) => {
-                        res.cookies.set(name, value, options)
-                    })
+                    cookiesToSet.forEach(({ name, value }) =>
+                        request.cookies.set(name, value)
+                    )
+                    response = NextResponse.next({ request: { headers: request.headers } })
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        response.cookies.set(name, value, options)
+                    )
                 },
             },
         }
     )
 
-    // Check if the user has a valid session
-    const {
-        data: { session },
-    } = await supabase.auth.getSession()
+    // =====================================================
+    // STEP 3: Check if user has an active session
+    // If no session → redirect to portal login
+    // =====================================================
+    const { data: { session } } = await supabase.auth.getSession()
 
-    const url = req.nextUrl.clone()
-
-    // 1. NOT logged in → redirect protected pages to /login
-    if (!session && (
-        url.pathname.startsWith('/dashboard') ||
-        url.pathname.startsWith('/admin') ||
-        url.pathname.startsWith('/pending')
-    )) {
-        url.pathname = '/login'
-        return NextResponse.redirect(url)
+    if (!session) {
+        return NextResponse.redirect(new URL('/portal/login', request.url))
     }
 
-    // 2. Logged in → check member status
-    if (session) {
-        // Use a separate admin client that BYPASSES RLS to read the member record
-        // This is necessary because pending users can't read their own record via RLS
+    // =====================================================
+    // STEP 4: Check member status using service role (bypasses RLS)
+    // Wrapped in try/catch — if database is unreachable, redirect safely
+    // =====================================================
+    try {
         const adminClient = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -64,13 +77,19 @@ export async function middleware(req: NextRequest) {
             }
         )
 
-        const { data: member } = await adminClient
+        const { data: member, error } = await adminClient
             .from('members')
             .select('status, role')
             .eq('id', session.user.id)
             .single()
 
-        // If no member record exists, create one with "pending" status
+        if (error) throw error
+
+        // =====================================================
+        // STEP 5: Handle different member statuses
+        // =====================================================
+
+        // No member record found — create one with pending status
         if (!member) {
             await adminClient.from('members').insert({
                 id: session.user.id,
@@ -78,42 +97,38 @@ export async function middleware(req: NextRequest) {
                 status: 'pending',
                 role: 'member',
             })
-
-            if (url.pathname !== '/pending') {
-                url.pathname = '/pending'
-                return NextResponse.redirect(url)
-            }
+            return NextResponse.redirect(new URL('/portal/pending', request.url))
         }
 
-        // Pending → only allow /pending page
-        if (member?.status === 'pending' && url.pathname !== '/pending') {
-            url.pathname = '/pending'
-            return NextResponse.redirect(url)
+        // Member is pending → send to pending page
+        if (member.status === 'pending') {
+            return NextResponse.redirect(new URL('/portal/pending', request.url))
         }
 
-        // Rejected → sign out and redirect to login
-        if (member?.status === 'rejected') {
-            await supabase.auth.signOut()
-            url.pathname = '/login'
-            url.searchParams.set('error', 'Access denied')
-            return NextResponse.redirect(url)
+        // Member was rejected → sign out & send to login with error
+        if (member.status === 'rejected') {
+            return NextResponse.redirect(new URL('/portal/login?error=access_denied', request.url))
         }
 
-        // Approved but still on login/pending → redirect to dashboard
-        if (member?.status === 'approved' && (url.pathname === '/login' || url.pathname === '/pending')) {
-            url.pathname = '/dashboard'
-            return NextResponse.redirect(url)
+        // Admin routes — only admins can access /portal/admin
+        if (pathname.startsWith('/portal/admin') && member.role !== 'admin') {
+            return NextResponse.redirect(new URL('/portal/dashboard', request.url))
         }
+
+        // Member is approved → let them through!
+        return response
+
+    } catch (err) {
+        // =====================================================
+        // CATCH: Database unreachable or query failed
+        // Redirect to login with a friendly error instead of crashing
+        // =====================================================
+        console.error('Middleware DB error:', err)
+        return NextResponse.redirect(new URL('/portal/login?error=server_error', request.url))
     }
-
-    return res
 }
 
+// Only run middleware on portal protected routes
 export const config = {
-    matcher: [
-        '/dashboard/:path*',
-        '/admin/:path*',
-        '/pending',
-        '/login',
-    ],
+    matcher: ['/portal/dashboard/:path*', '/portal/admin/:path*'],
 }
