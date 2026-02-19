@@ -1,34 +1,39 @@
-// components/public/StatsSection.tsx — Stealth Terminal Stats
-import { Users, Calendar, Trophy, Globe } from 'lucide-react'
+// components/public/StatsSection.tsx — IIMS Collegiate Public Stats
+import { Users, Calendar, Trophy, Globe, Zap } from 'lucide-react'
 import type { SiteSettings } from '@/types/database'
 
 export default function StatsSection({ settings }: { settings?: SiteSettings | null }) {
     return (
-        <section className="py-24 bg-[#09090B] border-b border-[#27272A] relative overflow-hidden">
-            {/* Background Grid */}
-            <div className="absolute inset-0 hero-grid opacity-20" />
+        <section className="py-24 bg-white border-y border-[#F3F4F6] relative overflow-hidden">
+            {/* Background Decor */}
+            <div className="absolute top-0 right-0 w-[30%] h-full bg-gradient-to-l from-[#58151C]/5 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 w-[30%] h-full bg-gradient-to-r from-[#FCD34D]/5 to-transparent pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-6 relative z-10">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-16">
                     <StatCard
                         icon={<Users className="h-6 w-6" />}
                         value={settings?.stat_members || '150+'}
-                        label="Active_Agents"
+                        label="Active Members"
+                        accent="bg-[#58151C]"
                     />
                     <StatCard
                         icon={<Calendar className="h-6 w-6" />}
                         value={settings?.stat_events || '25+'}
-                        label="Missions_Executed"
+                        label="Events Conducted"
+                        accent="bg-[#C3161C]"
                     />
                     <StatCard
                         icon={<Trophy className="h-6 w-6" />}
                         value={settings?.stat_competitions || '10+'}
-                        label="CTF_Victories"
+                        label="Competitions"
+                        accent="bg-[#D97706]"
                     />
                     <StatCard
-                        icon={<Globe className="h-6 w-6" />}
+                        icon={<Zap className="h-6 w-6" />}
                         value={settings?.stat_partners || '5+'}
-                        label="Strategic_Alliances"
+                        label="Industry Partners"
+                        accent="bg-[#059669]"
                     />
                 </div>
             </div>
@@ -36,16 +41,16 @@ export default function StatsSection({ settings }: { settings?: SiteSettings | n
     )
 }
 
-function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+function StatCard({ icon, value, label, accent }: { icon: React.ReactNode; value: string; label: string; accent: string }) {
     return (
-        <div className="flex flex-col items-center group">
-            <div className="mb-4 p-4 rounded-full bg-[#111113] border border-[#27272A] text-[#10B981] group-hover:scale-110 group-hover:border-[#10B981] transition-all duration-300">
+        <div className="flex flex-col items-center group text-center">
+            <div className={`mb-6 p-5 rounded-2xl ${accent} text-white shadow-xl transition-all duration-300 group-hover:-translate-y-2 group-hover:scale-110`}>
                 {icon}
             </div>
-            <div className="font-mono font-bold text-4xl text-[#F8FAFC] mb-2">
+            <div className="font-poppins font-bold text-4xl md:text-5xl text-[#111827] mb-2">
                 {value}
             </div>
-            <div className="text-xs font-mono text-[#52525B] uppercase tracking-wider">
+            <div className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">
                 {label}
             </div>
         </div>

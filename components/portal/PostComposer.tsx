@@ -1,27 +1,30 @@
+// components/portal/PostComposer.tsx — IIMS Collegiate Feed Composer
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { createPost } from '@/app/portal/feed/actions'
 import { useFormStatus } from 'react-dom'
-import { Send, Loader2, AlertTriangle, Terminal } from 'lucide-react'
+import { Send, Loader2, AlertTriangle, Terminal, Megaphone, FileText, Layout } from 'lucide-react'
 import { toast } from 'sonner'
+import Button from '@/components/ui/Button'
 
 function SubmitButton() {
     const { pending } = useFormStatus()
     return (
-        <button
+        <Button
             type="submit"
-            disabled={pending}
-            className="px-4 py-2 bg-[#F8FAFC] text-black font-mono text-xs font-bold rounded-sm hover:bg-[#E2E8F0] transition-colors disabled:opacity-50 flex items-center gap-2"
+            loading={pending}
+            className="rounded-xl px-6 font-bold shadow-lg shadow-red-100"
+            rightIcon={!pending && <Send className="h-4 w-4" />}
         >
-            {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
-            {pending ? 'TRANSMITTING...' : 'TRANSMIT_PAYLOAD'}
-        </button>
+            {pending ? 'Transmitting...' : 'Post Intel'}
+        </Button>
     )
 }
 
-export default function PostComposer({ userRole }: { userRole: string }) {
+export default function PostComposer({ userRole, memberName }: { userRole: string, memberName: string }) {
     const [error, setError] = useState<string | null>(null)
+    const formRef = useRef<HTMLFormElement>(null)
 
     async function action(formData: FormData) {
         const res = await createPost(null, formData)
@@ -30,49 +33,67 @@ export default function PostComposer({ userRole }: { userRole: string }) {
             toast.error(res.error)
         } else {
             setError(null)
-            toast.success('Payload transmitted successfully')
-            // Reset form manually since we don't have a ref handy, strictly speaking actionable/useFormState pattern handles this but simple reset:
-            const form = document.querySelector('form') as HTMLFormElement
-            if (form) form.reset()
+            toast.success('Information broadcasted to all operatives')
+            formRef.current?.reset()
         }
     }
 
+    const isHighPerms = ['bod', 'admin', 'superadmin'].includes(userRole)
+
     return (
-        <div className="bg-[#09090B] border border-[#27272A] rounded-sm p-4 mb-6 animate-fade-up">
-            <div className="flex items-center gap-2 mb-3 text-[#10B981] text-xs font-mono">
-                <Terminal className="h-3 w-3" />
-                <span>NEW_TRANSMISSION</span>
+        <div className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-xl mb-10 group animate-fade-up">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-[#58151C]/5 text-[#58151C]">
+                    <Terminal className="h-5 w-5" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Secure Uplink: {memberName}</span>
             </div>
 
-            <form action={action} className="space-y-4">
+            <form ref={formRef} action={action} className="space-y-6">
                 <textarea
                     name="content"
-                    placeholder="Enter payload data..."
-                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm p-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors min-h-[100px] resize-y placeholder:text-[#3F3F46]"
+                    placeholder="Share mission intel, resources or questions..."
+                    className="w-full bg-gray-50 border border-transparent rounded-2xl p-5 text-[#111827] font-medium text-sm focus:bg-white focus:border-[#58151C]/20 focus:outline-none transition-all min-h-[120px] resize-none placeholder:text-gray-400"
                     required
                 />
 
                 {error && (
-                    <div className="p-2 bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#EF4444] text-xs font-mono flex items-center gap-2">
-                        <AlertTriangle className="h-3 w-3" />
+                    <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold flex items-center gap-3 animate-shake">
+                        <AlertTriangle className="h-4 w-4" />
                         {error}
                     </div>
                 )}
 
-                <div className="flex justify-between items-center">
-                    <div className="flex gap-2">
-                        {/* Only admins can change type for now, default hidden input for 'post' */}
-                        {(userRole === 'admin' || userRole === 'superadmin') ? (
-                            <select name="type" className="bg-[#111113] border border-[#27272A] text-[#A1A1AA] text-xs font-mono rounded-sm px-2 py-1 focus:border-[#10B981] outline-none">
-                                <option value="post">General_Post</option>
-                                <option value="announcement">Priority_Announcement</option>
-                                <option value="resource">Resource_Link</option>
-                            </select>
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-50">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                        {isHighPerms ? (
+                            <div className="relative w-full sm:w-auto">
+                                <select
+                                    name="type"
+                                    className="w-full appearance-none bg-gray-50 border border-transparent text-[#111827] text-[10px] font-black uppercase tracking-widest rounded-xl px-4 py-2.5 pr-10 focus:bg-white focus:border-[#58151C]/20 outline-none cursor-pointer transition-all"
+                                >
+                                    <option value="post">General Intel</option>
+                                    <option value="announcement">Priority Alert</option>
+                                    <option value="resource">Resource Link</option>
+                                    <option value="question">Sector Inquiry</option>
+                                </select>
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <Layout className="h-4 w-4" />
+                                </div>
+                            </div>
                         ) : (
                             <input type="hidden" name="type" value="post" />
                         )}
+
+                        <div className="hidden sm:flex items-center gap-2 px-3 text-gray-300">
+                            <Megaphone className="h-4 w-4" />
+                            <FileText className="h-4 w-4" />
+                        </div>
                     </div>
-                    <SubmitButton />
+
+                    <div className="w-full sm:w-auto flex justify-end">
+                        <SubmitButton />
+                    </div>
                 </div>
             </form>
         </div>

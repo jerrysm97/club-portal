@@ -1,145 +1,234 @@
-// app/portal/dashboard/page.tsx — Stealth Terminal Command Center
-import { createClient } from '@/utils/supabase/server'
+// app/portal/dashboard/page.tsx — IIMS Collegiate Member Dashboard
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Terminal, Shield, AlertTriangle, Activity, Calendar, FileText, ArrowUpRight } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { ShieldCheck, Calendar, FileText, ArrowRight, Megaphone, Terminal, Star, Zap, Trophy, MessageSquare, ChevronRight, Box as BoxIcon } from 'lucide-react'
+import type { Member, Event as DBEvent, Post } from '@/types/database'
+import Button from '@/components/ui/Button'
+import Avatar from '@/components/ui/Avatar'
 import { formatDate } from '@/lib/utils'
-import type { Member, PublicEvent, Post } from '@/types/database'
 
 export const revalidate = 60
 
 export default async function DashboardPage() {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
+    if (!session) redirect('/portal/login')
 
     // Parallel data fetching
-    const [memberRes, eventsRes, announcementsRes] = await Promise.all([
-        supabase.from('members').select('*').eq('id', session?.user?.id!).single(),
-        supabase.from('public_events').select('*').gte('event_date', new Date().toISOString()).order('event_date').limit(3),
-        supabase.from('posts').select('*, author:members(full_name, avatar_url)').eq('type', 'announcement').order('created_at', { ascending: false }).limit(3)
+    const [memberRes, eventsRes, announcementsRes, rankRes] = await Promise.all([
+        supabase.from('members').select('*').eq('user_id', session.user.id).single(),
+        supabase
+            .from('events')
+            .select('id, title, type, starts_at, location')
+            .gte('starts_at', new Date().toISOString())
+            .eq('is_published', true)
+            .order('starts_at')
+            .limit(4),
+        supabase
+            .from('posts')
+            .select('id, title, content, created_at, type')
+            .eq('type', 'announcement')
+            .order('created_at', { ascending: false })
+            .limit(3),
+        supabase
+            .from('members')
+            .select('id', { count: 'exact', head: true })
+            .gt('points', 0) // placeholder, will refine below
     ])
 
-    const member = memberRes.data as Member
-    const events = (eventsRes.data || []) as PublicEvent[]
-    const announcements = (announcementsRes.data || []) as Post[]
+    const member = memberRes.data as unknown as Member | null
+    if (!member) redirect('/portal/login')
+    const events = (eventsRes.data ?? []) as any[]
+    const announcements = (announcementsRes.data ?? []) as any[]
+
+    // Refined rank query
+    const { count: rankCount } = await supabase
+        .from('members')
+        .select('id', { count: 'exact', head: true })
+        .gt('points', member.points || 0)
+
+    const userRank = (rankCount || 0) + 1
+
+    const isHighPerms = ['bod', 'admin', 'superadmin'].includes(member.role)
 
     return (
-        <div className="space-y-8 animate-fade-up">
+        <div className="space-y-10">
             {/* Welcome Banner */}
-            <div className="relative p-8 rounded-sm bg-[#09090B] border border-[#27272A] overflow-hidden">
-                <div className="absolute inset-0 hero-grid opacity-10" />
-                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div>
-                        <div className="flex items-center gap-2 text-[#10B981] mb-2 font-mono text-xs uppercase tracking-wider">
-                            <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-                            System_Online
+            <section className="relative rounded-[2.5rem] bg-[#58151C] overflow-hidden p-10 md:p-12 shadow-2xl shadow-red-100/50">
+                <div className="absolute inset-0 hero-grid opacity-20 pointer-events-none" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-white/10 to-transparent blur-3xl rounded-full translate-x-32 -translate-y-32" />
+
+                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                    <div className="flex items-center gap-6">
+                        <div className="hidden md:block p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner">
+                            <Avatar src={member.avatar_url} name={member.full_name} size="lg" className="ring-2 ring-white/10" />
                         </div>
-                        <h1 className="text-2xl md:text-3xl font-mono font-bold text-[#F8FAFC]">
-                            Welcome back, <span className="text-[#10B981]">{member.full_name.split(' ')[0]}</span>
-                        </h1>
-                        <p className="text-[#A1A1AA] font-mono text-sm mt-1">
-                            Clearance Level: <span className="text-[#F8FAFC] uppercase">{member.role}</span>
-                        </p>
+                        <div>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 text-[#FECACA] font-bold text-[10px] uppercase tracking-widest mb-4">
+                                <ShieldCheck className="h-3.5 w-3.5" />
+                                Active Session Established
+                            </div>
+                            <h1 className="text-3xl md:text-4xl font-poppins font-bold text-white leading-tight">
+                                Welcome back, <span className="text-[#FCD34D]">{member.full_name.split(' ')[0]}</span>
+                            </h1>
+                            <p className="text-[#FECACA] font-medium mt-2 flex items-center gap-2">
+                                {member.club_post || 'General Member'} <span className="h-1 w-1 rounded-full bg-white/30" /> {member.role.toUpperCase()}
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-6 bg-black/50 p-4 rounded-sm border border-[#27272A]">
+                    <div className="flex items-center gap-8 bg-black/20 backdrop-blur-xl px-10 py-6 rounded-[2rem] border border-white/10 shadow-2xl">
                         <div className="text-center">
-                            <span className="block text-xs font-mono text-[#52525B] uppercase">Rank_PTS</span>
-                            <span className="block text-xl font-mono font-bold text-[#10B981]">{member.points}</span>
+                            <span className="block text-[10px] text-[#FECACA] font-black uppercase tracking-[0.2em] mb-1">XP Points</span>
+                            <span className="block text-3xl font-poppins font-bold text-[#FCD34D]">{member.points}</span>
                         </div>
-                        <div className="w-px h-8 bg-[#27272A]" />
+                        <div className="w-px h-12 bg-white/10" />
                         <div className="text-center">
-                            <span className="block text-xs font-mono text-[#52525B] uppercase">ID_Ref</span>
-                            <span className="block text-xl font-mono font-bold text-[#F8FAFC]">#{member.student_id || 'N/A'}</span>
+                            <span className="block text-[10px] text-[#FECACA] font-black uppercase tracking-[0.2em] mb-1">Rank</span>
+                            <span className="block text-xl font-poppins font-bold text-white">
+                                #{userRank}
+                            </span>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Feed / Announcements */}
-                <div className="lg:col-span-2 space-y-6">
+            {/* Main Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                {/* Announcements & Feed News */}
+                <div className="lg:col-span-2 space-y-8">
                     <div className="flex items-center justify-between">
-                        <h2 className="flex items-center gap-2 font-mono font-bold text-[#F8FAFC]">
-                            <AlertTriangle className="h-4 w-4 text-[#EAB308]" />
-                            Priority_Intel
+                        <h2 className="text-2xl font-poppins font-bold text-[#111827] flex items-center gap-3">
+                            <Megaphone className="h-6 w-6 text-[#C3161C]" />
+                            Sector Updates
                         </h2>
-                        <Link href="/portal/feed" className="text-xs font-mono text-[#10B981] hover:underline">View_All_Comms &gt;</Link>
+                        <Link href="/portal/feed" className="text-sm font-bold text-[#C3161C] hover:underline flex items-center gap-1 group">
+                            Full Archive <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Link>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-6">
                         {announcements.length > 0 ? (
-                            announcements.map(post => (
-                                <div key={post.id} className="p-5 rounded-sm bg-[#111113] border border-[#27272A] hover:border-[#27272A]/80 transition-colors">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <span className="px-2 py-0.5 rounded-full bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/20 text-[10px] font-mono uppercase">Announcement</span>
-                                        <span className="text-[#52525B] text-xs font-mono">{formatDate(post.created_at)}</span>
+                            announcements.map((post, idx) => (
+                                <div
+                                    key={post.id}
+                                    className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#58151C]/10 transition-all group"
+                                    style={{ animationDelay: `${idx * 100}ms` }}
+                                >
+                                    <div className="flex items-center justify-between mb-6">
+                                        <span className="px-3 py-1 rounded-lg bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-widest border border-amber-100">
+                                            High Priority
+                                        </span>
+                                        <span className="text-gray-400 text-xs font-bold font-mono">
+                                            {formatDate(post.created_at)}
+                                        </span>
                                     </div>
-                                    <h3 className="text-lg font-mono font-bold text-[#F8FAFC] mb-2">{post.title}</h3>
-                                    <p className="text-[#A1A1AA] text-sm line-clamp-2">{post.content}</p>
+                                    {post.title && (
+                                        <h3 className="text-xl font-poppins font-bold text-[#111827] mb-3 group-hover:text-[#C3161C] transition-colors">{post.title}</h3>
+                                    )}
+                                    <p className="text-gray-500 text-base leading-relaxed line-clamp-2 mb-6 font-medium">{post.content}</p>
+                                    <Link href={`/portal/feed/${post.id}`} className="inline-flex items-center gap-2 text-sm font-bold text-[#58151C] group-hover:gap-3 transition-all">
+                                        Read Intel Briefing <ChevronRight className="h-4 w-4" />
+                                    </Link>
                                 </div>
                             ))
                         ) : (
-                            <div className="p-8 text-center border border-dashed border-[#27272A] rounded-sm text-[#52525B] font-mono italic">
-                                No active priority communications.
+                            <div className="bg-gray-50 p-12 rounded-[2rem] border-2 border-dashed border-gray-200 text-center">
+                                <Box className="h-10 w-10 text-gray-300 mx-auto mb-4" />
+                                <p className="text-gray-500 font-bold">No active announcements detected.</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Sidebar Widgets */}
-                <div className="space-y-8">
-                    {/* Upcoming Missions */}
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="flex items-center gap-2 font-mono font-bold text-[#F8FAFC]">
-                                <Calendar className="h-4 w-4 text-[#06B6D4]" />
-                                Upcoming_Missions
+                {/* Sidebar Intel */}
+                <div className="space-y-10">
+                    {/* Quick Command */}
+                    {isHighPerms && (
+                        <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-[#58151C]/5 rounded-bl-[4rem] group-hover:bg-[#58151C]/10 transition-colors" />
+                            <h2 className="text-lg font-poppins font-bold text-[#111827] mb-6 flex items-center gap-2">
+                                <ShieldCheck className="h-5 w-5 text-[#C3161C]" />
+                                Command Center
                             </h2>
-                            <Link href="/portal/events" className="text-xs font-mono text-[#06B6D4] hover:underline">View_Log &gt;</Link>
+                            <div className="grid grid-cols-1 gap-3">
+                                <Button size="sm" className="rounded-xl font-bold justify-start px-5 h-11" leftIcon={<Star className="h-4 w-4" />}>
+                                    Create Announcement
+                                </Button>
+                                <Button variant="outline" size="sm" className="rounded-xl font-bold border-2 justify-start px-5 h-11" leftIcon={<Calendar className="h-4 w-4" />}>
+                                    Schedule Mission
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Upcoming Missions */}
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-lg font-poppins font-bold text-[#111827] flex items-center gap-2">
+                                <Calendar className="h-5 w-5 text-blue-600" />
+                                Next Missions
+                            </h2>
+                            <Link href="/portal/events" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">
+                                All Registry
+                            </Link>
                         </div>
 
-                        <div className="space-y-3">
-                            {events.length > 0 ? (
-                                events.map(event => (
-                                    <Link key={event.id} href={`/portal/events/${event.id}`} className="block p-4 rounded-sm bg-[#111113] border border-[#27272A] hover:border-[#06B6D4]/50 transition-colors group">
-                                        <div className="flex justify-between mb-1">
-                                            <span className="text-[#06B6D4] font-mono text-xs">{formatDate(event.event_date)}</span>
-                                            <ArrowUpRight className="h-3 w-3 text-[#52525B] group-hover:text-[#06B6D4] transition-colors" />
-                                        </div>
-                                        <h4 className="font-mono font-bold text-[#F8FAFC] text-sm truncate">{event.title}</h4>
-                                        <div className="flex items-center gap-1 mt-2 text-[#52525B] text-xs font-mono">
-                                            <div className={`w-1.5 h-1.5 rounded-full ${event.type.toLowerCase().includes('ctf') ? 'bg-[#EF4444]' : 'bg-[#10B981]'}`} />
+                        <div className="space-y-4">
+                            {events.map((event) => (
+                                <Link
+                                    key={event.id}
+                                    href={`/portal/events/${event.id}`}
+                                    className="block bg-white p-5 rounded-2xl border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all group"
+                                >
+                                    <span className="block text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1.5">
+                                        {formatDate(event.starts_at || '')}
+                                    </span>
+                                    <h4 className="font-bold text-[#111827] text-sm group-hover:text-[#C3161C] transition-colors line-clamp-1">
+                                        {event.title}
+                                    </h4>
+                                    <div className="flex items-center gap-3 mt-3">
+                                        <span className="px-2 py-0.5 rounded-lg bg-gray-50 text-gray-400 text-[9px] font-black uppercase border border-gray-100">
                                             {event.type}
-                                        </div>
-                                    </Link>
-                                ))
-                            ) : (
-                                <div className="p-4 text-center border border-dashed border-[#27272A] rounded-sm text-[#52525B] font-mono text-xs">
-                                    No upcoming missions.
-                                </div>
-                            )}
+                                        </span>
+                                    </div>
+                                </Link>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Quick Actions */}
-                    <div>
-                        <h2 className="flex items-center gap-2 font-mono font-bold text-[#F8FAFC] mb-4">
-                            <Terminal className="h-4 w-4 text-[#10B981]" />
-                            Quick_Access
-                        </h2>
-                        <div className="grid grid-cols-2 gap-3">
-                            <Link href="/portal/ctf" className="p-3 rounded-sm bg-[#27272A]/30 border border-[#27272A] hover:bg-[#27272A]/50 hover:text-[#10B981] transition-colors text-center">
-                                <Shield className="h-5 w-5 mx-auto mb-2 text-[#A1A1AA]" />
-                                <span className="block text-xs font-mono font-bold">CTF_Arena</span>
-                            </Link>
-                            <Link href="/portal/resources" className="p-3 rounded-sm bg-[#27272A]/30 border border-[#27272A] hover:bg-[#27272A]/50 hover:text-[#10B981] transition-colors text-center">
-                                <FileText className="h-5 w-5 mx-auto mb-2 text-[#A1A1AA]" />
-                                <span className="block text-xs font-mono font-bold">Archives</span>
-                            </Link>
-                        </div>
+                    {/* Quick Modals / Tools */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <Link href="/portal/ctf" className="flex flex-col items-center justify-center p-6 rounded-[1.5rem] bg-emerald-50 border border-emerald-100 group hover:bg-emerald-600 transition-all shadow-sm">
+                            <Trophy className="h-6 w-6 text-emerald-600 mb-2 group-hover:text-white transition-colors" />
+                            <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest group-hover:text-white">Arena</span>
+                        </Link>
+                        <Link href="/portal/messages" className="flex flex-col items-center justify-center p-6 rounded-[1.5rem] bg-indigo-50 border border-indigo-100 group hover:bg-indigo-600 transition-all shadow-sm">
+                            <MessageSquare className="h-6 w-6 text-indigo-600 mb-2 group-hover:text-white transition-colors" />
+                            <span className="text-[10px] font-black text-indigo-800 uppercase tracking-widest group-hover:text-white">Comm</span>
+                        </Link>
                     </div>
                 </div>
             </div>
         </div>
+    )
+}
+
+function Box({ className }: { className?: string }) {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+            <path d="m3.3 7 8.7 5 8.7-5" />
+            <path d="M12 22V12" />
+        </svg>
     )
 }

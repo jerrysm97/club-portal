@@ -1,47 +1,68 @@
-// components/ui/Modal.tsx — Reusable dark modal
+// components/ui/Modal.tsx — IIMS Collegiate modal dialog
 'use client'
-
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface ModalProps {
     open: boolean
     onClose: () => void
-    title: string
+    title?: string
     children: React.ReactNode
-    maxWidth?: string
+    size?: 'sm' | 'md' | 'lg'
+    className?: string
 }
 
-export default function Modal({ open, onClose, title, children, maxWidth = 'max-w-md' }: ModalProps) {
-    const overlayRef = useRef<HTMLDivElement>(null)
+const sizeMap = {
+    sm: 'max-w-sm',
+    md: 'max-w-lg',
+    lg: 'max-w-2xl',
+}
 
+export default function Modal({ open, onClose, title, children, size = 'md', className }: ModalProps) {
     useEffect(() => {
         if (!open) return
-        const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-        document.addEventListener('keydown', handleEsc)
-        document.body.style.overflow = 'hidden'
-        return () => {
-            document.removeEventListener('keydown', handleEsc)
-            document.body.style.overflow = ''
-        }
+        const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+        document.addEventListener('keydown', handleKey)
+        return () => document.removeEventListener('keydown', handleKey)
     }, [open, onClose])
 
     if (!open) return null
 
     return (
         <div
-            ref={overlayRef}
-            onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
         >
-            <div className={`bg-[#09090B] border border-[#27272A] rounded-md p-6 ${maxWidth} w-full mx-4 animate-fade-up`}>
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-mono font-bold text-[#F8FAFC] text-lg">{title}</h2>
-                    <button onClick={onClose} className="text-[#A1A1AA] hover:text-[#F8FAFC] transition-colors">
-                        <X className="h-5 w-5" />
-                    </button>
-                </div>
-                {children}
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                onClick={onClose}
+                aria-hidden="true"
+            />
+
+            {/* Panel */}
+            <div
+                className={cn(
+                    'relative w-full bg-white border border-[#E5E7EB] rounded-xl shadow-xl',
+                    sizeMap[size],
+                    className
+                )}
+            >
+                {title && (
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E7EB]">
+                        <h2 className="font-semibold text-[#111827] font-poppins">{title}</h2>
+                        <button
+                            onClick={onClose}
+                            className="p-1 rounded-md text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] transition-colors"
+                            aria-label="Close modal"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
+                )}
+                <div className="p-6">{children}</div>
             </div>
         </div>
     )

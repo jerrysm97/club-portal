@@ -1,54 +1,73 @@
-// app/portal/messages/layout.tsx
-import { createClient } from '@/utils/supabase/server'
-import ConversationList from '@/components/portal/ConversationList'
-import type { Conversation, Member } from '@/types/database'
+// app/portal/messages/layout.tsx — IIMS Collegiate Messaging Shell
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import ConversationList from '@/components/portal/ConversationList'
+import type { Member } from '@/types/database'
 
 export const revalidate = 0
 
 export default async function MessagesLayout({ children }: { children: React.ReactNode }) {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) redirect('/portal/login')
 
-    // Fetch conversations
-    // Since we don't have a simple join for participants in Supabase PostgREST (needs M2M View),
-    // we'll fetch conversations first, then participants. 
-    // OR use a view. Let's assume we can fetch basic view or construct it.
+    // Get current member
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single()
 
-    // Actually, standard way is: select *, participants:conversation_participants(...)
-    // But that gives nested array.
+    if (!member) redirect('/portal/login')
 
-    const { data: convosData } = await supabase
-        .from('conversations')
+    // To build a conversation list in a simplified model:
+    // 1. Fetch all messages where user is sender or receiver
+    // 2. Extract unique 'other' members
+    // 3. Fetch these members' details and their latest message
+    const { data: rawMessages } = await (supabase
+        .from('messages' as any) as any)
         .select(`
-        *,
-        participants:conversation_participants(
-            member:members(id, full_name, avatar_url)
-        )
+      id,
+      content,
+      created_at,
+      sender_id,
+      receiver_id,
+      is_read,
+      sender:members!sender_id(id, full_name, avatar_url),
+      receiver:members!receiver_id(id, full_name, avatar_url)
     `)
-        .order('updated_at', { ascending: false })
+        .or(`sender_id.eq.${(member as any).id},receiver_id.eq.${(member as any).id}`)
+        .order('created_at', { ascending: false })
 
-    // Transform data
-    const conversations = (convosData || []).map((c: any) => {
-        // Find 'other' participant
-        const participants = c.participants.map((p: any) => p.member)
-        const otherUser = participants.find((p: any) => p.id !== session.user.id) || participants[0]
+    // Aggregate into threads
+    const threadsMap = new Map()
 
-        return {
-            ...c,
-            participants,
-            otherParticipant: otherUser
-        }
-    })
+        ; (rawMessages || []).forEach((msg: any) => {
+            const otherMember = msg.sender_id === (member as any).id ? msg.receiver : msg.sender
+            if (!otherMember) return
+
+            if (!threadsMap.has(otherMember.id)) {
+                threadsMap.set(otherMember.id, {
+                    otherMember,
+                    lastMessage: msg,
+                    unreadCount: (msg.receiver_id === (member as any).id && !msg.is_read) ? 1 : 0
+                })
+            } else {
+                if (msg.receiver_id === (member as any).id && !msg.is_read) {
+                    threadsMap.get(otherMember.id).unreadCount++
+                }
+            }
+        })
+
+    const conversations = Array.from(threadsMap.values())
 
     return (
-        <div className="flex h-[calc(100vh-100px)] border border-[#27272A] rounded-sm overflow-hidden animate-fade-up">
-            <div className="w-80 hidden md:block border-r border-[#27272A]">
-                <ConversationList conversations={conversations} />
+        <div className="flex bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl overflow-hidden h-[calc(100vh-160px)] animate-fade-up">
+            <div className="w-80 hidden lg:block border-r border-gray-100 bg-gray-50/50">
+                <ConversationList conversations={conversations} currentMemberId={(member as any).id} />
             </div>
-            <div className="flex-1 bg-[#09090B]">
+            <div className="flex-1 bg-white relative">
                 {children}
             </div>
         </div>

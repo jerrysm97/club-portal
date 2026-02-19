@@ -1,77 +1,66 @@
+// app/portal/ctf/actions.ts — IIMS Collegiate CTF Actions
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export async function submitFlag(challengeId: string, flag: string) {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) return { error: 'Unauthorized uplink' }
 
-    // Rate limiting could go here, but skipping for MVP
-
-    // Fetch challenge to check flag
-    // Note: In a real CTF platform, flags should be hashed or checked via secure function. 
-    // For this club portal, we assume the flag is stored in a separate verification table or checking against a secret field 
-    // that we didn't expose in the Public `CTFChallenge` type (which is good).
-    // However, looking at the type definition `CTFChallenge`, I see `flag_format`. 
-    // I actually don't see a `flag` field in the public type, which is correct (it shouldn't be public).
-    // I'll assume there is a `flag` column in the database that is not selected in the public type,
-    // OR we need to use an RPC to check it securely.
-    // For this generic implementation without RPC details, I'll assume I can fetch it with service role or strictly eq check.
-    // Actually, standard pattern: `select id from ctf_challenges where id = ? and flag = ?`
-
-    const { data: validChallenge } = await supabase
-        .from('ctf_challenges')
+    // Get current member
+    const { data: member } = await supabase
+        .from('members')
         .select('id, points')
-        .eq('id', challengeId)
-        .eq('flag', flag.trim()) // Direct check
+        .eq('user_id', session.user.id)
         .single()
 
-    if (!validChallenge) {
+    if (!member) return { error: 'Operative identity not found' }
+
+    // Fetch challenge to check flag
+    const { data: challenge } = await (supabase
+        .from('ctf_challenges' as any) as any)
+        .select('id, points, flag')
+        .eq('id', challengeId)
+        .single()
+
+    if (!challenge) return { error: 'Challenge invalid or redacted' }
+
+    if ((challenge as any).flag !== flag.trim()) {
         return { error: 'Access Denied: Invalid Flag Sequence' }
     }
 
-    // Check if already solved
-    const { data: existingSolve } = await supabase
-        .from('ctf_solves')
+    // Check if already solved (using new ctf_submissions table)
+    const { data: existingSolve } = await (supabase
+        .from('ctf_submissions' as any) as any)
         .select('id')
         .eq('challenge_id', challengeId)
-        .eq('member_id', session.user.id)
-        .single()
+        .eq('member_id', (member as any).id)
+        .maybeSingle()
 
     if (existingSolve) {
-        return { error: 'Challenge already pwned' }
+        return { error: 'Challenge already pwned by your operative unit' }
     }
 
-    // Record solve
-    const { error } = await supabase.from('ctf_solves').insert({
+    // Record solve in ctf_submissions
+    const { error } = await (supabase.from('ctf_submissions' as any) as any).insert({
         challenge_id: challengeId,
-        member_id: session.user.id,
+        member_id: (member as any).id,
         solved_at: new Date().toISOString()
     })
 
-    // Update user points
-    if (!error) {
-        // Trigger points update via RPC or manual
-        // RPC `increment_score` is safer
-        const { error: rpcError } = await supabase.rpc('increment_score', {
-            user_id: session.user.id,
-            amount: validChallenge.points
-        })
+    if (error) return { error: 'Database write failed during capture' }
 
-        // Fallback manual update if RPC missing
-        if (rpcError) {
-            const { data: member } = await supabase.from('members').select('points').eq('id', session.user.id).single()
-            if (member) {
-                await supabase.from('members').update({ points: member.points + validChallenge.points }).eq('id', session.user.id)
-            }
-        }
-    }
-
-    if (error) return { error: 'Database write failed' }
+    // Update user points - Using a direct update since we have the data
+    const newPoints = ((member as any).points || 0) + ((challenge as any).points || 0)
+    await (supabase
+        .from('members' as any) as any)
+        .update({ points: newPoints })
+        .eq('id', (member as any).id)
 
     revalidatePath('/portal/ctf')
-    return { success: true, points: validChallenge.points }
+    revalidatePath('/portal/dashboard')
+    return { success: true, points: challenge.points }
 }

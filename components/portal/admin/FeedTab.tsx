@@ -1,74 +1,94 @@
+// components/portal/admin/FeedTab.tsx — IIMS Collegiate Transmission Ops
 'use client'
 
-import { Trash2, Pin, Eye, EyeOff } from 'lucide-react'
-import { deletePost, togglePinPost } from '@/app/portal/admin/actions'
-import { toast } from 'sonner'
-import type { Post } from '@/types/database'
+import { useState } from 'react'
+import { Trash2, Megaphone, Calendar, User, ExternalLink, Link2, Pin, Trash } from 'lucide-react'
+import { deletePost } from '@/app/portal/admin/actions'
 import { formatDate } from '@/lib/utils'
+import { toast } from 'sonner'
+import Avatar from '@/components/ui/Avatar'
+import { cn } from '@/lib/utils'
 
-export default function FeedTab({ posts }: { posts: Post[] }) {
-
-    async function handlePin(post: Post) {
-        const res = await togglePinPost(post.id, !post.is_pinned)
-        if (res?.error) toast.error(res.error)
-        else toast.success(`Post ${post.is_pinned ? 'unpinned' : 'pinned'}`)
-    }
+export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () => void }) {
+    const [isLoading, setIsLoading] = useState<string | null>(null)
 
     async function handleDelete(id: string) {
-        if (!confirm('Delete this post?')) return
+        if (!confirm('Purge Transmission? This action is absolute.')) return
+        setIsLoading(id)
         const res = await deletePost(id)
+        setIsLoading(null)
         if (res?.error) toast.error(res.error)
-        else toast.success('Post deleted')
+        else {
+            toast.success('Transmission purged from uplink')
+            refresh()
+        }
     }
 
     return (
-        <div className="space-y-6 animate-fade-up">
-            <div>
-                <h2 className="text-xl font-mono font-bold text-[#F8FAFC]">Intel_Feed_Control</h2>
-                <p className="text-[#A1A1AA] font-mono text-sm">Moderate posts and manage announcements.</p>
-            </div>
-
-            <div className="space-y-3">
+        <div className="space-y-8 animate-fade-up">
+            <div className="grid grid-cols-1 gap-6">
                 {posts.map(post => (
-                    <div key={post.id} className="p-4 bg-[#111113] border border-[#27272A] rounded-sm flex justify-between items-start">
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                {post.is_pinned && (
-                                    <span className="text-[10px] bg-[#EAB308]/20 text-[#EAB308] border border-[#EAB308]/30 px-1.5 rounded-sm font-mono uppercase">Pinned</span>
-                                )}
-                                <span className={`text-[10px] border px-1.5 rounded-sm font-mono uppercase ${post.type === 'announcement' ? 'border-[#F43F5E]/30 text-[#F43F5E]' : 'border-[#27272A] text-[#A1A1AA]'
-                                    }`}>
-                                    {post.type}
+                    <div key={post.id} className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#58151C]/10 transition-all group flex flex-col md:flex-row gap-8 items-start">
+                        <div className="flex-1 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <span className={cn(
+                                        "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
+                                        post.type === 'announcement' ? "bg-amber-50 text-amber-700 border-amber-100" : "bg-gray-50 text-gray-500 border-gray-200"
+                                    )}>
+                                        {post.type || 'Standard'} Directive
+                                    </span>
+                                    {post.is_pinned && <Pin className="h-3.5 w-3.5 text-[#C3161C]" />}
+                                </div>
+                                <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                                    {formatDate(post.created_at)}
                                 </span>
-                                <span className="text-xs text-[#52525B] font-mono">{formatDate(post.created_at)}</span>
                             </div>
-                            <h3 className="text-[#F8FAFC] font-mono font-bold text-sm mb-1">{post.title || 'Untitled Post'}</h3>
-                            <p className="text-[#A1A1AA] text-sm line-clamp-2 max-w-2xl">{post.content}</p>
-                            <div className="text-xs text-[#52525B] mt-2 font-mono">
-                                Author: {post.author?.full_name || 'Unknown'}
+
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-poppins font-black text-[#111827] group-hover:text-[#C3161C] transition-colors">
+                                    {post.title || 'Untitled Transmission'}
+                                </h3>
+                                <p className="text-gray-500 font-medium text-sm line-clamp-2 leading-relaxed">
+                                    {post.content}
+                                </p>
+                            </div>
+
+                            <div className="flex items-center gap-4 pt-4">
+                                <Avatar src={post.author?.avatar_url} name={post.author?.full_name} size="xs" />
+                                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    Relayed by <span className="text-[#58151C]">{post.author?.full_name || 'System'}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => handlePin(post)}
-                                className={`p-2 rounded-sm transition-colors border ${post.is_pinned
-                                        ? 'bg-[#EAB308]/10 text-[#EAB308] border-[#EAB308]/30'
-                                        : 'border-[#27272A] text-[#A1A1AA] hover:text-[#F8FAFC]'
-                                    }`}
-                                title="Toggle Pin"
-                            >
-                                <Pin className="h-4 w-4" />
-                            </button>
+                        <div className="flex md:flex-col gap-2 w-full md:w-auto mt-4 md:mt-0">
                             <button
                                 onClick={() => handleDelete(post.id)}
-                                className="p-2 rounded-sm border border-[#27272A] text-[#F43F5E] hover:bg-[#F43F5E]/10 transition-colors"
+                                disabled={!!isLoading}
+                                className="flex-1 md:w-12 h-12 bg-gray-50 hover:bg-gray-900 text-gray-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-gray-100 shadow-sm"
+                                title="Abort Transmission"
                             >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash className="h-5 w-5" />
                             </button>
+                            <a
+                                href={`/portal/feed/${post.id}`}
+                                target="_blank"
+                                className="flex-1 md:w-12 h-12 bg-gray-50 hover:bg-[#58151C] text-gray-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-gray-100 shadow-sm"
+                                title="View Frequency"
+                            >
+                                <ExternalLink className="h-5 w-5" />
+                            </a>
                         </div>
                     </div>
                 ))}
+
+                {posts.length === 0 && (
+                    <div className="py-24 text-center bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
+                        <Megaphone className="h-12 w-12 text-gray-200 mx-auto mb-4" />
+                        <p className="text-gray-400 font-black text-lg uppercase tracking-widest">Uplink Silent</p>
+                    </div>
+                )}
             </div>
         </div>
     )

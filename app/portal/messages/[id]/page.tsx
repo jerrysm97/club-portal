@@ -1,40 +1,55 @@
-// app/portal/messages/[id]/page.tsx
-import { createClient } from '@/utils/supabase/server'
+// app/portal/messages/[id]/page.tsx — Direct Member Chat
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import ChatWindow from '@/components/portal/ChatWindow'
 import type { Message, Member } from '@/types/database'
-import { redirect } from 'next/navigation'
+import { redirect, notFound } from 'next/navigation'
 
 export const revalidate = 0
 
 export default async function MessageThreadPage({ params }: { params: { id: string } }) {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) redirect('/portal/login')
 
-    // Fetch messages
-    const { data: messages } = await supabase
-        .from('messages')
+    // Identify current member
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id, full_name, avatar_url')
+        .eq('user_id', session.user.id)
+        .single()
+
+    if (!member) redirect('/portal/login')
+
+    // Identify 'other' member
+    const { data: otherUser } = await (supabase
+        .from('members' as any) as any)
+        .select('id, full_name, avatar_url, role, club_post')
+        .eq('id', params.id)
+        .single()
+
+    if (!otherUser) return notFound()
+
+    // Fetch direct messages between these two
+    const { data: messages } = await (supabase
+        .from('messages' as any) as any)
         .select('*')
-        .eq('conversation_id', params.id)
+        .or(`and(sender_id.eq.${(member as any).id},receiver_id.eq.${(otherUser as any).id}),and(sender_id.eq.${(otherUser as any).id},receiver_id.eq.${(member as any).id})`)
         .order('created_at', { ascending: true })
 
-    // Fetch conversation participants to identify 'other' user
-    const { data: participants } = await supabase
-        .from('conversation_participants')
-        .select('member:members(id, full_name, avatar_url)')
-        .eq('conversation_id', params.id)
-
-    const memberList = (participants || []).map((p: any) => p.member)
-    const otherUser = memberList.find((m: any) => m.id !== session.user.id) || { full_name: 'Unknown', avatar_url: null, id: 'unknown' }
-    const currentUser = memberList.find((m: any) => m.id === session.user.id) || { id: session.user.id } as Member
+    // Update as read (simplified: mark all from 'other' to 'me' as read)
+    await (supabase
+        .from('messages' as any) as any)
+        .update({ is_read: true })
+        .eq('sender_id', (otherUser as any).id)
+        .eq('receiver_id', (member as any).id)
+        .eq('is_read', false)
 
     return (
         <ChatWindow
-            conversationId={params.id}
-            initialMessages={(messages || []) as Message[]}
-            currentUser={currentUser}
-            otherUser={otherUser}
+            initialMessages={(messages || []) as unknown as Message[]}
+            currentUser={member as any}
+            otherUser={otherUser as any}
         />
     )
 }

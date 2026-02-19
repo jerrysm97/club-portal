@@ -1,30 +1,53 @@
-// components/ui/Badge.tsx — Styled badge with color variants
+// components/ui/Badge.tsx — IIMS Collegiate status badges
 import { cn } from '@/lib/utils'
 
-type BadgeColor = 'cyan' | 'green' | 'red' | 'amber' | 'gray'
-
 interface BadgeProps {
+    variant?: 'default' | 'success' | 'warning' | 'danger' | 'maroon' | 'info' | 'outline'
     children: React.ReactNode
-    color?: BadgeColor
     className?: string
 }
 
-const colorStyles: Record<BadgeColor, string> = {
-    cyan: 'text-[#06B6D4] bg-[#06B6D4]/10 border-[#06B6D4]/30',
-    green: 'text-[#10B981] bg-[#10B981]/10 border-[#10B981]/30',
-    red: 'text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/30',
-    amber: 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/30',
-    gray: 'text-[#A1A1AA] bg-[#27272A] border-[#27272A]',
+const variants: Record<string, string> = {
+    default: 'bg-[#F3F4F6] text-[#374151]',
+    success: 'bg-[#D1FAE5] text-[#065F46]',
+    warning: 'bg-[#FEF3C7] text-[#92400E]',
+    danger: 'bg-[#FEE2E2] text-[#991B1B]',
+    maroon: 'bg-[#58151C] text-white',
+    info: 'bg-[#DBEAFE] text-[#1E40AF]',
+    outline: 'border border-[#E5E7EB] text-[#374151] bg-transparent',
 }
 
-export default function Badge({ children, color = 'gray', className }: BadgeProps) {
+export default function Badge({ variant = 'default', children, className }: BadgeProps) {
     return (
-        <span className={cn(
-            'font-mono text-xs px-2 py-0.5 rounded-full border inline-flex items-center',
-            colorStyles[color],
-            className
-        )}>
+        <span
+            className={cn(
+                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                variants[variant],
+                className
+            )}
+        >
             {children}
         </span>
     )
+}
+
+// Status-specific helpers
+export function MemberStatusBadge({ status }: { status: string }) {
+    const map: Record<string, 'warning' | 'success' | 'danger' | 'default'> = {
+        pending: 'warning',
+        approved: 'success',
+        rejected: 'danger',
+        banned: 'danger',
+    }
+    return <Badge variant={map[status] ?? 'default'}>{status}</Badge>
+}
+
+export function RoleBadge({ role }: { role: string }) {
+    const map: Record<string, 'maroon' | 'danger' | 'info' | 'default'> = {
+        superadmin: 'maroon',
+        admin: 'danger',
+        bod: 'info',
+        member: 'default',
+    }
+    return <Badge variant={map[role] ?? 'default'}>{role}</Badge>
 }

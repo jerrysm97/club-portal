@@ -1,155 +1,126 @@
+// components/portal/admin/CTFTab.tsx — IIMS Collegiate Arena Operations
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, Trophy, Edit2, Flag } from 'lucide-react'
-import { upsertChallenge, deleteChallenge } from '@/app/portal/admin/actions'
+import { Trophy, Target, Shield, Globe, Cpu, Key, Plus, Edit2, Trash2, Eye, EyeOff, BarChart3 } from 'lucide-react'
+import { updateChallengeStatus } from '@/app/portal/admin/actions'
+import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import type { CTFChallenge } from '@/types/database'
 
-export default function CTFTab({ challenges }: { challenges: CTFChallenge[] }) {
-    const [isEditing, setIsEditing] = useState(false)
-    const [form, setForm] = useState<Partial<CTFChallenge> & { flag?: string }>({})
+export default function CTFTab({ challenges, refresh }: { challenges: any[], refresh: () => void }) {
+    const [isLoading, setIsLoading] = useState<string | null>(null)
 
-    function startEdit(challenge?: CTFChallenge) {
-        setForm(challenge || {
-            title: '',
-            description: '',
-            category: 'web',
-            difficulty: 'easy',
-            points: 100,
-            is_active: true,
-            flag_format: 'flag{...}'
-        })
-        setIsEditing(true)
-    }
-
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        const res = await upsertChallenge(form)
+    async function handleToggleStatus(id: string, currentStatus: boolean) {
+        setIsLoading(id)
+        const res = await updateChallengeStatus(id, !currentStatus)
+        setIsLoading(null)
         if (res?.error) toast.error(res.error)
         else {
-            toast.success('Challenge manifest updated')
-            setIsEditing(false)
+            toast.success(`Challenge ${!currentStatus ? 'activated' : 'deactivated'}`)
+            refresh()
         }
     }
 
-    async function handleDelete(id: string) {
-        if (!confirm('Decommission this challenge?')) return
-        const res = await deleteChallenge(id)
-        if (res?.error) toast.error(res.error)
-        else toast.success('Challenge decommissioned')
+    const getIcon = (category: string) => {
+        switch (category) {
+            case 'web': return <Globe className="h-5 w-5" />
+            case 'pwn': return <Shield className="h-5 w-5" />
+            case 'reverse': return <Cpu className="h-5 w-5" />
+            case 'crypto': return <Key className="h-5 w-5" />
+            default: return <Target className="h-5 w-5" />
+        }
     }
 
     return (
-        <div className="space-y-6 animate-fade-up">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-xl font-mono font-bold text-[#F8FAFC]">CTF_Arena_Control</h2>
-                    <p className="text-[#A1A1AA] font-mono text-sm">Deploy and manage wargame challenges.</p>
-                </div>
-                <button
-                    onClick={() => startEdit()}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#EAB308] text-black font-mono text-xs font-bold rounded-sm hover:bg-[#FACC15] transition-colors"
-                >
-                    <Plus className="h-4 w-4" /> DEPLOY_CHALLENGE
+        <div className="space-y-10 animate-fade-up">
+            <div className="flex justify-end">
+                <button className="bg-[#58151C] text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-xl shadow-red-900/10 flex items-center gap-3 hover:translate-y-[-2px] transition-all hover:bg-[#C3161C]">
+                    <Plus className="h-5 w-5" /> New Arena Challenge
                 </button>
             </div>
 
-            {isEditing && (
-                <form onSubmit={handleSubmit} className="p-6 bg-[#111113] border border-[#27272A] rounded-sm space-y-4 mb-8">
-                    <h3 className="text-[#F8FAFC] font-mono font-bold">{form.id ? 'Edit Protocol' : 'New Protocol'}</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <input
-                            placeholder="Challenge Title"
-                            className="bg-[#09090B] border border-[#27272A] p-2 text-[#F8FAFC] text-sm font-mono rounded-sm"
-                            value={form.title || ''}
-                            onChange={e => setForm({ ...form, title: e.target.value })}
-                            required
-                        />
-                        <div className="flex gap-2">
-                            <select
-                                className="bg-[#09090B] border border-[#27272A] p-2 text-[#F8FAFC] text-sm font-mono rounded-sm flex-1"
-                                value={form.category || 'web'}
-                                onChange={e => setForm({ ...form, category: e.target.value as any })}
-                            >
-                                <option value="web">Web</option>
-                                <option value="pwn">Pwn</option>
-                                <option value="crypto">Crypto</option>
-                                <option value="forensics">Forensics</option>
-                                <option value="misc">Misc</option>
-                            </select>
-                            <select
-                                className="bg-[#09090B] border border-[#27272A] p-2 text-[#F8FAFC] text-sm font-mono rounded-sm flex-1"
-                                value={form.difficulty || 'easy'}
-                                onChange={e => setForm({ ...form, difficulty: e.target.value as any })}
-                            >
-                                <option value="easy">Easy</option>
-                                <option value="medium">Medium</option>
-                                <option value="hard">Hard</option>
-                                <option value="insane">Insane</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <input
-                            placeholder="Points"
-                            type="number"
-                            className="bg-[#09090B] border border-[#27272A] p-2 text-[#F8FAFC] text-sm font-mono rounded-sm"
-                            value={form.points || ''}
-                            onChange={e => setForm({ ...form, points: parseInt(e.target.value) })}
-                            required
-                        />
-                        <input
-                            placeholder="Flag (e.g. flag{...})"
-                            className="bg-[#09090B] border border-[#27272A] p-2 text-[#F8FAFC] text-sm font-mono rounded-sm border-l-4 border-l-[#EAB308]"
-                            value={form.flag || ''}
-                            onChange={e => setForm({ ...form, flag: e.target.value })}
-                        />
-                    </div>
-                    <textarea
-                        placeholder="Challenge Description..."
-                        rows={4}
-                        className="w-full bg-[#09090B] border border-[#27272A] p-2 text-[#F8FAFC] text-sm font-mono rounded-sm"
-                        value={form.description || ''}
-                        onChange={e => setForm({ ...form, description: e.target.value })}
-                    />
-                    <div className="flex justify-end gap-2">
-                        <button type="button" onClick={() => setIsEditing(false)} className="px-3 py-2 text-[#A1A1AA] hover:text-[#F8FAFC] font-mono text-sm">CANCEL</button>
-                        <button type="submit" className="px-3 py-2 bg-[#EAB308] text-black font-mono text-xs font-bold rounded-sm hover:bg-[#FACC15]">DEPLOY</button>
-                    </div>
-                </form>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {challenges.map((chal) => (
-                    <div key={chal.id} className="p-4 bg-[#111113] border border-[#27272A] rounded-sm flex flex-col justify-between group hover:border-[#EAB308]/50 transition-colors">
-                        <div>
-                            <div className="flex justify-between items-start mb-2">
-                                <h3 className="text-[#F8FAFC] font-mono font-bold text-sm">{chal.title}</h3>
-                                <span className="text-[#EAB308] font-mono font-bold text-sm">{chal.points} pts</span>
-                            </div>
-                            <div className="flex gap-2 text-[10px] font-mono uppercase mb-3">
-                                <span className="px-1.5 py-0.5 border border-[#27272A] rounded-sm text-[#A1A1AA]">{chal.category}</span>
-                                <span className="px-1.5 py-0.5 border border-[#27272A] rounded-sm text-[#A1A1AA]">{chal.difficulty}</span>
-                            </div>
-                            <p className="text-[#A1A1AA] text-xs font-mono line-clamp-2 mb-4">{chal.description}</p>
-                        </div>
-                        <div className="flex justify-between items-center border-t border-[#27272A] pt-3">
-                            <span className="text-[10px] text-[#52525B] font-mono flex items-center gap-1">
-                                <Trophy className="h-3 w-3" /> {chal.solves_count} Solves
-                            </span>
-                            <div className="flex gap-2">
-                                <button onClick={() => startEdit(chal)} className="text-[#A1A1AA] hover:text-[#F8FAFC]">
-                                    <Edit2 className="h-4 w-4" />
-                                </button>
-                                <button onClick={() => handleDelete(chal.id)} className="text-[#A1A1AA] hover:text-[#F43F5E]">
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+            <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-50/50 border-b border-gray-100">
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Challenge Intel</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Type</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Difficulty</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">XP Value</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Breaches</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ops</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {challenges.map(chal => (
+                                <tr key={chal.id} className="group hover:bg-gray-50/50 transition-all">
+                                    <td className="px-8 py-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className={cn(
+                                                "p-3 rounded-xl bg-gray-50 text-gray-400 shadow-inner group-hover:bg-white group-hover:text-[#58151C] transition-colors",
+                                                !chal.is_active && "opacity-30"
+                                            )}>
+                                                {getIcon(chal.category)}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className={cn("text-sm font-bold truncate", !chal.is_active ? "text-gray-300" : "text-[#111827]")}>{chal.title}</div>
+                                                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">{chal.category} protocol</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <span className={cn(
+                                            "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
+                                            chal.is_active ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-gray-50 text-gray-400 border-gray-200"
+                                        )}>
+                                            {chal.is_active ? 'Active' : 'Offline'}
+                                        </span>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <span className={cn(
+                                            "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
+                                            chal.difficulty === 'hard' || chal.difficulty === 'expert' ? "bg-red-50 text-[#C3161C] border-red-100" :
+                                                chal.difficulty === 'medium' ? "bg-amber-50 text-amber-700 border-amber-100" :
+                                                    "bg-blue-50 text-blue-700 border-blue-100"
+                                        )}>
+                                            {chal.difficulty}
+                                        </span>
+                                    </td>
+                                    <td className="px-8 py-6 text-center">
+                                        <span className="text-sm font-poppins font-black text-[#58151C]">{chal.points}</span>
+                                    </td>
+                                    <td className="px-8 py-6 text-center">
+                                        <div className="flex items-center justify-center gap-2 text-gray-400 text-xs font-bold">
+                                            <BarChart3 className="h-4 w-4 opacity-30" />
+                                            {chal.solved_count?.[0]?.count || 0}
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handleToggleStatus(chal.id, chal.is_active)}
+                                                disabled={!!isLoading}
+                                                className={cn(
+                                                    "p-3 rounded-xl transition-all shadow-sm border",
+                                                    chal.is_active
+                                                        ? "bg-gray-900 border-gray-800 text-white hover:bg-black"
+                                                        : "bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-600 hover:text-white"
+                                                )}
+                                                title={chal.is_active ? "Deactivate Challenge" : "Activate Challenge"}
+                                            >
+                                                {chal.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
+                                            <button className="p-3 bg-white border border-gray-100 text-[#58151C] hover:bg-[#58151C] hover:text-white rounded-xl transition-all shadow-sm">
+                                                <Edit2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )

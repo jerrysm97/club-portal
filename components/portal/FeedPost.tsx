@@ -1,24 +1,69 @@
+// components/portal/FeedPost.tsx — IIMS Collegiate Feed Item
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Avatar from '@/components/ui/Avatar'
-import { formatDate } from '@/lib/utils'
-import { MessageSquare, Heart, Share2, MoreHorizontal, AlertTriangle, FileText } from 'lucide-react'
+import { formatDate, cn } from '@/lib/utils'
+import { MessageSquare, Heart, Share2, MoreHorizontal, Megaphone, FileText, ShieldCheck, ChevronRight } from 'lucide-react'
 import { toggleReaction } from '@/app/portal/feed/actions'
 import type { Post } from '@/types/database'
-import { useOptimistic } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 interface FeedPostProps {
     post: Post
-    currentUserId: string
+    currentMemberId: string // Ensure this is member.id
 }
 
-export default function FeedPost({ post, currentUserId }: FeedPostProps) {
+export default function FeedPost({ post, currentMemberId }: FeedPostProps) {
     const [liked, setLiked] = useState(post.user_has_reacted)
     const [likesCount, setLikesCount] = useState(post.reaction_count || 0)
+    const [commentsCount, setCommentsCount] = useState(post.comment_count || 0)
 
-    // Optimistic UI could be improved here, but simple state handling for "toggle" feel is good enough for now
+    // Real-time subscription for counts & reactions
+    useEffect(() => {
+        const supabase = createClient()
+
+        // Subscribe to reactions table for this post
+        const reactionChannel = supabase.channel(`post-reactions-${post.id}`)
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'post_reactions',
+                filter: `post_id=eq.${post.id}`
+            }, async () => {
+                // Refresh counts on change — simpler than manual diffing for this scale
+                const { count } = await supabase
+                    .from('post_reactions')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('post_id', post.id)
+
+                setLikesCount(count || 0)
+            })
+            .subscribe()
+
+        // Subscribe to comments table for this post
+        const commentChannel = supabase.channel(`post-comments-${post.id}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'post_comments',
+                filter: `post_id=eq.${post.id}`
+            }, async () => {
+                const { count } = await supabase
+                    .from('post_comments')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('post_id', post.id)
+                setCommentsCount(count || 0)
+            })
+            .subscribe()
+
+        return () => {
+            reactionChannel.unsubscribe()
+            commentChannel.unsubscribe()
+        }
+    }, [post.id])
+
     async function handleLike() {
         const newLiked = !liked
         const newCount = newLiked ? likesCount + 1 : likesCount - 1
@@ -33,68 +78,104 @@ export default function FeedPost({ post, currentUserId }: FeedPostProps) {
     const isResource = post.type === 'resource'
 
     return (
-        <div className={`
-        relative p-6 rounded-sm border mb-4 animate-fade-up transition-all
-        ${isAnnouncement ? 'bg-[#111113] border-[#EAB308]/30 shadow-[0_0_15px_-3px_rgba(234,179,8,0.1)]' : 'bg-[#09090B] border-[#27272A] hover:border-[#3F3F46]'}
-    `}>
+        <div className={cn(
+            "relative p-8 rounded-[2rem] border transition-all animate-fade-up group hover:shadow-2xl",
+            isAnnouncement
+                ? "bg-[#58151C]/5 border-[#58151C]/10 shadow-lg"
+                : "bg-white border-gray-100 shadow-sm hover:border-[#58151C]/10"
+        )}>
+            {/* Visual Indicator for Priority */}
+            {isAnnouncement && (
+                <div className="absolute -top-3 left-10 px-4 py-1 rounded-full bg-[#C3161C] text-white text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2">
+                    <Megaphone className="h-3 w-3" /> Priority Broadcast
+                </div>
+            )}
+
             {/* Header */}
-            <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
+            <div className="flex justify-between items-start mb-8">
+                <div className="flex items-center gap-4">
                     <Avatar
-                        src={post.author?.avatar_url}
-                        name={post.author?.full_name || 'Generic Operative'}
-                        className="w-10 h-10 border border-[#27272A]"
+                        src={(post.author as any)?.avatar_url}
+                        name={(post.author as any)?.full_name || 'Operative'}
+                        size="md"
+                        className="ring-2 ring-white shadow-md group-hover:scale-105 transition-transform"
                     />
                     <div>
                         <div className="flex items-center gap-2">
-                            <span className="text-[#F8FAFC] font-mono font-bold text-sm">{post.author?.full_name}</span>
-                            {isAnnouncement && (
-                                <span className="px-1.5 py-0.5 rounded-sm bg-[#EAB308]/10 text-[#EAB308] text-[10px] uppercase font-mono border border-[#EAB308]/20 flex items-center gap-1">
-                                    <AlertTriangle className="h-3 w-3" /> Priority
-                                </span>
-                            )}
-                            {isResource && (
-                                <span className="px-1.5 py-0.5 rounded-sm bg-[#8B5CF6]/10 text-[#8B5CF6] text-[10px] uppercase font-mono border border-[#8B5CF6]/20 flex items-center gap-1">
-                                    <FileText className="h-3 w-3" /> Resource
-                                </span>
+                            <span className="text-[#111827] font-poppins font-bold text-sm">
+                                {(post.author as any)?.full_name}
+                            </span>
+                            {(post.author as any)?.role === 'admin' && (
+                                <ShieldCheck className="h-3.5 w-3.5 text-[#C3161C]" />
                             )}
                         </div>
-                        <span className="text-[#52525B] font-mono text-xs">{formatDate(post.created_at)}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-gray-400 text-[10px] font-black uppercase tracking-widest">
+                                {formatDate(post.created_at)}
+                            </span>
+                            {isResource && (
+                                <>
+                                    <span className="h-1 w-1 rounded-full bg-gray-200" />
+                                    <span className="flex items-center gap-1 text-blue-600 text-[10px] font-black uppercase tracking-widest">
+                                        <FileText className="h-3 w-3" /> Intel Resource
+                                    </span>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                <button className="text-[#52525B] hover:text-[#F8FAFC]">
-                    <MoreHorizontal className="h-4 w-4" />
+                <button className="p-2 rounded-xl text-gray-300 hover:text-[#58151C] hover:bg-gray-50 transition-all">
+                    <MoreHorizontal className="h-5 w-5" />
                 </button>
             </div>
 
             {/* Content */}
-            <div className="mb-4">
-                {post.title && <h3 className="text-[#F8FAFC] font-bold font-mono text-lg mb-2">{post.title}</h3>}
-                <div className="text-[#A1A1AA] font-mono text-sm whitespace-pre-wrap leading-relaxed">
+            <div className="mb-8">
+                {post.title && (
+                    <h3 className="text-xl font-poppins font-bold text-[#111827] mb-3 group-hover:text-[#C3161C] transition-colors">
+                        {post.title}
+                    </h3>
+                )}
+                <div className="text-gray-600 font-medium text-base leading-relaxed whitespace-pre-wrap">
                     {post.content}
                 </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-6 pt-4 border-t border-[#27272A]/50">
+            <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-gray-50">
                 <button
                     onClick={handleLike}
-                    className={`flex items-center gap-2 text-xs font-mono font-bold transition-colors ${liked ? 'text-[#F43F5E]' : 'text-[#52525B] hover:text-[#F43F5E]'}`}
+                    className={cn(
+                        "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
+                        liked
+                            ? "text-[#C3161C] bg-[#C3161C]/5 shadow-inner"
+                            : "text-gray-400 hover:text-[#C3161C] hover:bg-red-50"
+                    )}
                 >
-                    <Heart className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} />
+                    <Heart className={cn("h-4.5 w-4.5 transition-transform", liked ? "fill-current scale-110" : "group-hover:scale-110")} />
                     <span>{likesCount}</span>
                 </button>
 
-                <button className="flex items-center gap-2 text-xs font-mono font-bold text-[#52525B] hover:text-[#10B981] transition-colors">
-                    <MessageSquare className="h-4 w-4" />
-                    <span>{post.comment_count || 0}</span>
+                <Link
+                    href={`/portal/feed/${post.id}`}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
+                >
+                    <MessageSquare className="h-4.5 w-4.5" />
+                    <span>{commentsCount}</span>
+                </Link>
+
+                <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-gray-400 hover:text-[#58151C] hover:bg-gray-50 transition-all ml-auto">
+                    <Share2 className="h-4.5 w-4.5" />
+                    <span className="hidden sm:inline">BroadCast</span>
                 </button>
 
-                <button className="flex items-center gap-2 text-xs font-mono font-bold text-[#52525B] hover:text-[#F8FAFC] transition-colors ml-auto">
-                    <Share2 className="h-4 w-4" />
-                    <span>SHARE</span>
-                </button>
+                <Link
+                    href={`/portal/feed/${post.id}`}
+                    className="p-2 rounded-full bg-gray-50 text-gray-300 hover:text-[#58151C] hover:bg-[#58151C]/5 transition-all"
+                >
+                    <ChevronRight className="h-5 w-5" />
+                </Link>
             </div>
         </div>
     )

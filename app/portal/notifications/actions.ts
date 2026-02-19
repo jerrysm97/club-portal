@@ -1,36 +1,54 @@
+// app/portal/notifications/actions.ts — IIMS Collegiate Notification Actions
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export async function markNotificationRead(notificationId: string) {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
 
-    if (!session) return { error: 'Unauthorized' }
+    if (!session) return { error: 'Unauthorized uplink' }
 
-    await supabase
-        .from('notifications')
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single()
+
+    if (!member) return { error: 'Member not found' }
+
+    await (supabase
+        .from('notifications' as any) as any)
         .update({ is_read: true })
         .eq('id', notificationId)
-        .eq('recipient_id', session.user.id)
+        .eq('member_id', (member as any).id)
 
-    revalidatePath('/portal')
+    revalidatePath('/portal/notifications')
     return { success: true }
 }
 
 export async function markAllNotificationsRead() {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
 
-    if (!session) return { error: 'Unauthorized' }
+    if (!session) return { error: 'Unauthorized uplink' }
 
-    await supabase
-        .from('notifications')
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single()
+
+    if (!member) return { error: 'Member not found' }
+
+    await (supabase
+        .from('notifications' as any) as any)
         .update({ is_read: true })
-        .eq('recipient_id', session.user.id)
+        .eq('member_id', (member as any).id)
         .eq('is_read', false)
 
-    revalidatePath('/portal')
+    revalidatePath('/portal/notifications')
+    revalidatePath('/portal/dashboard')
     return { success: true }
 }

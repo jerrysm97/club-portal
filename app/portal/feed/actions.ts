@@ -1,17 +1,18 @@
+// app/portal/feed/actions.ts — IIMS Collegiate Feed Actions
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 const postSchema = z.object({
-    content: z.string().min(1, 'Payload cannot be empty').max(2000, 'Payload exceeds buffer size'),
+    content: z.string().min(1, 'Transmission cannot be empty').max(2000, 'Transmission exceeds buffer size'),
     type: z.enum(['post', 'resource', 'announcement', 'question']),
     title: z.string().optional()
 })
 
 export async function createPost(prevState: any, formData: FormData) {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
 
     const content = formData.get('content') as string
     const type = formData.get('type') as string || 'post'
@@ -20,18 +21,27 @@ export async function createPost(prevState: any, formData: FormData) {
     const validated = postSchema.safeParse({ content, type, title })
 
     if (!validated.success) {
-        return { error: validated.error.flatten().fieldErrors.content?.[0] || 'Invalid input' }
+        return { error: validated.error.flatten().fieldErrors.content?.[0] || 'Invalid input signature' }
     }
 
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return { error: 'Unauthorized uplink' }
 
-    const { error } = await supabase.from('posts').insert({
-        author_id: session.user.id,
+    // Check if member exists and get their ID
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single()
+
+    if (!member) return { error: 'Operative identity not found' }
+
+    const { error } = await (supabase.from('posts' as any) as any).insert({
+        author_id: (member as any).id, // using member.id as author_id per new schema
         content: validated.data.content,
         title: validated.data.title,
         type: validated.data.type,
-        is_public: false // Internal only by default
+        is_public: false
     })
 
     if (error) return { error: error.message }
@@ -42,24 +52,31 @@ export async function createPost(prevState: any, formData: FormData) {
 }
 
 export async function toggleReaction(postId: string) {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return { error: 'Unauthorized' }
 
-    // Check if already reacted
-    const { data: existing } = await supabase
-        .from('post_reactions')
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
         .select('id')
-        .eq('post_id', postId)
-        .eq('member_id', session.user.id)
+        .eq('user_id', session.user.id)
         .single()
 
+    if (!member) return { error: 'Member not found' }
+
+    const { data: existing } = await (supabase
+        .from('post_reactions' as any) as any)
+        .select('id')
+        .eq('post_id', postId)
+        .eq('member_id', (member as any).id)
+        .maybeSingle()
+
     if (existing) {
-        await supabase.from('post_reactions').delete().eq('id', existing.id)
+        await (supabase.from('post_reactions' as any) as any).delete().eq('id', (existing as any).id)
     } else {
-        await supabase.from('post_reactions').insert({
+        await (supabase.from('post_reactions' as any) as any).insert({
             post_id: postId,
-            member_id: session.user.id
+            member_id: (member as any).id
         })
     }
 
@@ -67,15 +84,23 @@ export async function toggleReaction(postId: string) {
 }
 
 export async function addComment(postId: string, content: string) {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return { error: 'Unauthorized' }
 
-    if (!content.trim()) return { error: 'Empty comment' }
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single()
 
-    await supabase.from('post_comments').insert({
+    if (!member) return { error: 'Member not found' }
+
+    if (!content.trim()) return { error: 'Empty transmission' }
+
+    await (supabase.from('post_comments' as any) as any).insert({
         post_id: postId,
-        author_id: session.user.id,
+        author_id: (member as any).id,
         content: content.trim()
     })
 

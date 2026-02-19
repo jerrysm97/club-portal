@@ -1,57 +1,48 @@
-// app/api/contact/route.ts
-// Contact form API — saves to contact_messages table AND sends via Resend.
-
+// app/api/contact/route.ts — Contact Form (CONTEXT §14)
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { contactSchema } from '@/lib/validations'
+import { Resend } from 'resend'
 
-// Use service role to bypass RLS for inserting contact messages
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
-        const { name, email, subject, message } = await req.json()
+        const body = await req.json()
+        const result = contactSchema.safeParse(body)
 
-        // Server-side validation
-        if (!name || !email || !subject || !message) {
-            return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return NextResponse.json({ error: 'Invalid email address.' }, { status: 400 })
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.flatten() }, { status: 400 })
         }
 
-        // Save to contact_messages table
-        const { error: dbError } = await supabaseAdmin.from('contact_messages').insert({
-            name,
-            email,
-            subject,
-            message,
+        const { name, email, subject, message } = result.data
+
+        // Initialize Resend inside the handler to avoid build-time errors when API key is missing
+        const resend = new Resend(process.env.RESEND_API_KEY || 're_stub')
+
+        // Send email via Resend
+        const { error: emailError } = await resend.emails.send({
+            from: 'IIMS Cyber Portal <onboarding@resend.dev>',
+            to: ['cybersec@iimscollege.edu.np'],
+            replyTo: email,
+            subject: `[Contact Form] ${subject}`,
+            html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #E5E7EB; border-radius: 8px;">
+          <h2 style="color: #58151C; margin-top: 0;">New Contact Form Submission</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 20px 0;" />
+          <p style="white-space: pre-wrap;">${message}</p>
+        </div>
+      `,
         })
 
-        if (dbError) throw dbError
-
-        // Send email via Resend (optional — only fires if RESEND_API_KEY is set)
-        if (process.env.RESEND_API_KEY) {
-            await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    from: 'IIMS Cyber Club <onboarding@resend.dev>',
-                    to: ['cybersec@iimscollege.edu.np'],
-                    subject: `New Contact: ${subject} — IIMS Cybersecurity Club`,
-                    text: `From: ${name} <${email}>\nSubject: ${subject}\n\n${message}`,
-                }),
-            })
+        if (emailError) {
+            console.error('[contact] Resend error:', emailError)
+            return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
         }
 
         return NextResponse.json({ success: true })
-    } catch (err) {
-        console.error('Contact route error:', err)
-        return NextResponse.json({ error: 'Server error. Please try again.' }, { status: 500 })
+    } catch (err: unknown) {
+        console.error('[contact] Server error:', err)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }

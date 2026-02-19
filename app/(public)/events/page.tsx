@@ -1,67 +1,70 @@
-// app/(public)/events/page.tsx — Stealth Terminal Events List
-import { createClient } from '@supabase/supabase-js'
+// app/(public)/events/page.tsx — IIMS Collegiate Public Events List Page
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Filter } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Clock, Box } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import type { PublicEvent } from '@/types/database'
 
 export const revalidate = 60
 
 export default async function EventsPage() {
-    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-    const { data: events } = await sb.from('public_events').select('*').order('event_date', { ascending: false })
+    const sb = await createServerSupabaseClient()
+    // Using new table name 'events' per CONTEXT.md §17
+    const { data: events } = await sb.from('events').select('*').order('starts_at', { ascending: false })
 
     const listOrEmpty = (events || []) as PublicEvent[]
-    const upcoming = listOrEmpty.filter(e => new Date(e.event_date) >= new Date())
-    const past = listOrEmpty.filter(e => new Date(e.event_date) < new Date())
+    const upcoming = listOrEmpty.filter(e => new Date(e.event_date || e.starts_at || '') >= new Date())
+    const past = listOrEmpty.filter(e => new Date(e.event_date || e.starts_at || '') < new Date())
 
     return (
-        <div className="bg-black min-h-screen pb-24">
+        <div className="bg-white min-h-screen pb-24">
             {/* Header */}
-            <section className="py-20 border-b border-[#27272A] relative overflow-hidden">
-                <div className="absolute inset-0 hero-grid opacity-20" />
-                <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-                    <h1 className="text-4xl md:text-6xl font-mono font-bold text-[#F8FAFC] mb-6">
-                        Mission <span className="text-[#10B981]">Log</span>
+            <section className="py-32 bg-[#58151C] relative overflow-hidden">
+                <div className="absolute inset-0 hero-grid opacity-10 pointer-events-none" />
+                <div className="max-w-4xl mx-auto px-6 text-center relative z-10 animate-fade-up">
+                    <h1 className="text-5xl md:text-7xl font-poppins font-bold text-white mb-8">
+                        Mission <span className="text-[#FCD34D]">Log</span>
                     </h1>
-                    <p className="text-[#A1A1AA] font-mono text-lg leading-relaxed">
-                        Upcoming operations, workshops, and capture-the-flag competitions.
+                    <p className="text-[#FECACA] font-medium text-xl leading-relaxed max-w-2xl mx-auto">
+                        Upcoming operations, technical workshops, and competitive security events at IIMS College.
                     </p>
                 </div>
             </section>
 
-            <div className="max-w-7xl mx-auto px-6 py-16">
+            <div className="max-w-7xl mx-auto px-6 py-20">
                 {/* Upcoming */}
-                <div className="mb-20">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-                        <h2 className="text-xl font-mono font-bold text-[#F8FAFC] uppercase tracking-wider">Upcoming_Missions</h2>
+                <div className="mb-24">
+                    <div className="flex items-center gap-4 mb-12">
+                        <div className="h-10 w-1.5 rounded-full bg-[#C3161C]" />
+                        <h2 className="text-3xl font-poppins font-bold text-[#111827] uppercase tracking-wider">Active Missions</h2>
                     </div>
 
                     {upcoming.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-6">
+                        <div className="grid grid-cols-1 gap-8">
                             {upcoming.map(e => <EventListItem key={e.id} event={e} />)}
                         </div>
                     ) : (
-                        <div className="p-12 border border-dashed border-[#27272A] rounded-sm text-center bg-[#09090B]">
-                            <p className="text-[#52525B] font-mono">No active missions scheduled.</p>
+                        <div className="p-20 rounded-3xl border-2 border-dashed border-gray-200 text-center bg-gray-50 shadow-inner">
+                            <Box className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                            <p className="text-gray-500 font-poppins font-bold text-xl">No active missions scheduled for now.</p>
+                            <p className="text-gray-400 mt-2">Check back soon for upcoming workshops and CTFs.</p>
                         </div>
                     )}
                 </div>
 
-                {/* Past */}
+                {/* Past Events */}
                 <div>
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-2 h-2 rounded-full bg-[#52525B]" />
-                        <h2 className="text-xl font-mono font-bold text-[#A1A1AA] uppercase tracking-wider">Mission_Archive</h2>
+                    <div className="flex items-center gap-4 mb-12">
+                        <div className="h-10 w-1.5 rounded-full bg-gray-300" />
+                        <h2 className="text-3xl font-poppins font-bold text-gray-400 uppercase tracking-wider">Archived Operations</h2>
                     </div>
 
                     {past.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80 hover:opacity-100 transition-opacity">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {past.map(e => <EventCard key={e.id} event={e} />)}
                         </div>
                     ) : (
-                        <p className="text-[#52525B] font-mono italic">Archive is empty.</p>
+                        <p className="text-[#9CA3AF] font-poppins font-medium italic translate-x-3">The archive is currently empty.</p>
                     )}
                 </div>
             </div>
@@ -70,32 +73,45 @@ export default async function EventsPage() {
 }
 
 function EventListItem({ event }: { event: PublicEvent }) {
-    // Determine if we need to use a fallback image or the actual one
     const imgUrl = event.cover_image_url || event.image_url
 
     return (
-        <div className="group flex flex-col md:flex-row bg-[#09090B] border border-[#27272A] rounded-sm overflow-hidden hover:border-[#10B981]/50 transition-all">
-            <div className="w-full md:w-64 h-48 md:h-auto relative shrink-0">
+        <div className="group flex flex-col lg:flex-row bg-white border border-[#E5E7EB] rounded-3xl overflow-hidden hover:border-[#C3161C]/30 hover:shadow-2xl transition-all duration-300">
+            <div className="w-full lg:w-[40%] h-64 lg:h-auto relative shrink-0 overflow-hidden">
                 {imgUrl ? (
-                    <img src={imgUrl} alt={event.title} className="w-full h-full object-cover" />
+                    <img src={imgUrl} alt={event.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 ) : (
-                    <div className="absolute inset-0 bg-[#111113] hero-grid opacity-30" />
+                    <div className="absolute inset-0 bg-gray-50 hero-grid opacity-30" />
                 )}
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
             </div>
-            <div className="p-6 md:p-8 flex-1 flex flex-col justify-center">
-                <div className="flex flex-wrap items-center gap-3 mb-3">
-                    <span className="text-[#10B981] font-mono text-sm font-bold">{formatDate(event.event_date)}</span>
-                    <span className="px-2 py-0.5 rounded-full border border-[#27272A] text-[10px] text-[#A1A1AA] font-mono uppercase bg-black">{event.type}</span>
-                </div>
-                <h3 className="text-2xl font-mono font-bold text-[#F8FAFC] mb-3 group-hover:text-[#10B981] transition-colors">{event.title}</h3>
-                <p className="text-[#A1A1AA] text-sm leading-relaxed mb-6 line-clamp-2">{event.short_desc || event.description}</p>
-                <div className="flex items-center justify-between mt-auto">
-                    <div className="flex items-center gap-2 text-[#52525B] text-xs font-mono">
-                        <MapPin className="h-3 w-3" />
-                        {event.location || 'Online'}
+            <div className="p-8 lg:p-12 flex-1 flex flex-col justify-center">
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#58151C]/5 text-[#58151C] font-bold text-xs">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(event.event_date || event.starts_at || '')}
                     </div>
-                    <Link href={`/events/${event.slug || event.id}`} className="flex items-center gap-2 text-[#F8FAFC] font-mono text-sm font-bold hover:text-[#10B981] transition-colors">
-                        Details
+                    <span className="px-3 py-1.5 rounded-lg border border-gray-100 text-[10px] text-gray-400 font-black uppercase tracking-widest bg-gray-50">{event.type}</span>
+                </div>
+
+                <h3 className="text-3xl md:text-4xl font-poppins font-bold text-[#111827] mb-6 group-hover:text-[#C3161C] transition-colors leading-tight">
+                    {event.title}
+                </h3>
+
+                <p className="text-[#6B7280] text-lg leading-relaxed mb-10 line-clamp-3 font-medium">
+                    {event.short_desc || event.description}
+                </p>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-10 border-t border-gray-50">
+                    <div className="flex items-center gap-3 text-gray-500 font-medium text-sm">
+                        <MapPin className="h-5 w-5 text-[#C3161C]" />
+                        {event.location || 'IIMS College Campus'}
+                    </div>
+                    <Link
+                        href={`/events/${event.slug || event.id}`}
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#58151C] text-white font-bold hover:bg-[#C3161C] transition-all shadow-lg"
+                    >
+                        Access Mission Details
                         <ArrowRight className="h-4 w-4" />
                     </Link>
                 </div>
@@ -108,16 +124,18 @@ function EventCard({ event }: { event: PublicEvent }) {
     const imgUrl = event.cover_image_url || event.image_url
 
     return (
-        <Link href={`/events/${event.slug || event.id}`} className="group block bg-[#09090B] border border-[#27272A] rounded-sm overflow-hidden hover:border-[#52525B] transition-colors">
-            <div className="h-40 bg-[#111113] relative overflow-hidden grayscale group-hover:grayscale-0 transition-all">
+        <Link href={`/events/${event.slug || event.id}`} className="group block bg-gray-50 border border-transparent rounded-2xl overflow-hidden hover:bg-white hover:border-[#E5E7EB] hover:shadow-xl transition-all duration-300">
+            <div className="h-48 bg-gray-100 relative overflow-hidden">
                 {imgUrl ? (
-                    <img src={imgUrl} alt={event.title} className="w-full h-full object-cover" />
-                ) : null}
+                    <img src={imgUrl} alt={event.title} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                ) : (
+                    <div className="absolute inset-0 hero-grid opacity-10 bg-[#58151C]/5" />
+                )}
             </div>
-            <div className="p-5">
-                <span className="block text-[#10B981] font-mono text-xs font-bold mb-2">{formatDate(event.event_date)}</span>
-                <h3 className="font-mono font-bold text-[#F8FAFC] text-lg mb-2 line-clamp-1">{event.title}</h3>
-                <p className="text-[#52525B] text-xs line-clamp-2">{event.short_desc || event.description}</p>
+            <div className="p-8">
+                <span className="block text-[#C3161C] font-bold text-xs mb-3">{formatDate(event.event_date || event.starts_at || '')}</span>
+                <h3 className="font-poppins font-bold text-[#111827] text-xl mb-3 line-clamp-1 group-hover:text-[#C3161C] transition-colors">{event.title}</h3>
+                <p className="text-[#9CA3AF] text-sm leading-relaxed line-clamp-2 font-medium">{event.short_desc || event.description}</p>
             </div>
         </Link>
     )

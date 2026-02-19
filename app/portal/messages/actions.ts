@@ -1,68 +1,56 @@
+// app/portal/messages/actions.ts — Direct Messaging Actions (Simplified Model)
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function sendMessage(conversationId: string, content: string) {
-    const supabase = await createClient()
+export async function sendMessage(receiverId: string, content: string) {
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
 
-    if (!session) return { error: 'Unauthorized' }
-    if (!content.trim()) return { error: 'Empty message payload' }
+    if (!session) return { error: 'Unauthorized uplink' }
+    if (!content.trim()) return { error: 'Empty transmission payload' }
 
-    // Insert message
-    const { error } = await supabase.from('messages').insert({
-        conversation_id: conversationId,
-        sender_id: session.user.id,
+    // Get current member
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single()
+
+    if (!member) return { error: 'Operative identity not found' }
+
+    // Insert message using direct sender/receiver model
+    const { error } = await (supabase.from('messages' as any) as any).insert({
+        sender_id: (member as any).id,
+        receiver_id: receiverId,
         content: content.trim()
     })
 
     if (error) return { error: error.message }
 
-    // Update conversation timestamp
-    await supabase
-        .from('conversations')
-        .update({ updated_at: new Date().toISOString() })
-        .eq('id', conversationId)
-
-    revalidatePath(`/portal/messages/${conversationId}`)
+    revalidatePath(`/portal/messages/${receiverId}`)
+    revalidatePath('/portal/messages')
     return { success: true }
 }
 
-export async function createConversation(participantId: string) {
-    const supabase = await createClient()
+export async function markAsRead(senderId: string) {
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return { error: 'Unauthorized' }
+    if (!session) return
 
-    // Check if conversation already exists between these two
-    // tailored for 1-on-1 for now
-
-    // Complex query to find existing convo... simplistic approach:
-    // This is hard to do efficiently without a stored procedure or complex join in standard SQL/PostgREST
-    // For MVP, we'll create a new one or just link to existing if we had a way to lookup.
-    // Let's assume we create a new one if we don't find one in client state, 
-    // BUT duplicate convos are bad.
-    // Ideally, we'd have a unique constraint or lookup function.
-    // Let's assume we proceed with creating and if it exists, we handle or ignore.
-
-    // Better: RPC `get_or_create_conversation(user2_id)`
-    // Without RPC, we might just insert and hope.
-    // Let's implement a simple creation.
-
-    const { data: conversation, error } = await supabase
-        .from('conversations')
-        .insert({})
-        .select()
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id')
+        .eq('user_id', session.user.id)
         .single()
 
-    if (error) return { error: error.message }
+    if (!member) return
 
-    // Add participants
-    await supabase.from('conversation_participants').insert([
-        { conversation_id: conversation.id, member_id: session.user.id },
-        { conversation_id: conversation.id, member_id: participantId }
-    ])
-
-    revalidatePath('/portal/messages')
-    return { success: true, conversationId: conversation.id }
+    await (supabase
+        .from('messages' as any) as any)
+        .update({ is_read: true })
+        .eq('sender_id', senderId)
+        .eq('receiver_id', (member as any).id)
+        .eq('is_read', false)
 }

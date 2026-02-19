@@ -1,10 +1,11 @@
-// components/public/ContactSection.tsx — Stealth Terminal Contact
+// components/public/ContactSection.tsx — IIMS Collegiate Public Contact
 'use client'
-
-import React, { useState } from 'react' // Import React and useState
-import { Send, Loader2, CheckCircle, Mail, MapPin } from 'lucide-react'
-import { contactFormSchema } from '@/lib/validations'
+import React, { useState } from 'react'
+import { Send, Loader2, CheckCircle, Mail, MapPin, Globe, ArrowRight } from 'lucide-react'
+import { contactSchema } from '@/lib/validations'
 import { z } from 'zod'
+import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
 
 export default function ContactSection({ contactEmail }: { contactEmail?: string | null }) {
     const [loading, setLoading] = useState(false)
@@ -15,13 +16,11 @@ export default function ContactSection({ contactEmail }: { contactEmail?: string
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         setLoading(true)
-        setErrors({}) // Clear previous errors
+        setErrors({})
 
         try {
-            // Validate form
-            contactFormSchema.parse(formData)
+            contactSchema.parse(formData)
 
-            // Simulate API call (replace with actual fetch later)
             const res = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -34,11 +33,8 @@ export default function ContactSection({ contactEmail }: { contactEmail?: string
             setFormData({ name: '', email: '', subject: '', message: '' })
         } catch (err) {
             if (err instanceof z.ZodError) {
-                const fieldErrors: Record<string, string> = {}; // Added semicolon to prevent ASI issues
-
-                // Type assertion to fix build error
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (err as any).errors.forEach((e: any) => {
+                const fieldErrors: Record<string, string> = {}
+                err.issues.forEach((e) => {
                     if (e.path[0]) fieldErrors[e.path[0] as string] = e.message
                 })
                 setErrors(fieldErrors)
@@ -51,122 +47,132 @@ export default function ContactSection({ contactEmail }: { contactEmail?: string
     }
 
     return (
-        <section className="py-24 bg-[#09090B] border-t border-[#27272A]">
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16">
-                {/* Contact Info */}
-                <div>
-                    <h2 className="text-3xl md:text-5xl font-mono font-bold text-[#F8FAFC] mb-8">
-                        Establish <span className="text-[#10B981]">Uplink</span>
-                    </h2>
-                    <p className="text-[#A1A1AA] font-mono mb-12 leading-relaxed">
-                        Have a query about our operations? Want to collaborate on a security project?
-                        Initiate a secure transmission below.
-                    </p>
-
-                    <div className="space-y-6">
-                        <div className="flex items-start gap-4 p-6 rounded-sm bg-black border border-[#27272A]">
-                            <Mail className="h-6 w-6 text-[#10B981] mt-1" />
-                            <div>
-                                <h4 className="font-mono font-bold text-[#F8FAFC] mb-1">Electronic Mail</h4>
-                                <a href={`mailto:${contactEmail || 'cybersec@iimscollege.edu.np'}`} className="text-[#A1A1AA] hover:text-[#10B981] transition-colors font-mono text-sm">
-                                    {contactEmail || 'cybersec@iimscollege.edu.np'}
-                                </a>
-                            </div>
+        <section className="py-24 bg-white border-t border-gray-100">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
+                    {/* Contact Info */}
+                    <div className="animate-fade-up">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#58151C]/5 text-[#58151C] font-poppins text-sm font-bold tracking-wider uppercase mb-6">
+                            <Mail className="h-4 w-4" />
+                            <span>Get In Touch</span>
                         </div>
 
-                        <div className="flex items-start gap-4 p-6 rounded-sm bg-black border border-[#27272A]">
-                            <MapPin className="h-6 w-6 text-[#10B981] mt-1" />
-                            <div>
-                                <h4 className="font-mono font-bold text-[#F8FAFC] mb-1">Base of Operations</h4>
-                                <p className="text-[#A1A1AA] font-mono text-sm">
-                                    IIMS College<br />
-                                    Putalisadak, Kathmandu
-                                </p>
-                            </div>
+                        <h2 className="text-4xl md:text-5xl font-poppins font-bold text-[#111827] mb-8 leading-tight">
+                            Establish a <span className="text-[#C3161C]">Secure Uplink</span> with Our Team
+                        </h2>
+
+                        <p className="text-[#6B7280] text-lg mb-12 leading-relaxed font-medium">
+                            Have a query about our operations? Want to collaborate on a security project?
+                            Initiate a secure transmission below and our operatives will respond shortly.
+                        </p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <ContactInfoCard
+                                icon={<Mail className="h-6 w-6" />}
+                                title="Electronic Mail"
+                                value={contactEmail || 'cybersec@iimscollege.edu.np'}
+                                href={`mailto:${contactEmail || 'cybersec@iimscollege.edu.np'}`}
+                            />
+                            <ContactInfoCard
+                                icon={<MapPin className="h-6 w-6" />}
+                                title="Base of Operations"
+                                value="IIMS College Campus, Putalisadak, Kathmandu"
+                                href="#"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Contact Form */}
+                    <div className="relative animate-fade-up">
+                        <div className="absolute -inset-4 bg-gradient-to-br from-[#58151C]/5 to-[#C3161C]/5 blur-3xl rounded-[2rem] -z-10" />
+                        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 md:p-12 shadow-2xl">
+                            {success ? (
+                                <div className="text-center py-12">
+                                    <div className="w-20 h-20 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-8 shadow-inner">
+                                        <CheckCircle className="h-10 w-10" />
+                                    </div>
+                                    <h3 className="text-2xl font-poppins font-bold text-[#111827] mb-3">Transmission Received</h3>
+                                    <p className="text-[#6B7280] mb-8">Your message has been encrypted and sent to our lead operators.</p>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setSuccess(false)}
+                                        className="rounded-xl border-2 px-8"
+                                    >
+                                        Send Another Transmission
+                                    </Button>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <Input
+                                        label="Identity (Full Name)"
+                                        placeholder="John Doe"
+                                        required
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        error={errors.name}
+                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <Input
+                                            label="Return Address (Email)"
+                                            type="email"
+                                            placeholder="john@example.com"
+                                            required
+                                            value={formData.email}
+                                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                            error={errors.email}
+                                        />
+                                        <Input
+                                            label="Subject Line"
+                                            placeholder="Collaboration Inquiry"
+                                            required
+                                            value={formData.subject}
+                                            onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                                            error={errors.subject}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium text-[#374151]">Payload (Message)</label>
+                                        <textarea
+                                            rows={4}
+                                            placeholder="Type your secure message here..."
+                                            required
+                                            value={formData.message}
+                                            onChange={e => setFormData({ ...formData, message: e.target.value })}
+                                            className="w-full rounded-lg border border-[#D1D5DB] bg-white px-4 py-3 text-sm text-[#111827] focus:ring-2 focus:ring-[#C3161C] focus:border-transparent transition-all outline-none resize-none"
+                                        />
+                                        {errors.message && <p className="text-xs text-red-500 font-medium">{errors.message}</p>}
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        loading={loading}
+                                        className="w-full h-12 rounded-xl text-base shadow-xl shadow-red-100"
+                                        rightIcon={<ArrowRight className="h-5 w-5" />}
+                                    >
+                                        {loading ? 'Transmitting...' : 'Initiate Transmission'}
+                                    </Button>
+                                </form>
+                            )}
                         </div>
                     </div>
                 </div>
-
-                {/* Contact Form */}
-                <div className="bg-black border border-[#27272A] rounded-sm p-8">
-                    {success ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                            <div className="w-16 h-16 rounded-full bg-[#10B981]/10 flex items-center justify-center mb-6">
-                                <CheckCircle className="h-8 w-8 text-[#10B981]" />
-                            </div>
-                            <h3 className="font-mono font-bold text-xl text-[#F8FAFC] mb-2">Transmission Received</h3>
-                            <p className="text-[#A1A1AA] font-mono text-sm">Our operatives will respond shortly.</p>
-                            <button
-                                onClick={() => setSuccess(false)}
-                                className="mt-8 text-[#10B981] font-mono text-xs hover:underline"
-                            >
-                                Send_Another_Transmission
-                            </button>
-                        </div>
-                    ) : (
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div>
-                                <label className="block font-mono text-xs text-[#A1A1AA] mb-2 uppercase">Identity</label>
-                                <input
-                                    type="text"
-                                    placeholder="John Doe"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm px-4 py-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors placeholder:text-[#3F3F46]"
-                                />
-                                {errors.name && <p className="text-[#EF4444] text-xs font-mono mt-1">{errors.name}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block font-mono text-xs text-[#A1A1AA] mb-2 uppercase">Return Address</label>
-                                <input
-                                    type="email"
-                                    placeholder="john@example.com"
-                                    value={formData.email}
-                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm px-4 py-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors placeholder:text-[#3F3F46]"
-                                />
-                                {errors.email && <p className="text-[#EF4444] text-xs font-mono mt-1">{errors.email}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block font-mono text-xs text-[#A1A1AA] mb-2 uppercase">Subject Line</label>
-                                <input
-                                    type="text"
-                                    placeholder="Collaboration Inquiry"
-                                    value={formData.subject}
-                                    onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm px-4 py-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors placeholder:text-[#3F3F46]"
-                                />
-                                {errors.subject && <p className="text-[#EF4444] text-xs font-mono mt-1">{errors.subject}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block font-mono text-xs text-[#A1A1AA] mb-2 uppercase">Payload</label>
-                                <textarea
-                                    rows={4}
-                                    placeholder="Type your message here..."
-                                    value={formData.message}
-                                    onChange={e => setFormData({ ...formData, message: e.target.value })}
-                                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm px-4 py-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors placeholder:text-[#3F3F46] resize-none"
-                                />
-                                {errors.message && <p className="text-[#EF4444] text-xs font-mono mt-1">{errors.message}</p>}
-                            </div>
-
-                            <div>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full bg-[#F8FAFC] text-black font-mono font-bold py-3 rounded-sm hover:bg-[#E2E8F0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                >
-                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                                    {loading ? 'Transmitting...' : 'Send_Transmission'}
-                                </button>
-                            </div>
-                        </form>
-                    )}
-                </div>
             </div>
         </section>
+    )
+}
+
+function ContactInfoCard({ icon, title, value, href }: { icon: React.ReactNode; title: string; value: string; href: string }) {
+    return (
+        <div className="group p-6 rounded-2xl bg-gray-50 border border-transparent hover:border-[#58151C]/20 hover:bg-white hover:shadow-xl transition-all duration-300">
+            <div className="p-3 rounded-xl bg-white text-[#58151C] shadow-sm mb-4 w-fit group-hover:scale-110 group-hover:bg-[#C3161C] group-hover:text-white transition-all">
+                {icon}
+            </div>
+            <h4 className="font-poppins font-bold text-[#111827] mb-2">{title}</h4>
+            <a
+                href={href}
+                className="text-[#6B7280] text-sm font-medium hover:text-[#C3161C] transition-colors inline-block leading-relaxed"
+            >
+                {value}
+            </a>
+        </div>
     )
 }

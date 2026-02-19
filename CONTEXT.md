@@ -1,30 +1,35 @@
-# CONTEXT.md — IIMS Cybersecurity Club Portal
-> **Version:** 2.0.0 | **Architecture:** Production-Ready (Industry Standard)
-> Single source of truth for all contributors and AI sessions.
+# IIMS Cybersecurity Club — Master Project Context
+> **Version:** 2.0 — Production-Ready  
+> **Stack:** Next.js 14 · TypeScript · Supabase · Tailwind CSS · Resend  
+> **Agent Instructions:** Read this file fully before writing any code. Every section is a contract. Violating any rule = broken production build.
 
 ---
 
 ## TABLE OF CONTENTS
 
 1. [Project Identity](#1-project-identity)
-2. [Project Overview & Feature Map](#2-project-overview--feature-map)
-3. [Tech Stack](#3-tech-stack)
-4. [Design System — Stealth Terminal](#4-design-system--stealth-terminal)
-5. [Folder Structure](#5-folder-structure)
+2. [Architecture Overview](#2-architecture-overview)
+3. [Tech Stack & Versions](#3-tech-stack--versions)
+4. [Design System — IIMS Collegiate Theme](#4-design-system--iims-collegiate-theme)
+5. [Folder Structure (Strict)](#5-folder-structure-strict)
 6. [Environment Variables](#6-environment-variables)
 7. [Complete Database Schema](#7-complete-database-schema)
 8. [Supabase Storage Buckets](#8-supabase-storage-buckets)
 9. [Row-Level Security (RLS) Policies](#9-row-level-security-rls-policies)
 10. [Authentication & Middleware](#10-authentication--middleware)
-11. [Feature Specifications](#11-feature-specifications)
-12. [Admin Panel Specification](#12-admin-panel-specification)
-13. [API Routes Reference](#13-api-routes-reference)
-14. [Real-Time Features](#14-real-time-features-supabase-realtime)
-15. [Email Templates](#15-email-templates-resend)
-16. [Coding Rules & Standards](#16-coding-rules--standards)
-17. [Performance & Scalability Rules](#17-performance--scalability-rules)
-18. [Security Checklist](#18-security-checklist)
-19. [Quick Reference — DO / DON'T](#19-quick-reference--do--dont)
+11. [Frontend ↔ Backend Connection Rules](#11-frontend--backend-connection-rules)
+12. [Feature Specifications](#12-feature-specifications)
+13. [Admin Panel Specification](#13-admin-panel-specification)
+14. [API Routes Reference](#14-api-routes-reference)
+15. [Real-Time Features](#15-real-time-features)
+16. [Email Templates](#16-email-templates-resend)
+17. [Type Definitions](#17-type-definitions)
+18. [Coding Rules & Standards](#18-coding-rules--standards)
+19. [Security Checklist](#19-security-checklist)
+20. [Error Handling Patterns](#20-error-handling-patterns)
+21. [Performance Rules](#21-performance-rules)
+22. [Common Bugs to Avoid](#22-common-bugs-to-avoid)
+23. [Quick Reference — DO / DON'T](#23-quick-reference--do--dont)
 
 ---
 
@@ -38,299 +43,199 @@
 | Project Folder | `iims-cyber-club` |
 | Domain Structure | Single domain — portal at `/portal/*` |
 | Architecture Level | Production-Ready (Industry Standard) |
-| Design Language | Stealth Terminal (Minimalist Cyber — Dark Only) |
+| Design Language | IIMS Collegiate Theme (White, Maroon, Red, Yellow) |
 
 ---
 
-## 2. PROJECT OVERVIEW & FEATURE MAP
+## 2. ARCHITECTURE OVERVIEW
 
-One Next.js 14 project. Two experiences. One domain.
+```
+iims-cyber-club/
+│
+├── PUBLIC WEBSITE (/)          → Anyone on the internet
+│   └── Content 100% driven from Supabase — no hardcoded text
+│
+└── MEMBER PORTAL (/portal/*)   → Approved members only (middleware-guarded)
+    ├── Auth Layer               → Supabase Auth (Email + Password only)
+    ├── Role System              → member → bod → admin → superadmin
+    └── Admin Panel              → /portal/admin (admin/superadmin only)
+```
 
-### 2.1 Public Website (`/`) — Anyone on the internet
+### Route Map
 
-| Page | Route | Description |
+| Route | Access Level | Description |
 |---|---|---|
-| Homepage | `/` | Hero, club intro, stats, featured events |
-| About | `/about` | Team, mission, club history, gallery |
-| Events | `/events` | Public event listings |
-| Contact | `/contact` | Contact form (Resend-powered) |
-
-> All content is 100% data-driven — managed entirely via the Admin Portal.
-
-### 2.2 Private Member Portal (`/portal/*`) — Approved members only
-
-| Feature | Route | Access |
-|---|---|---|
-| Login | `/portal/login` | Public |
-| Pending Approval | `/portal/pending` | Registered but unapproved |
-| Dashboard | `/portal/dashboard` | Members |
-| Post Feed | `/portal/feed` | Members |
-| Direct Messages | `/portal/messages` | Members |
-| Direct Message Thread | `/portal/messages/[conversationId]` | Members |
-| Notifications | `/portal/notifications` | Members |
-| Documents | `/portal/documents` | Members |
-| Events (Portal) | `/portal/events` | Members |
-| Event Detail + RSVP | `/portal/events/[id]` | Members |
-| CTF Challenges | `/portal/ctf` | Members |
-| CTF Challenge Detail | `/portal/ctf/[challengeId]` | Members |
-| Leaderboard | `/portal/leaderboard` | Members |
-| Own Profile | `/portal/profile` | Members |
-| Member Profile View | `/portal/members/[id]` | Members |
-| Admin Panel | `/portal/admin` | Admins only |
+| `/` | Public | Homepage — hero, stats, featured events |
+| `/about` | Public | Team, mission, gallery |
+| `/events` | Public | Public event listings |
+| `/contact` | Public | Resend-powered contact form |
+| `/portal/login` | Public | Email/Password login |
+| `/portal/signup` | Public | Self-registration form |
+| `/portal/pending` | Registered (unapproved) | Waiting screen |
+| `/portal/dashboard` | `approved` members | Main dashboard |
+| `/portal/feed` | `approved` members | Post feed |
+| `/portal/messages` | `approved` members | Direct messages (real-time) |
+| `/portal/documents` | `approved` members | Club docs |
+| `/portal/events` | `approved` members | Events (portal view) |
+| `/portal/ctf` | `approved` members | CTF challenges |
+| `/portal/leaderboard` | `approved` members | Points leaderboard |
+| `/portal/profile` | `approved` members | Own profile |
+| `/portal/admin` | `admin` / `superadmin` | Admin panel |
 
 ---
 
-## 3. TECH STACK
+## 3. TECH STACK & VERSIONS
 
-| Layer | Technology | Notes |
+| Layer | Technology | Version / Notes |
 |---|---|---|
-| Framework | Next.js 14 (App Router) | Server Components by default |
-| Language | TypeScript (strict) | No plain `.js` files ever |
-| Styling | Tailwind CSS | Arbitrary values for exact hex colors |
-| Database | Supabase (PostgreSQL) | All data storage |
-| Auth | Supabase Magic Link | Email-only, no passwords |
+| Framework | Next.js | 14 — App Router, Server Components by default |
+| Language | TypeScript | Strict mode (`"strict": true` in tsconfig) |
+| Styling | Tailwind CSS | v3 — arbitrary values for IIMS brand colors |
+| Database | Supabase | PostgreSQL — all tables listed in §7 |
+| Auth | Supabase Auth | Email + Password **only** — no magic links ever |
 | Real-Time | Supabase Realtime | DMs, notifications, live feed reactions |
-| File Storage | Supabase Storage | 5 buckets (see Section 8) |
-| Email | Resend | Magic links, contact form, notification emails |
-| Hosting | Vercel | Edge functions supported |
-| Markdown | `react-markdown` + `remark-gfm` | Post/event descriptions |
-| Notifications UI | Custom `Toast.tsx` | Non-blocking, bottom-right |
-| Date Handling | `date-fns` | Formatting, relative time display |
-| Form Validation | `zod` | Schema validation for all forms |
-| Icons | `lucide-react` | Only icon library permitted |
+| File Storage | Supabase Storage | 3 buckets: `club-documents`, `public-gallery`, `team-avatars` |
+| Email | Resend | Welcome, rejection, contact form emails |
+| Validation | Zod | Every form and API input is validated with Zod schemas |
 
 ---
 
-## 4. DESIGN SYSTEM — STEALTH TERMINAL
+## 4. DESIGN SYSTEM — IIMS COLLEGIATE THEME
 
-> **CRITICAL RULE:** This design language applies to the **ENTIRE project** — public site, member portal, and admin panel. Do **NOT** inject default white/indigo SaaS themes. No `bg-white`. No `border-gray-200`. No Tailwind gray defaults.
+> **CRITICAL:** Every page, component, and modal must use ONLY these colors. Never introduce blue, green, purple, or any default Tailwind color class.
 
 ### 4.1 Typography
 
 | Font | Usage | Weights |
 |---|---|---|
-| **JetBrains Mono** | Headings, section labels, code, terminal outputs, all buttons | 400, 700 |
-| **Inter** | Body text, paragraphs, long-form descriptions, form inputs | 300, 400, 600 |
+| **Poppins** | Headings, display text, hero sections | 500, 600, 700 |
+| **Inter** | Body text, paragraphs, buttons, form inputs | 400, 500, 600 |
+| **JetBrains Mono** | Terminal output, CTF flags, code blocks | 400, 700 |
+
+Add to `app/layout.tsx`:
+```tsx
+import { Poppins, Inter } from 'next/font/google'
+// JetBrains Mono loaded via @fontsource/jetbrains-mono
+```
 
 ### 4.2 Color Palette
 
-| Name | Hex | Tailwind Class | Usage |
+| Token | Hex | Tailwind | Usage |
 |---|---|---|---|
-| Pure Black | `#000000` | `bg-black` | Page backgrounds |
-| Matte Dark | `#09090B` | `bg-[#09090B]` | Cards, surfaces, modals, sidebars |
-| Elevated Surface | `#111113` | `bg-[#111113]` | Hover states, nested cards |
-| Border Gray | `#27272A` | `border-[#27272A]` | All borders, dividers, separators |
-| Terminal Emerald | `#10B981` | `text-[#10B981]` `bg-[#10B981]` | Primary CTA, success, online status dot |
-| Hacker Cyan | `#06B6D4` | `text-[#06B6D4]` | Tags, badges, hyperlinks |
-| Danger Red | `#EF4444` | `text-[#EF4444]` `bg-[#EF4444]` | Errors, delete actions, ban, reject |
-| Warning Amber | `#F59E0B` | `text-[#F59E0B]` | Warnings, pending states, medium difficulty |
-| Ghost White | `#F8FAFC` | `text-[#F8FAFC]` | Primary readable text |
-| Muted Slate | `#A1A1AA` | `text-[#A1A1AA]` | Subtitles, timestamps, placeholders |
+| White | `#FFFFFF` | `bg-white` | Main backgrounds |
+| Light Gray | `#F9FAFB` | `bg-[#F9FAFB]` | Section alt backgrounds |
+| IIMS Red | `#C3161C` | `bg-[#C3161C]` / `text-[#C3161C]` | Primary CTA, active states |
+| IIMS Maroon | `#58151C` | `bg-[#58151C]` / `text-[#58151C]` | Header, footer, sidebar |
+| IIMS Yellow | `#FFCD39` | `bg-[#FFCD39]` / `text-[#FFCD39]` | Highlights, badges, stars |
+| Text Primary | `#111827` | `text-[#111827]` | Body copy |
+| Text Muted | `#6B7280` | `text-[#6B7280]` | Subtitles, timestamps |
+| Border Soft | `#E5E7EB` | `border-[#E5E7EB]` | Card borders, dividers |
+| Red Hover | `#A31217` | `hover:bg-[#A31217]` | Primary button hover |
+| Maroon Hover | `#431015` | `hover:bg-[#431015]` | Secondary button hover |
 
-### 4.3 UI Primitives
-
-```
-CARD:           bg-[#09090B] border border-[#27272A] rounded-md p-6
-CARD (hover):   hover:bg-[#111113] transition-colors duration-150 cursor-pointer
-
-INPUT:          bg-[#09090B] border border-[#27272A] text-[#F8FAFC] rounded-sm px-3 py-2
-                focus:outline-none focus:border-[#10B981] placeholder:text-[#A1A1AA] w-full
-TEXTAREA:       Same as INPUT — add resize-none
-SELECT:         Same as INPUT styling
-
-BTN PRIMARY:    bg-[#10B981] text-black font-mono font-bold px-4 py-2 rounded-sm
-                hover:bg-[#0ea472] disabled:opacity-50 disabled:cursor-not-allowed transition-colors
-BTN SECONDARY:  border border-[#27272A] text-[#F8FAFC] font-mono px-4 py-2 rounded-sm
-                hover:bg-[#111113] transition-colors
-BTN DANGER:     bg-[#EF4444] text-white font-mono px-4 py-2 rounded-sm
-                hover:bg-[#dc2626] disabled:opacity-50 transition-colors
-BTN GHOST:      text-[#A1A1AA] font-mono px-4 py-2 rounded-sm
-                hover:text-[#F8FAFC] hover:bg-[#111113] transition-colors
-
-BADGE:          font-mono text-xs px-2 py-0.5 rounded-full border
-BADGE (cyan):   text-[#06B6D4] bg-[#06B6D4]/10 border-[#06B6D4]/30
-BADGE (green):  text-[#10B981] bg-[#10B981]/10 border-[#10B981]/30
-BADGE (red):    text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/30
-BADGE (amber):  text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/30
-
-MODAL OVERLAY:  fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm
-MODAL PANEL:    bg-[#09090B] border border-[#27272A] rounded-md p-6 max-w-md w-full mx-4
-
-TOAST (base):   fixed bottom-4 right-4 z-50 bg-[#09090B] border-l-4 px-4 py-3
-                rounded-sm shadow-xl font-mono text-sm text-[#F8FAFC]
-TOAST (success): border-[#10B981]
-TOAST (error):  border-[#EF4444]
-TOAST (warning): border-[#F59E0B]
-
-SIDEBAR:        bg-[#09090B] border-r border-[#27272A] h-screen w-64 fixed left-0 top-0
-DIVIDER:        border-t border-[#27272A] my-4
-SKELETON:       bg-[#27272A] animate-pulse rounded-sm
-
-MSG BUBBLE (self):  bg-[#10B981]/20 border border-[#10B981]/30 text-[#F8FAFC] rounded-md
-                    px-3 py-2 max-w-xs ml-auto
-MSG BUBBLE (other): bg-[#09090B] border border-[#27272A] text-[#F8FAFC] rounded-md
-                    px-3 py-2 max-w-xs
-```
-
-### 4.4 Iconography
-
-Use **Lucide React** icons exclusively. No other icon libraries.
+### 4.3 Component Primitives (Copy-Exact)
 
 ```
-Size conventions:
-  16px (h-4 w-4) — Inline text icons
-  20px (h-5 w-5) — Button icons
-  24px (h-6 w-6) — Navigation icons
+CARD:          bg-white border border-[#E5E7EB] rounded-xl shadow-sm p-6
+CARD HOVER:    hover:shadow-md hover:border-[#C3161C]/30 transition-all duration-200
 
-Common icons:
-  Shield, Terminal, Lock, Zap — Branding
-  Users, UserCheck, UserX    — Member management
-  Bell, BellDot              — Notifications
-  MessageSquare, Send        — Messaging
-  Flag, Trophy               — CTF / Leaderboard
-  FileText, Upload, Download — Documents
-  Calendar, MapPin           — Events
-  Settings, LogOut           — Admin / Auth
-  ChevronLeft, ChevronRight  — Pagination
-  Search, Filter             — Data controls
-  Plus, Trash2, Edit2, Eye   — CRUD actions
-  CheckCircle, XCircle       — Status
-  Loader2                    — Loading spinner (animate-spin)
+INPUT:         bg-white border border-[#D1D5DB] text-[#111827] rounded-lg px-4 py-2.5
+               focus:outline-none focus:ring-2 focus:ring-[#C3161C]/20 focus:border-[#C3161C]
+TEXTAREA:      Same as INPUT + resize-none
+
+BTN PRIMARY:   bg-[#C3161C] text-white font-medium px-5 py-2.5 rounded-lg
+               hover:bg-[#A31217] shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+BTN SECONDARY: bg-[#58151C] text-white font-medium px-5 py-2.5 rounded-lg
+               hover:bg-[#431015] shadow-sm transition-colors
+BTN OUTLINE:   border border-[#D1D5DB] text-[#374151] bg-white font-medium px-5 py-2.5 rounded-lg
+               hover:bg-[#F9FAFB] hover:text-[#C3161C] transition-colors
+
+BADGE RED:     text-[#C3161C] bg-[#C3161C]/10 px-2.5 py-0.5 rounded-full text-xs font-semibold
+BADGE MAROON:  text-[#58151C] bg-[#58151C]/10 px-2.5 py-0.5 rounded-full text-xs font-semibold
+BADGE YELLOW:  text-[#B45309] bg-[#FFCD39]/20 px-2.5 py-0.5 rounded-full text-xs font-semibold
+BADGE GRAY:    text-[#4B5563] bg-[#F3F4F6] px-2.5 py-0.5 rounded-full text-xs font-medium
+
+MODAL OVERLAY: fixed inset-0 z-50 flex items-center justify-center bg-[#111827]/60 backdrop-blur-sm
+MODAL PANEL:   bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4 border border-[#E5E7EB]
+
+SIDEBAR:       bg-[#58151C] text-white h-screen w-64 fixed left-0 top-0 shadow-lg overflow-y-auto
+SIDEBAR LINK:  px-4 py-2.5 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors
+SIDEBAR ACTIVE: bg-[#C3161C] text-white px-4 py-2.5 rounded-lg
 ```
-
-### 4.5 Prohibited Patterns
-
-- ❌ `window.alert()` or `window.confirm()` — use `Modal.tsx` / `Toast.tsx`
-- ❌ Infinite scroll without skeleton states
-- ❌ Client-side filtering for datasets > 50 rows
-- ❌ Any external UI library (Radix, MUI, Shadcn, Headless UI)
-- ❌ Light mode styles: `bg-white`, `bg-gray-100`, `text-gray-900`
-- ❌ Raw `<img>` tags — always use Next.js `<Image />`
-- ❌ `console.log` in committed code
 
 ---
 
-## 5. FOLDER STRUCTURE
+## 5. FOLDER STRUCTURE (STRICT)
 
 ```
 iims-cyber-club/
-│
 ├── app/
-│   ├── layout.tsx                          ← Root layout (fonts, ToastProvider)
-│   ├── globals.css                         ← Tailwind + custom scrollbar styling
-│   │
-│   ├── (public)/                           ← Public website group
-│   │   ├── layout.tsx                      ← Public Navbar + Footer
-│   │   ├── page.tsx                        ← Homepage
+│   ├── (public)/
+│   │   ├── layout.tsx               ← Public layout (no sidebar)
+│   │   ├── page.tsx                 ← Homepage
 │   │   ├── about/page.tsx
 │   │   ├── events/page.tsx
 │   │   └── contact/page.tsx
 │   │
-│   └── portal/                             ← All portal routes
-│       ├── layout.tsx                      ← Auth gate + Sidebar shell
-│       ├── login/page.tsx
-│       ├── pending/page.tsx
-│       ├── dashboard/page.tsx
-│       ├── feed/page.tsx
-│       ├── messages/
-│       │   ├── page.tsx                    ← Conversation list
-│       │   └── [conversationId]/page.tsx   ← Chat window
-│       ├── notifications/page.tsx
-│       ├── documents/page.tsx
-│       ├── events/
-│       │   ├── page.tsx
-│       │   └── [id]/page.tsx
-│       ├── ctf/
-│       │   ├── page.tsx
-│       │   └── [challengeId]/page.tsx
-│       ├── leaderboard/page.tsx
-│       ├── profile/page.tsx
-│       ├── members/[id]/page.tsx
-│       └── admin/page.tsx                  ← 12-tab admin panel
-│
-├── app/api/
-│   ├── contact/route.ts                    ← Public contact form
-│   ├── admin/
-│   │   ├── members/route.ts
-│   │   ├── posts/route.ts
-│   │   ├── events/route.ts
-│   │   ├── documents/route.ts
-│   │   ├── ctf/route.ts
-│   │   ├── broadcast/route.ts              ← Send notification to all members
-│   │   └── export-csv/route.ts
-│   ├── messages/
-│   │   ├── route.ts                        ← List/create conversations
-│   │   └── [conversationId]/route.ts       ← Fetch/send messages
-│   ├── notifications/route.ts
-│   ├── ctf/submit/route.ts                 ← Flag submission (server-side hash compare)
-│   └── upload/route.ts                     ← Generate signed upload URL
+│   ├── portal/
+│   │   ├── layout.tsx               ← Portal layout (sidebar + auth guard)
+│   │   ├── login/page.tsx
+│   │   ├── signup/page.tsx
+│   │   ├── pending/page.tsx
+│   │   ├── dashboard/page.tsx
+│   │   ├── feed/page.tsx
+│   │   ├── messages/page.tsx
+│   │   ├── documents/page.tsx
+│   │   ├── events/page.tsx
+│   │   ├── ctf/page.tsx
+│   │   ├── leaderboard/page.tsx
+│   │   ├── profile/page.tsx
+│   │   └── admin/page.tsx
+│   │
+│   └── api/
+│       ├── auth/
+│       │   └── register/route.ts    ← POST: Create user + member row
+│       ├── admin/
+│       │   └── members/
+│       │       └── approve/route.ts ← PATCH: Approve/reject/update role
+│       └── contact/
+│           └── route.ts             ← POST: Contact form → Resend
 │
 ├── components/
-│   ├── ui/                                 ← Design system primitives
+│   ├── ui/                          ← Reusable primitives
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
 │   │   ├── Modal.tsx
-│   │   ├── ConfirmModal.tsx
-│   │   ├── Toast.tsx
-│   │   ├── ToastProvider.tsx
-│   │   ├── Pagination.tsx
-│   │   ├── Skeleton.tsx
 │   │   ├── Badge.tsx
-│   │   ├── Avatar.tsx
-│   │   ├── MarkdownEditor.tsx
-│   │   └── MarkdownRenderer.tsx
-│   ├── public/
+│   │   └── LoadingSpinner.tsx
+│   ├── public/                      ← Public site components
 │   │   ├── Navbar.tsx
 │   │   ├── Footer.tsx
 │   │   ├── HeroSection.tsx
-│   │   ├── EventCard.tsx
-│   │   └── ContactForm.tsx
-│   └── portal/
-│       ├── Sidebar.tsx                     ← Nav + notification/message badges
+│   │   └── EventCard.tsx
+│   └── portal/                      ← Portal components
+│       ├── Sidebar.tsx
+│       ├── DashboardStats.tsx
 │       ├── PostCard.tsx
-│       ├── PostComposer.tsx
 │       ├── MessageThread.tsx
-│       ├── ConversationList.tsx
-│       ├── ConversationItem.tsx
-│       ├── NotificationItem.tsx
-│       ├── CTFChallengeCard.tsx
-│       ├── FlagSubmitForm.tsx
-│       ├── LeaderboardTable.tsx
-│       ├── MemberCard.tsx
-│       ├── EventCard.tsx                   ← Portal version (with RSVP)
-│       └── admin/                          ← One component per admin tab
-│           ├── AdminOverviewTab.tsx
-│           ├── AdminMembersTab.tsx
-│           ├── AdminPostsTab.tsx
-│           ├── AdminEventsTab.tsx
-│           ├── AdminDocumentsTab.tsx
-│           ├── AdminCTFTab.tsx
-│           ├── AdminLeaderboardTab.tsx
-│           ├── AdminGalleryTab.tsx
-│           ├── AdminMessagesTab.tsx
-│           ├── AdminBroadcastTab.tsx
-│           ├── AdminContactTab.tsx
-│           ├── AdminAuditTab.tsx
-│           └── AdminSettingsTab.tsx
+│       └── AdminMemberRow.tsx
 │
 ├── lib/
-│   ├── supabase.ts                         ← Browser client (ANON key only)
-│   ├── supabase-server.ts                  ← Server client (SERVICE ROLE KEY ONLY)
-│   ├── resend.ts                           ← Resend client instance
-│   ├── auth.ts                             ← getSession(), getMember(), getRole()
-│   ├── validations.ts                      ← All Zod schemas
-│   └── utils.ts                            ← formatDate, truncate, cn(), hashFlag()
-│
-├── hooks/
-│   ├── useToast.ts
-│   ├── useModal.ts
-│   ├── useRealtimeMessages.ts              ← Supabase Realtime DM subscription
-│   └── useNotifications.ts                ← Realtime notification count
+│   ├── supabase/
+│   │   ├── client.ts                ← Browser client (anon key only)
+│   │   ├── server.ts                ← Server client (service role — NEVER import in components)
+│   │   └── middleware.ts            ← Middleware Supabase client
+│   ├── validations/
+│   │   ├── auth.ts                  ← Zod schemas: signup, login
+│   │   └── admin.ts                 ← Zod schemas: approve action
+│   └── email/
+│       └── templates.ts             ← Resend email templates
 │
 ├── types/
-│   └── database.ts                         ← All DB types
+│   └── database.ts                  ← All DB types (auto-generated or hand-written)
 │
-├── middleware.ts
-├── .env.local
-└── CONTEXT.md
+├── middleware.ts                     ← Route protection (root level)
+└── .env.local                        ← Environment variables (never commit)
 ```
 
 ---
@@ -338,27 +243,25 @@ iims-cyber-club/
 ## 6. ENVIRONMENT VARIABLES
 
 ```env
-# .env.local
-
-# Supabase
+# ─── Supabase ─────────────────────────────────────────────
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...           # Safe for browser
-SUPABASE_SERVICE_ROLE_KEY=eyJ...               # ⚠️ SERVER ONLY — never prefix NEXT_PUBLIC_
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...          # Safe for browser
+SUPABASE_SERVICE_ROLE_KEY=eyJ...              # ⚠️ SERVER ONLY — never expose to client
 
-# Email
+# ─── Email ────────────────────────────────────────────────
 RESEND_API_KEY=re_...
 
-# App
-NEXT_PUBLIC_SITE_URL=http://localhost:3000     # Update to Vercel prod URL on deploy
+# ─── App ──────────────────────────────────────────────────
+NEXT_PUBLIC_SITE_URL=http://localhost:3000    # Change to production URL on deploy
 ```
 
-> ⚠️ `SUPABASE_SERVICE_ROLE_KEY` bypasses ALL Row-Level Security. It must **only** appear inside `lib/supabase-server.ts` and server-side API routes. Never import it in any `'use client'` component.
+> **Rule:** `SUPABASE_SERVICE_ROLE_KEY` must NEVER appear in any file inside `components/`, `app/(public)/`, or any client component (`'use client'`). Only use it inside `app/api/` or `lib/supabase/server.ts`.
 
 ---
 
 ## 7. COMPLETE DATABASE SCHEMA
 
-Run this entirely in the **Supabase SQL Editor**. Order matters — foreign keys depend on prior tables.
+Run this entire block in the Supabase SQL Editor **in order**. Do not skip any statement.
 
 ```sql
 -- =============================================
@@ -369,37 +272,34 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- =============================================
 -- MEMBERS
 -- =============================================
-CREATE TABLE members (
+CREATE TABLE IF NOT EXISTS members (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id       uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
-  full_name     text NOT NULL,
+  user_id       uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE NOT NULL,
+  full_name     text NOT NULL CHECK (char_length(full_name) >= 2),
   email         text UNIQUE NOT NULL,
   student_id    text UNIQUE,
+  club_post     text DEFAULT 'General Member',
   role          text NOT NULL DEFAULT 'member'
-                CHECK (role IN ('member', 'admin', 'superadmin')),
+                CHECK (role IN ('member', 'bod', 'admin', 'superadmin')),
   status        text NOT NULL DEFAULT 'pending'
                 CHECK (status IN ('pending', 'approved', 'rejected', 'banned')),
   bio           text,
   avatar_url    text,
-  github_url    text,
-  linkedin_url  text,
-  skills        text[],              -- e.g. ARRAY['web','forensics','pwn']
-  points        integer DEFAULT 0,   -- CTF leaderboard points (managed by trigger)
+  skills        text[] DEFAULT '{}',
+  points        integer DEFAULT 0 CHECK (points >= 0),
   joined_at     timestamptz DEFAULT now(),
-  approved_at   timestamptz,
-  approved_by   uuid REFERENCES members(id) ON DELETE SET NULL
+  updated_at    timestamptz DEFAULT now()
 );
 
 -- =============================================
--- POSTS
+-- POSTS & FEED
 -- =============================================
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   author_id   uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
   title       text,
-  content     text NOT NULL,         -- Stored as Markdown
-  type        text DEFAULT 'post'
-              CHECK (type IN ('post', 'announcement', 'resource')),
+  content     text NOT NULL CHECK (char_length(content) >= 1),
+  type        text DEFAULT 'post' CHECK (type IN ('post', 'announcement', 'resource')),
   is_pinned   boolean DEFAULT false,
   created_at  timestamptz DEFAULT now(),
   updated_at  timestamptz DEFAULT now()
@@ -408,125 +308,67 @@ CREATE TABLE posts (
 -- =============================================
 -- POST REACTIONS
 -- =============================================
-CREATE TABLE post_reactions (
-  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  post_id    uuid NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  member_id  uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS post_reactions (
+  id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id   uuid NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  member_id uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  emoji     text NOT NULL DEFAULT '👍',
   created_at timestamptz DEFAULT now(),
-  UNIQUE(post_id, member_id)         -- One reaction per member per post
+  UNIQUE(post_id, member_id, emoji)
 );
 
 -- =============================================
--- POST COMMENTS
+-- DIRECT MESSAGES
 -- =============================================
-CREATE TABLE post_comments (
-  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  post_id    uuid NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  author_id  uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-  content    text NOT NULL,
-  created_at timestamptz DEFAULT now()
-);
-
--- =============================================
--- DIRECT MESSAGES — Conversations
--- =============================================
-CREATE TABLE conversations (
-  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()  -- Bump on new message for sort order
-);
-
--- =============================================
--- DIRECT MESSAGES — Participants
--- =============================================
-CREATE TABLE conversation_participants (
-  conversation_id  uuid NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
-  member_id        uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-  last_read_at     timestamptz DEFAULT now(),
-  PRIMARY KEY (conversation_id, member_id)
-);
-
--- =============================================
--- DIRECT MESSAGES — Messages
--- =============================================
-CREATE TABLE messages (
-  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  conversation_id  uuid NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
-  sender_id        uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-  content          text NOT NULL,
-  is_deleted       boolean DEFAULT false,
-  created_at       timestamptz DEFAULT now()
-);
-
--- =============================================
--- NOTIFICATIONS
--- =============================================
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS messages (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  recipient_id uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-  sender_id    uuid REFERENCES members(id) ON DELETE SET NULL,
-  type         text NOT NULL CHECK (type IN (
-    'new_message', 'new_post', 'post_reaction', 'post_comment',
-    'event_reminder', 'member_approved', 'member_rejected',
-    'ctf_new_challenge', 'ctf_solved', 'announcement'
-  )),
-  title        text NOT NULL,
-  body         text,
-  link         text,                 -- e.g. '/portal/messages/[convId]'
+  sender_id    uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  receiver_id  uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  content      text NOT NULL CHECK (char_length(content) >= 1),
   is_read      boolean DEFAULT false,
-  created_at   timestamptz DEFAULT now()
+  created_at   timestamptz DEFAULT now(),
+  CHECK (sender_id <> receiver_id)
 );
 
 -- =============================================
 -- DOCUMENTS
 -- =============================================
-CREATE TABLE documents (
-  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  uploader_id    uuid NOT NULL REFERENCES members(id) ON DELETE SET NULL,
-  title          text NOT NULL,
-  description    text,
-  file_url       text NOT NULL,      -- Supabase Storage path (NOT public URL)
-  file_size      bigint,             -- bytes
-  file_type      text,               -- MIME type
-  category       text DEFAULT 'general' CHECK (category IN (
-    'general', 'study-material', 'writeup', 'presentation', 'report', 'other'
-  )),
-  is_public      boolean DEFAULT false,
-  download_count integer DEFAULT 0,
-  created_at     timestamptz DEFAULT now()
+CREATE TABLE IF NOT EXISTS documents (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  uploader_id  uuid NOT NULL REFERENCES members(id) ON DELETE SET NULL,
+  title        text NOT NULL,
+  description  text,
+  file_url     text NOT NULL,
+  file_type    text NOT NULL CHECK (file_type IN ('pdf', 'docx', 'zip', 'txt', 'md')),
+  file_size    bigint,
+  category     text DEFAULT 'general' CHECK (category IN ('general', 'writeup', 'resource', 'official')),
+  created_at   timestamptz DEFAULT now()
 );
 
 -- =============================================
 -- EVENTS
 -- =============================================
-CREATE TABLE public_events (
-  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_by      uuid REFERENCES members(id) ON DELETE SET NULL,
-  title           text NOT NULL,
-  slug            text UNIQUE NOT NULL,  -- URL-friendly e.g. 'ctf-workshop-2025'
-  description     text NOT NULL,        -- Markdown
-  short_desc      text,                 -- Max 160 chars, for public cards
-  event_date      timestamptz NOT NULL,
-  end_date        timestamptz,
-  location        text,                 -- Physical address or "Online"
-  meeting_link    text,                 -- Zoom/Meet URL (portal-only)
-  cover_image_url text,
-  type            text DEFAULT 'workshop' CHECK (type IN (
-    'workshop', 'ctf', 'seminar', 'meetup', 'competition', 'other'
-  )),
-  max_attendees   integer,
-  is_published    boolean DEFAULT false,
-  created_at      timestamptz DEFAULT now()
+CREATE TABLE IF NOT EXISTS events (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title         text NOT NULL,
+  description   text,
+  event_type    text DEFAULT 'workshop' CHECK (event_type IN ('workshop', 'ctf', 'seminar', 'meetup', 'competition')),
+  location      text,
+  starts_at     timestamptz NOT NULL,
+  ends_at       timestamptz,
+  banner_url    text,
+  is_public     boolean DEFAULT true,
+  created_by    uuid REFERENCES members(id) ON DELETE SET NULL,
+  created_at    timestamptz DEFAULT now()
 );
 
 -- =============================================
--- EVENT RSVPs
+-- EVENT REGISTRATIONS
 -- =============================================
-CREATE TABLE event_rsvps (
+CREATE TABLE IF NOT EXISTS event_registrations (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_id   uuid NOT NULL REFERENCES public_events(id) ON DELETE CASCADE,
+  event_id   uuid NOT NULL REFERENCES events(id) ON DELETE CASCADE,
   member_id  uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-  status     text DEFAULT 'going' CHECK (status IN ('going', 'maybe', 'not_going')),
   created_at timestamptz DEFAULT now(),
   UNIQUE(event_id, member_id)
 );
@@ -534,719 +376,972 @@ CREATE TABLE event_rsvps (
 -- =============================================
 -- CTF CHALLENGES
 -- =============================================
-CREATE TABLE ctf_challenges (
+CREATE TABLE IF NOT EXISTS ctf_challenges (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_by   uuid REFERENCES members(id) ON DELETE SET NULL,
   title        text NOT NULL,
-  description  text NOT NULL,           -- Markdown
-  category     text NOT NULL CHECK (category IN (
-    'web', 'forensics', 'crypto', 'pwn', 'reversing', 'osint', 'misc'
-  )),
-  difficulty   text NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard', 'insane')),
-  points       integer NOT NULL DEFAULT 100,
-  flag         text NOT NULL,           -- SHA256 hash of the real flag — NEVER raw
-  flag_format  text DEFAULT 'IIMS{...}',
-  hint         text,
-  file_url     text,                    -- ctf-files storage path (signed URL on request)
-  is_active    boolean DEFAULT false,
-  solves_count integer DEFAULT 0,       -- Denormalized via trigger
+  description  text NOT NULL,
+  category     text NOT NULL CHECK (category IN ('web', 'crypto', 'forensics', 'pwn', 'reverse', 'osint', 'misc')),
+  difficulty   text NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard', 'expert')),
+  points       integer NOT NULL DEFAULT 100 CHECK (points > 0),
+  flag         text NOT NULL,
+  hints        text[] DEFAULT '{}',
+  file_url     text,
+  is_active    boolean DEFAULT true,
+  created_by   uuid REFERENCES members(id) ON DELETE SET NULL,
   created_at   timestamptz DEFAULT now()
 );
 
 -- =============================================
--- CTF SOLVES
+-- CTF SUBMISSIONS
 -- =============================================
-CREATE TABLE ctf_solves (
+CREATE TABLE IF NOT EXISTS ctf_submissions (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   challenge_id uuid NOT NULL REFERENCES ctf_challenges(id) ON DELETE CASCADE,
   member_id    uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-  solved_at    timestamptz DEFAULT now(),
-  UNIQUE(challenge_id, member_id)
+  submitted_flag text NOT NULL,
+  is_correct   boolean NOT NULL DEFAULT false,
+  points_awarded integer DEFAULT 0,
+  submitted_at timestamptz DEFAULT now(),
+  UNIQUE(challenge_id, member_id)            -- one correct submission per member per challenge
 );
 
 -- =============================================
--- GALLERY
+-- NOTIFICATIONS
 -- =============================================
-CREATE TABLE gallery_images (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  uploader_id uuid REFERENCES members(id) ON DELETE SET NULL,
-  url         text NOT NULL,
-  caption     text,
-  event_id    uuid REFERENCES public_events(id) ON DELETE SET NULL,
-  created_at  timestamptz DEFAULT now()
-);
-
--- =============================================
--- CONTACT MESSAGES
--- =============================================
-CREATE TABLE contact_messages (
+CREATE TABLE IF NOT EXISTS notifications (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name       text NOT NULL,
-  email      text NOT NULL,
-  subject    text NOT NULL,
-  message    text NOT NULL,
+  member_id  uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  title      text NOT NULL,
+  body       text NOT NULL,
+  type       text DEFAULT 'info' CHECK (type IN ('info', 'success', 'warning', 'error')),
   is_read    boolean DEFAULT false,
+  link       text,
   created_at timestamptz DEFAULT now()
 );
 
 -- =============================================
--- AUDIT LOGS
+-- UPDATED_AT TRIGGER (applies to members, posts)
 -- =============================================
-CREATE TABLE audit_logs (
-  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  admin_id   uuid REFERENCES members(id) ON DELETE SET NULL,
-  action     text NOT NULL,             -- 'APPROVED_MEMBER', 'DELETED_POST', etc.
-  target_id  text,
-  meta       jsonb,                     -- Old/new values, context
-  ip_address text,
-  created_at timestamptz DEFAULT now()
-);
-
--- =============================================
--- SITE SETTINGS
--- =============================================
-CREATE TABLE site_settings (
-  key        text PRIMARY KEY,
-  value      text NOT NULL,
-  updated_at timestamptz DEFAULT now()
-);
-
-INSERT INTO site_settings (key, value) VALUES
-  ('registration_open',  'true'),
-  ('site_title',         'IIMS Cybersecurity Club'),
-  ('hero_tagline',       'Hack the future. Secure the present.'),
-  ('hero_subtext',       'Join Nepal''s premier college cybersecurity community.'),
-  ('contact_email',      'cybersec@iimscollege.edu.np'),
-  ('ctf_enabled',        'true');
-
--- =============================================
--- TRIGGERS — CTF point + solve count management
--- =============================================
-CREATE OR REPLACE FUNCTION on_ctf_solve_fn()
+CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Increment member points
-  UPDATE members
-    SET points = points + (SELECT points FROM ctf_challenges WHERE id = NEW.challenge_id)
-    WHERE id = NEW.member_id;
-  -- Increment challenge solve count
-  UPDATE ctf_challenges
-    SET solves_count = solves_count + 1
-    WHERE id = NEW.challenge_id;
+  NEW.updated_at = now();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
-CREATE TRIGGER on_ctf_solve
-  AFTER INSERT ON ctf_solves
-  FOR EACH ROW EXECUTE FUNCTION on_ctf_solve_fn();
+CREATE TRIGGER members_updated_at
+  BEFORE UPDATE ON members
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER posts_updated_at
+  BEFORE UPDATE ON posts
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================
--- PERFORMANCE INDEXES
+-- CTF POINTS AUTO-UPDATE TRIGGER
 -- =============================================
-CREATE INDEX idx_members_status       ON members(status);
-CREATE INDEX idx_members_role         ON members(role);
-CREATE INDEX idx_members_points       ON members(points DESC);
-CREATE INDEX idx_posts_created        ON posts(created_at DESC);
-CREATE INDEX idx_posts_author         ON posts(author_id);
-CREATE INDEX idx_messages_conv        ON messages(conversation_id, created_at ASC);
-CREATE INDEX idx_conv_participants    ON conversation_participants(member_id);
-CREATE INDEX idx_notifications_recip  ON notifications(recipient_id, is_read, created_at DESC);
-CREATE INDEX idx_events_date          ON public_events(event_date DESC);
-CREATE INDEX idx_events_published     ON public_events(is_published);
-CREATE INDEX idx_ctf_active           ON ctf_challenges(is_active);
-CREATE INDEX idx_ctf_solves_member    ON ctf_solves(member_id);
-CREATE INDEX idx_ctf_solves_challenge ON ctf_solves(challenge_id);
-CREATE INDEX idx_audit_created        ON audit_logs(created_at DESC);
-CREATE INDEX idx_documents_category   ON documents(category);
+CREATE OR REPLACE FUNCTION award_ctf_points()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.is_correct = true AND OLD.is_correct = false THEN
+    UPDATE members
+    SET points = points + NEW.points_awarded
+    WHERE id = NEW.member_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER ctf_award_points
+  AFTER UPDATE ON ctf_submissions
+  FOR EACH ROW EXECUTE FUNCTION award_ctf_points();
+
+-- =============================================
+-- INDEXES (Performance)
+-- =============================================
+CREATE INDEX IF NOT EXISTS idx_members_user_id ON members(user_id);
+CREATE INDEX IF NOT EXISTS idx_members_status ON members(status);
+CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts(author_id);
+CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id);
+CREATE INDEX IF NOT EXISTS idx_ctf_submissions_member ON ctf_submissions(member_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_member ON notifications(member_id);
 ```
 
 ---
 
 ## 8. SUPABASE STORAGE BUCKETS
 
-| Bucket Name | Visibility | Max Size | Allowed Types | Usage |
+| Bucket Name | Visibility | Allowed MIME Types | Max Size | Usage |
 |---|---|---|---|---|
-| `club-documents` | **Private** (signed URLs, 1hr expiry) | 50MB | PDF, DOCX, PPTX, ZIP | Member docs, writeups |
-| `public-gallery` | Public | 10MB | JPG, PNG, WebP | Event photos, gallery |
-| `event-images` | Public | 5MB | JPG, PNG, WebP | Event cover images |
-| `team-avatars` | Public | 2MB | JPG, PNG, WebP | Member profile photos |
-| `ctf-files` | **Private** (signed URLs, 2hr expiry) | 20MB | Any | Challenge files/attachments |
+| `club-documents` | Private | `application/pdf`, `application/zip`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | 50 MB | Member docs, writeups |
+| `public-gallery` | Public | `image/jpeg`, `image/png`, `image/webp` | 10 MB | Event photos |
+| `team-avatars` | Public | `image/jpeg`, `image/png`, `image/webp` | 5 MB | Profile photos |
+
+Create these in the Supabase Dashboard → Storage → New Bucket. Set the appropriate public/private toggle.
 
 ---
 
 ## 9. ROW-LEVEL SECURITY (RLS) POLICIES
 
-Enable RLS on **every** table. Use the service role (server-side) to bypass when needed for admin operations.
+Run in Supabase SQL Editor **after** creating tables.
 
 ```sql
--- MEMBERS
+-- =============================================
+-- MEMBERS TABLE
+-- =============================================
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Approved members can view approved members"
+
+-- Any approved member can view the members list
+CREATE POLICY "approved_members_can_view_members"
   ON members FOR SELECT
-  USING (status = 'approved');
-CREATE POLICY "Members can update own profile"
+  USING (
+    EXISTS (
+      SELECT 1 FROM members m
+      WHERE m.user_id = auth.uid() AND m.status = 'approved'
+    )
+  );
+
+-- Members can update only their own profile (not role/status)
+CREATE POLICY "member_can_update_own_profile"
   ON members FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = user_id)
+  WITH CHECK (
+    auth.uid() = user_id
+    AND role = (SELECT role FROM members WHERE user_id = auth.uid())
+    AND status = (SELECT status FROM members WHERE user_id = auth.uid())
+  );
 
--- POSTS
+-- Only service role can insert (via API route)
+CREATE POLICY "service_role_insert_members"
+  ON members FOR INSERT
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Only service role can update role/status (admin actions go via API)
+CREATE POLICY "service_role_admin_update"
+  ON members FOR UPDATE
+  USING (auth.role() = 'service_role');
+
+-- =============================================
+-- POSTS TABLE
+-- =============================================
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Approved members can read posts"
+
+CREATE POLICY "approved_members_read_posts"
   ON posts FOR SELECT
-  USING (EXISTS (
-    SELECT 1 FROM members WHERE user_id = auth.uid() AND status = 'approved'
-  ));
-CREATE POLICY "Approved members can insert posts"
+  USING (
+    EXISTS (
+      SELECT 1 FROM members WHERE user_id = auth.uid() AND status = 'approved'
+    )
+  );
+
+CREATE POLICY "bod_and_above_create_posts"
   ON posts FOR INSERT
-  WITH CHECK (EXISTS (
-    SELECT 1 FROM members WHERE user_id = auth.uid() AND status = 'approved'
-  ));
-CREATE POLICY "Authors can update own posts"
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM members
+      WHERE user_id = auth.uid()
+        AND status = 'approved'
+        AND role IN ('bod', 'admin', 'superadmin')
+    )
+  );
+
+CREATE POLICY "author_can_update_own_post"
   ON posts FOR UPDATE
-  USING (author_id = (SELECT id FROM members WHERE user_id = auth.uid()));
+  USING (
+    EXISTS (
+      SELECT 1 FROM members
+      WHERE user_id = auth.uid() AND id = posts.author_id
+    )
+  );
 
--- MESSAGES — members can only read conversations they participate in
+CREATE POLICY "admin_can_delete_any_post"
+  ON posts FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM members
+      WHERE user_id = auth.uid()
+        AND status = 'approved'
+        AND role IN ('admin', 'superadmin')
+    )
+  );
+
+-- =============================================
+-- MESSAGES TABLE
+-- =============================================
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Members can read own conversation messages"
+
+CREATE POLICY "members_see_own_messages"
   ON messages FOR SELECT
-  USING (EXISTS (
-    SELECT 1 FROM conversation_participants cp
-    JOIN members m ON m.id = cp.member_id
-    WHERE cp.conversation_id = messages.conversation_id
-      AND m.user_id = auth.uid()
-  ));
+  USING (
+    EXISTS (
+      SELECT 1 FROM members
+      WHERE user_id = auth.uid()
+        AND (id = messages.sender_id OR id = messages.receiver_id)
+        AND status = 'approved'
+    )
+  );
 
--- NOTIFICATIONS — only own notifications
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Members can read own notifications"
-  ON notifications FOR SELECT
-  USING (recipient_id = (SELECT id FROM members WHERE user_id = auth.uid()));
-CREATE POLICY "Members can update own notifications (mark read)"
-  ON notifications FOR UPDATE
-  USING (recipient_id = (SELECT id FROM members WHERE user_id = auth.uid()));
+CREATE POLICY "approved_members_send_messages"
+  ON messages FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM members
+      WHERE user_id = auth.uid() AND id = messages.sender_id AND status = 'approved'
+    )
+  );
 
--- CTF CHALLENGES — never expose flag column client-side
+-- =============================================
+-- CTF CHALLENGES TABLE
+-- =============================================
 ALTER TABLE ctf_challenges ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Approved members can read active challenges"
+
+CREATE POLICY "approved_members_view_active_challenges"
   ON ctf_challenges FOR SELECT
   USING (
     is_active = true AND
-    EXISTS (SELECT 1 FROM members WHERE user_id = auth.uid() AND status = 'approved')
+    EXISTS (
+      SELECT 1 FROM members WHERE user_id = auth.uid() AND status = 'approved'
+    )
   );
--- Note: API queries must explicitly exclude the 'flag' column:
--- .select('id, title, description, category, difficulty, points, hint, file_url, solves_count')
 
--- CTF SOLVES
-ALTER TABLE ctf_solves ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Members can read own solves"
-  ON ctf_solves FOR SELECT
-  USING (member_id = (SELECT id FROM members WHERE user_id = auth.uid()));
+-- =============================================
+-- CTF SUBMISSIONS TABLE
+-- =============================================
+ALTER TABLE ctf_submissions ENABLE ROW LEVEL SECURITY;
 
--- CONTACT MESSAGES — public insert, admin read via service role
-ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can insert contact message"
-  ON contact_messages FOR INSERT WITH CHECK (true);
+CREATE POLICY "members_see_own_submissions"
+  ON ctf_submissions FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM members WHERE user_id = auth.uid() AND id = ctf_submissions.member_id
+    )
+  );
+
+CREATE POLICY "approved_members_submit_flags"
+  ON ctf_submissions FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM members
+      WHERE user_id = auth.uid() AND id = ctf_submissions.member_id AND status = 'approved'
+    )
+  );
+
+-- =============================================
+-- NOTIFICATIONS TABLE
+-- =============================================
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "members_view_own_notifications"
+  ON notifications FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM members WHERE user_id = auth.uid() AND id = notifications.member_id
+    )
+  );
 ```
 
 ---
 
 ## 10. AUTHENTICATION & MIDDLEWARE
 
-### 10.1 Auth Flow
+### 10.1 Supabase Client Files
 
+**`lib/supabase/client.ts`** — Browser only (anon key)
+```typescript
+import { createBrowserClient } from '@supabase/ssr'
+import type { Database } from '@/types/database'
+
+export function createClient() {
+  return createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 ```
-User enters email on /portal/login
-→ Supabase sends Magic Link (via Resend)
-→ User clicks link → Supabase creates session cookie
-→ middleware.ts intercepts protected routes:
 
-  No session?          → redirect /portal/login
-  Session + pending?   → redirect /portal/pending
-  Session + rejected?  → redirect /portal/login (show reason)
-  Session + banned?    → redirect /portal/login (show ban message)
-  Session + approved?  → allow access to /portal/*
-  Session + admin?     → allow access to /portal/admin
+**`lib/supabase/server.ts`** — Server only (service role)
+```typescript
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import type { Database } from '@/types/database'
+
+export function createServerSupabaseClient() {
+  const cookieStore = cookies()
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) { return cookieStore.get(name)?.value },
+        set(name, value, options) { cookieStore.set({ name, value, ...options }) },
+        remove(name, options) { cookieStore.set({ name, value: '', ...options }) },
+      }
+    }
+  )
+}
+
+// Service role — for admin API routes only
+export function createAdminSupabaseClient() {
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { cookies: { get: () => '', set: () => {}, remove: () => {} } }
+  )
+}
 ```
 
-### 10.2 Middleware (`middleware.ts`)
+### 10.2 Middleware (`middleware.ts` — root level)
 
 ```typescript
-// Protected prefixes
-const MEMBER_ROUTES = [
-  '/portal/dashboard', '/portal/feed', '/portal/messages',
-  '/portal/notifications', '/portal/documents', '/portal/events',
-  '/portal/ctf', '/portal/leaderboard', '/portal/profile', '/portal/members'
-]
-const ADMIN_ROUTES = ['/portal/admin']
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-// Performance strategy:
-// 1. Check Supabase session (lightweight JWT validation)
-// 2. Read signed cookie 'iims_member_ctx' → { memberId, role, status }
-// 3. Cookie missing → DB lookup → set cookie (1hr TTL) → proceed
-// 4. Avoid DB hit on every route change
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({ request: { headers: request.headers } })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) { return request.cookies.get(name)?.value },
+        set(name, value, options) {
+          request.cookies.set({ name, value, ...options })
+          response = NextResponse.next({ request: { headers: request.headers } })
+          response.cookies.set({ name, value, ...options })
+        },
+        remove(name, options) {
+          request.cookies.set({ name, value: '', ...options })
+          response = NextResponse.next({ request: { headers: request.headers } })
+          response.cookies.set({ name, value: '', ...options })
+        },
+      }
+    }
+  )
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const pathname = request.nextUrl.pathname
+
+  // Not authenticated → send to login (except login/signup/pending pages)
+  if (!session && pathname.startsWith('/portal') &&
+      !pathname.startsWith('/portal/login') &&
+      !pathname.startsWith('/portal/signup') &&
+      !pathname.startsWith('/portal/pending')) {
+    return NextResponse.redirect(new URL('/portal/login', request.url))
+  }
+
+  // Authenticated → check member status
+  if (session && pathname.startsWith('/portal') &&
+      !pathname.startsWith('/portal/login') &&
+      !pathname.startsWith('/portal/signup')) {
+    const { data: member } = await supabase
+      .from('members')
+      .select('status, role')
+      .eq('user_id', session.user.id)
+      .single()
+
+    if (!member) {
+      return NextResponse.redirect(new URL('/portal/login', request.url))
+    }
+
+    if (member.status === 'pending' && !pathname.startsWith('/portal/pending')) {
+      return NextResponse.redirect(new URL('/portal/pending', request.url))
+    }
+
+    if ((member.status === 'rejected' || member.status === 'banned') &&
+        !pathname.startsWith('/portal/login')) {
+      await supabase.auth.signOut()
+      return NextResponse.redirect(new URL('/portal/login?reason=access_denied', request.url))
+    }
+
+    if (pathname.startsWith('/portal/admin') && !['admin', 'superadmin'].includes(member.role)) {
+      return NextResponse.redirect(new URL('/portal/dashboard', request.url))
+    }
+  }
+
+  // Already logged in → skip login/signup pages
+  if (session && (pathname === '/portal/login' || pathname === '/portal/signup')) {
+    return NextResponse.redirect(new URL('/portal/dashboard', request.url))
+  }
+
+  return response
+}
+
+export const config = {
+  matcher: ['/portal/:path*']
+}
 ```
 
 ### 10.3 Role Hierarchy
 
-| Role | Capabilities |
-|---|---|
-| `member` | All portal features: feed, DMs, docs, CTF, events, profile |
-| `admin` | All member features + full Admin Panel (cannot demote other admins) |
-| `superadmin` | All admin features + promote/demote admins + site settings |
-
----
-
-## 11. FEATURE SPECIFICATIONS
-
-### 11.1 Member Registration & Approval
-
-**Flow:**
-1. Visitor goes to `/portal/login` → enters email → clicks "Send Magic Link"
-2. Email arrives (sent via Resend, not Supabase default)
-3. First-time login → redirect to registration completion form
-4. Form fields: `full_name` (required), `student_id` (required), `bio` (optional), `skills[]` (multi-select checkboxes)
-5. Submit → member created with `status: 'pending'` → redirect to `/portal/pending`
-6. `/portal/pending` shows: "Your application is under review. You will receive an email when approved."
-7. Admin approves in Admin Panel → `status → 'approved'` → welcome email sent via Resend → member can now log in to dashboard
-
----
-
-### 11.2 Member Dashboard (`/portal/dashboard`)
-
-Displayed widgets (all data fetched server-side in parallel):
-- **Welcome Banner:** "Welcome back, [name]" + formatted current date
-- **Stats Row (4 cards):** Total approved members | Active CTF challenges | Upcoming events | Your points + rank
-- **Pinned/Announcement Feed:** Last 3 announcement posts
-- **Upcoming Events:** Next 2 events with one-click RSVP
-- **CTF Progress:** Solved N / Total challenges + your rank position
-- **Unread Notifications:** Count badge + latest 3 notification items
-
----
-
-### 11.3 Post Feed (`/portal/feed`)
-
-- Paginated (20 posts/page), sorted by `created_at DESC`, pinned posts always float to top
-- Post type badges: `announcement` = amber, `resource` = cyan, `post` = muted
-- Markdown rendered via `MarkdownRenderer.tsx` (sanitized — no raw HTML)
-- **Reactions:** Toggle like button (1 per member). Count updates live via Realtime subscription
-- **Comments:** Expandable section per post. Paginated 20/page. Members can delete own comments.
-- **Compose Panel:** Members can create `post` or `resource` type. Admins can create `announcement`.
-- **Pinning:** Admin only — pins post to top of feed
-- **Edit:** Author can edit own post within 24h (shows `updated_at` label)
-- **Delete:** Author deletes own post. Admin deletes any post (with `ConfirmModal`)
-- **Search:** Server-side `ilike` search on `title` + `content`
-
----
-
-### 11.4 Direct Messaging (DMs) — `/portal/messages`
-
-**Architecture:** Supabase Realtime subscribed to `messages` table filtered by `conversation_id`.
-
-**Conversation List (left panel — `w-72`):**
-- Sorted by `conversations.updated_at DESC` (most recent message first)
-- Each row: `Avatar` + name + last message preview (60 char truncate) + unread count badge + relative timestamp
-- "New Message" button → member search modal → select member → creates/opens conversation
-
-**Chat Window (right panel — `flex-1`):**
-- Header: avatar + name + online indicator dot
-- Messages: oldest at top, newest at bottom, auto-scroll to bottom on load and new message
-- Self messages: right-aligned, emerald bubble. Other messages: left-aligned, dark bubble
-- Timestamps shown on hover
-- Soft-delete: "Delete" option on own messages → content replaced with `[message deleted]`
-- Input: multi-line textarea + Send button (or `Ctrl+Enter`)
-
-**Real-Time:**
-```typescript
-// useRealtimeMessages hook
-supabase.channel(`messages:${conversationId}`)
-  .on('postgres_changes', {
-    event: 'INSERT', schema: 'public', table: 'messages',
-    filter: `conversation_id=eq.${conversationId}`
-  }, (payload) => setMessages(prev => [...prev, payload.new]))
-  .subscribe()
-```
-
-**Unread count:** Sidebar `MessageSquare` icon shows red badge with total unread count, updated via `useNotifications` hook.
-
-**DB flow for sending a message:**
-```
-INSERT into messages → UPDATE conversations.updated_at → INSERT notification (type: 'new_message') for recipient
-```
-
----
-
-### 11.5 Notifications (`/portal/notifications`)
-
-**Notification types and triggers:**
-
-| Type | Trigger | Destination Link |
+| Role | DB Value | Capabilities |
 |---|---|---|
-| `new_message` | Someone sends a DM | `/portal/messages/[convId]` |
-| `announcement` | Admin broadcasts to all | `/portal/feed` |
-| `post_reaction` | Someone reacts to your post | `/portal/feed#[postId]` |
-| `post_comment` | Someone comments on your post | `/portal/feed#[postId]` |
-| `event_reminder` | 24hr before an RSVPd event | `/portal/events/[id]` |
-| `member_approved` | Admin approves your registration | `/portal/dashboard` |
-| `member_rejected` | Admin rejects your application | `/portal/login` |
-| `ctf_new_challenge` | New challenge published | `/portal/ctf` |
-| `ctf_solved` | You correctly submit a flag | `/portal/leaderboard` |
-
-**UI:**
-- List sorted by `created_at DESC`, 30 per page
-- Unread items: subtle `bg-[#10B981]/5 border-l-2 border-[#10B981]` left accent
-- "Mark all as read" button (top right, ghost style)
-- Click item → navigate to `link` + mark as read
-- Sidebar bell icon: red badge with unread count, live via Realtime
+| General Member | `member` | Read feed, access docs, play CTF, manage own profile |
+| Board of Directors | `bod` | All member capabilities + create posts, manage events |
+| Admin | `admin` | All BoD capabilities + approve/reject members, admin panel |
+| Super Admin | `superadmin` | All admin capabilities + manage admins, cannot be removed |
 
 ---
 
-### 11.6 Documents & Resources (`/portal/documents`)
+## 11. FRONTEND ↔ BACKEND CONNECTION RULES
 
-- Category filter tabs: All | Study Material | Writeups | Presentations | Reports | Other
-- Document card: icon (by file type), title, uploader name, category badge, file size, upload date, download count
-- **Download:** Private documents → server generates signed URL (1hr expiry) → download starts
-- **Upload:** Member uploads → file goes to `club-documents` bucket → metadata saved to `documents` table
-- **Search:** Server-side `ilike` on `title` + `description`
-- **Admin controls:** Delete any document, toggle `is_public`, change category
-- Pagination: 20 per page
+> This section defines exactly how data flows. Any deviation causes bugs.
 
----
+### 11.1 Data Fetching Patterns
 
-### 11.7 Events System
+**Server Components (default — use for initial data loads):**
+```typescript
+// app/portal/dashboard/page.tsx
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
-**Public site (`/events`):**
-- Only `is_published: true` events shown
-- Card: cover image, title, date, type badge, short_desc, "Learn More" button
-- Event detail: full description, location, type. CTA: "Login to RSVP →"
+export default async function DashboardPage() {
+  const supabase = createServerSupabaseClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return null  // middleware handles redirect
 
-**Portal (`/portal/events`):**
-- Same listing + RSVP control (Going / Maybe / Not Going — toggle)
-- Event detail: full Markdown description, meeting link (portal-only), attendee list with avatars
-- "My Events" filter tab: shows only events you RSVPd "going" to
-- Attendee count shown on card: `X going · Y maybe`
+  const { data: member, error } = await supabase
+    .from('members')
+    .select('*')
+    .eq('user_id', session.user.id)
+    .single()
 
-**Admin:** Create, edit (all fields), publish/unpublish toggle, delete (with `ConfirmModal`), upload cover image.
+  if (error || !member) return <div>Error loading profile</div>
+  return <DashboardClient member={member} />
+}
+```
 
----
+**Client Components (for interactivity — reactions, real-time, forms):**
+```typescript
+'use client'
+import { createClient } from '@/lib/supabase/client'
+```
 
-### 11.8 CTF Challenges & Leaderboard
+### 11.2 API Routes — Authenticated
 
-**Challenge Grid (`/portal/ctf`):**
-- Filter bar: category buttons + difficulty buttons (all combinable)
-- Card: title, category badge (cyan), difficulty badge (color-coded), points, solve count
-- Solved overlay: emerald `✓ SOLVED` stamp on card
-- Difficulty color mapping:
-  - `easy` → `text-[#10B981]` badge
-  - `medium` → `text-[#F59E0B]` badge
-  - `hard` → `text-[#EF4444]` badge
-  - `insane` → `text-[#EF4444]` badge + `animate-pulse`
-
-**Challenge Detail (`/portal/ctf/[challengeId]`):**
-- Title, category + difficulty badges, points value
-- Description rendered as Markdown
-- Challenge file download button (if present) → signed URL from `/api/upload`
-- **Flag hint:** "Show Hint" button (hint shown inline, tracked for future point deduction)
-- **Flag submit form (`FlagSubmitForm.tsx`):**
-  - Input enforces `IIMS{` prefix client-side
-  - Submit → POST `/api/ctf/submit` with `{ challengeId, flag }`
-  - Server: SHA256(flag) compared to stored hash — never return hash to client
-  - Success: Toast "🏴 Flag captured! +[points] points" + update member.points display
-  - Wrong: Toast error "Incorrect flag. Keep trying." (no hint about closeness)
-  - Already solved: Button replaced with "✓ Already Solved"
-
-**Leaderboard (`/portal/leaderboard`):**
-- Table: Rank | Avatar | Name | Points | Challenges Solved | Last Solve Date
-- Top 3 rows: gold/silver/bronze highlight (`#F59E0B`, `#A1A1AA`, `#B45309` tint)
-- Viewer's own row: always highlighted with emerald left border, sticky if outside top 10
-- Pagination: 20 per page
-
----
-
-### 11.9 Member Profiles
-
-**Own Profile (`/portal/profile`):**
-- Edit: `full_name`, `bio`, avatar upload (→ `team-avatars` bucket), `github_url`, `linkedin_url`, `skills[]`
-- Stats section (read-only): Points, CTF rank, Challenges solved, Posts published, Member since
-
-**Other Member's Profile (`/portal/members/[id]`):**
-- Read-only: avatar, name, bio, skills badges, CTF stats, joined date
-- Solved challenges list (titles only — no flags ever shown)
-- Recent posts by member
-- "Send Message" CTA → creates or navigates to existing DM conversation
-
----
-
-### 11.10 Public Website
-
-**Homepage (`/`):** Hero tagline (from `site_settings`), animated terminal cursor effect, stats bar (member count, events, CTF challenges), 3 upcoming featured events, team section (admins from `members` table), join CTA button.
-
-**About (`/about`):** Mission statement, leadership team cards (avatar, name, role), club gallery grid (from `public-gallery` bucket), brief club history.
-
-**Events (`/events`):** Grid of published events, filter by type. Event cards link to detail page. No RSVP on public site — "Login to RSVP" CTA redirects to `/portal/login`.
-
-**Contact (`/contact`):** Name, email, subject, message form. Submit → POST `/api/contact` → insert into `contact_messages` + send Resend notification to club email. Client receives success Toast.
-
----
-
-### 11.11 Contact Form API (`/api/contact/route.ts`)
+All API routes under `/api/admin/*` must verify session AND role before any DB operation:
 
 ```typescript
-// Zod validation
-const schema = z.object({
-  name:    z.string().min(2).max(100),
-  email:   z.string().email(),
-  subject: z.string().min(5).max(200),
-  message: z.string().min(10).max(2000),
+// Pattern for all admin API routes
+import { createAdminSupabaseClient, createServerSupabaseClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function PATCH(req: NextRequest) {
+  // 1. Verify session
+  const supabase = createServerSupabaseClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // 2. Verify role
+  const { data: caller } = await supabase
+    .from('members')
+    .select('role, status')
+    .eq('user_id', session.user.id)
+    .single()
+
+  if (!caller || !['admin', 'superadmin'].includes(caller.role) || caller.status !== 'approved') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  // 3. Validate input with Zod
+  // 4. Execute with admin client (service role)
+  const adminClient = createAdminSupabaseClient()
+  // ... DB operations
+}
+```
+
+### 11.3 Form Submission Pattern
+
+```typescript
+'use client'
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+
+export function PostForm() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('posts').insert({ content: '...' })
+      if (error) throw error
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
+  // ...
+}
+```
+
+---
+
+## 12. FEATURE SPECIFICATIONS
+
+### 12.1 Self-Registration & Approval Flow
+
+1. User visits `/portal/signup`
+2. Form fields: `full_name` (required), `email` (required), `password` (min 8 chars, required), `confirm_password`, `student_id` (optional), `requested_club_post` (text field)
+3. On submit → POST `/api/auth/register`
+4. API creates Supabase Auth user, then inserts into `members` with `status: 'pending'`, `role: 'member'`
+5. User is redirected to `/portal/pending`
+6. Admin approves in Admin Panel → `status` updated to `'approved'` → welcome email sent via Resend
+
+### 12.2 Member Dashboard
+
+- Background: `bg-[#F9FAFB]`
+- Stat cards: Points, Challenges Solved, Posts, Events Attended — all cards use IIMS Card primitive
+- BoD members see an additional "Quick Actions" panel: "New Post", "Create Event"
+- Data fetched server-side on page load, real-time reactions fetched client-side
+
+### 12.3 CTF Module
+
+- Flag submission: POST to `ctf_submissions` via API route (not direct client insert — flag must be verified server-side)
+- Points awarded automatically via DB trigger (§7)
+- Leaderboard: `SELECT member_id, sum(points_awarded) FROM ctf_submissions WHERE is_correct = true GROUP BY member_id ORDER BY sum DESC`
+- Flags must never be returned to client — CTF challenge queries must never include the `flag` column
+
+---
+
+## 13. ADMIN PANEL SPECIFICATION
+
+Route: `/portal/admin` — Requires `role IN ('admin', 'superadmin')`
+
+### 13.1 Tabs
+
+| Tab | Function |
+|---|---|
+| Members | View all members, filter by status, approve/reject/ban |
+| Posts | View all posts, pin/unpin, delete |
+| Events | Create/edit/delete events |
+| CTF | Create/edit/delete challenges |
+| Documents | Upload/delete club documents |
+
+### 13.2 Member Approval Workflow
+
+1. Admin sees list of `status = 'pending'` members (highlighted in yellow badge)
+2. Admin sets `role` via dropdown: `member` / `bod`
+3. Admin sets `club_post` via text input (e.g., "Vice President")
+4. Admin clicks "Approve" → PATCH `/api/admin/members/approve`
+5. API validates admin role → updates `members` row → sends Resend welcome email
+6. Rejected members: PATCH `/api/admin/members/approve` with `status: 'rejected'` → sends rejection email
+
+### 13.3 Superadmin Protections
+
+- `superadmin` role can never be changed by an `admin`
+- Only another `superadmin` can modify a `superadmin`'s record
+- Enforce this in the API route level check
+
+---
+
+## 14. API ROUTES REFERENCE
+
+| Method | Route | Auth Required | Role | Description |
+|---|---|---|---|---|
+| POST | `/api/auth/register` | No | — | Create Supabase user + `members` row |
+| PATCH | `/api/admin/members/approve` | Yes | `admin`/`superadmin` | Update member `status`, `role`, `club_post` |
+| POST | `/api/contact` | No | — | Send contact form email via Resend |
+| POST | `/api/ctf/submit` | Yes | `member`+ | Verify flag, insert submission, update points |
+
+### `/api/auth/register` — Full Implementation
+
+```typescript
+import { createAdminSupabaseClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
+const registerSchema = z.object({
+  full_name: z.string().min(2).max(100),
+  email: z.string().email(),
+  password: z.string().min(8).max(100),
+  student_id: z.string().optional(),
+  club_post: z.string().optional(),
 })
 
-// Rate limiting: max 3 submissions per IP per hour (use headers or KV store)
-// Success: INSERT into contact_messages + Resend email to club address
-// Response: NextResponse<{ success: true }> or NextResponse<{ error: string }, { status: 400 }>
-```
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const validated = registerSchema.safeParse(body)
+    if (!validated.success) {
+      return NextResponse.json({ error: validated.error.flatten() }, { status: 400 })
+    }
 
----
+    const { full_name, email, password, student_id, club_post } = validated.data
+    const adminClient = createAdminSupabaseClient()
 
-## 12. ADMIN PANEL SPECIFICATION
+    // Create auth user
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,  // skip email confirmation — admin approves instead
+    })
 
-Route: `/portal/admin` — requires `role: admin` or `role: superadmin`.
+    if (authError) {
+      if (authError.message.includes('already registered')) {
+        return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
+      }
+      throw authError
+    }
 
-### 12.1 Layout
-- Horizontal tab bar at top of page
-- Active tab: `border-b-2 border-[#10B981] text-[#F8FAFC] font-mono`
-- Inactive tab: `text-[#A1A1AA] hover:text-[#F8FAFC] font-mono`
-- Tab content rendered below the bar in a full-width panel
+    // Create member row
+    const { error: memberError } = await adminClient.from('members').insert({
+      user_id: authData.user.id,
+      full_name,
+      email,
+      student_id: student_id || null,
+      club_post: club_post || 'General Member',
+      role: 'member',
+      status: 'pending',
+    })
 
-### 12.2 Tabs (13 Total)
+    if (memberError) {
+      // Rollback: delete auth user if member insert fails
+      await adminClient.auth.admin.deleteUser(authData.user.id)
+      throw memberError
+    }
 
-| # | Tab Label | Key Features |
-|---|---|---|
-| 1 | **Overview** | Stat cards: total members, pending approvals, posts, events, CTF solves today, unread contact messages |
-| 2 | **Members** | Paginated (20/pg), filter by status, approve/reject/ban buttons, "Export CSV" |
-| 3 | **Posts** | Paginated, pin/unpin, delete, create announcement with `MarkdownEditor` |
-| 4 | **Events** | Create/edit/delete, publish toggle, view RSVP attendee list per event |
-| 5 | **Documents** | Upload new doc, manage existing, toggle `is_public`, delete |
-| 6 | **CTF Challenges** | Create/edit challenge (title, desc, category, difficulty, points, flag, hint, file), activate/deactivate |
-| 7 | **Leaderboard** | Read-only leaderboard + manual point adjustment input (logged to audit_logs) |
-| 8 | **Gallery** | Upload images (to `public-gallery`), tag to event, delete |
-| 9 | **Broadcast** | Compose message → creates `notification` row for every approved member (type: `announcement`) |
-| 10 | **Contact Inbox** | Paginated list of contact form submissions, mark as read, view full message |
-| 11 | **Audit Logs** | Paginated (30/pg), filterable by action type, shows admin + action + target + timestamp |
-| 12 | **Site Settings** | Edit `site_settings` key-value pairs: hero tagline, registration open/closed, CTF enabled |
-| 13 | **Pending Review** | Quick-access tab showing only `status: 'pending'` members for fast approval workflow |
-
-### 12.3 Admin Interaction Standards
-
-| Interaction | Implementation |
-|---|---|
-| Delete any record | `ConfirmModal.tsx`: "This action cannot be undone." + [DELETE] [Cancel] |
-| Approve member | Inline button → Toast "Member approved. Welcome email sent." + audit log entry |
-| Reject member | `ConfirmModal` with optional rejection reason → email sent to member |
-| Ban member | `ConfirmModal` with required reason field → logged to `audit_logs` with `meta` |
-| Async button states | `disabled + "PROCESSING..."` + `<Loader2 className="animate-spin" />` icon |
-| Success | Toast with `border-[#10B981]` |
-| Error | Toast with `border-[#EF4444]` |
-| Pagination | `.range(from, to)` with `<Pagination />` component — 20 records/page |
-
-### 12.4 CSV Export Format
-
-```
-id,full_name,email,student_id,role,status,points,joined_at,approved_at
-uuid,Jane Doe,jane@iims.edu.np,STU001,member,approved,350,2025-01-15,2025-01-16
-```
-
----
-
-## 13. API ROUTES REFERENCE
-
-All routes in `app/api/`. Admin routes verify `role` using the service-role Supabase client.
-
-| Method | Route | Auth | Description |
-|---|---|---|---|
-| `POST` | `/api/contact` | Public | Submit contact form → DB + Resend |
-| `GET` | `/api/admin/members` | Admin | List members with status filter + pagination |
-| `PATCH` | `/api/admin/members` | Admin | Update member status or role |
-| `POST` | `/api/admin/events` | Admin | Create event |
-| `PATCH` | `/api/admin/events` | Admin | Update event (including publish toggle) |
-| `DELETE` | `/api/admin/events` | Admin | Delete event |
-| `POST` | `/api/admin/ctf` | Admin | Create CTF challenge |
-| `PATCH` | `/api/admin/ctf` | Admin | Update / activate challenge |
-| `DELETE` | `/api/admin/ctf` | Admin | Delete challenge |
-| `POST` | `/api/admin/broadcast` | Admin | Send notification to all approved members |
-| `GET` | `/api/admin/export-csv` | Admin | Stream approved members as CSV |
-| `GET` | `/api/messages` | Member | List conversations for current user |
-| `POST` | `/api/messages` | Member | Start a new conversation |
-| `GET` | `/api/messages/[id]` | Member | Fetch paginated messages in conversation |
-| `POST` | `/api/messages/[id]` | Member | Send a message |
-| `GET` | `/api/notifications` | Member | List notifications (paginated) |
-| `PATCH` | `/api/notifications` | Member | Mark notification(s) read |
-| `POST` | `/api/ctf/submit` | Member | Submit CTF flag (server-side SHA256 compare) |
-| `POST` | `/api/upload` | Member | Generate signed upload URL for a storage bucket |
-
----
-
-## 14. REAL-TIME FEATURES (Supabase Realtime)
-
-Enable Realtime on these tables in **Supabase Dashboard → Database → Replication → Supabase Realtime**.
-
-| Table | Events Listened | Component | Hook |
-|---|---|---|---|
-| `messages` | `INSERT` | Chat window | `useRealtimeMessages(conversationId)` |
-| `notifications` | `INSERT` | Sidebar bell + Notification page | `useNotifications(memberId)` |
-| `post_reactions` | `INSERT`, `DELETE` | PostCard like count | Inline subscription in `PostCard.tsx` |
-
-**Pattern (`useRealtimeMessages.ts`):**
-```typescript
-export function useRealtimeMessages(conversationId: string) {
-  const [messages, setMessages] = useState<Message[]>([])
-
-  useEffect(() => {
-    const channel = supabase
-      .channel(`messages:${conversationId}`)
-      .on('postgres_changes', {
-        event: 'INSERT', schema: 'public', table: 'messages',
-        filter: `conversation_id=eq.${conversationId}`
-      }, (payload) => {
-        setMessages(prev => [...prev, payload.new as Message])
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [conversationId])
-
-  return messages
-}
-```
-
-**Pattern (`useNotifications.ts`):**
-```typescript
-export function useNotifications(memberId: string) {
-  const [unreadCount, setUnreadCount] = useState(0)
-
-  useEffect(() => {
-    const channel = supabase
-      .channel(`notifications:${memberId}`)
-      .on('postgres_changes', {
-        event: 'INSERT', schema: 'public', table: 'notifications',
-        filter: `recipient_id=eq.${memberId}`
-      }, () => {
-        setUnreadCount(prev => prev + 1)
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [memberId])
-
-  return unreadCount
+    return NextResponse.json({ success: true }, { status: 201 })
+  } catch (err: unknown) {
+    console.error('[register]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
 ```
 
 ---
 
-## 15. EMAIL TEMPLATES (Resend)
+## 15. REAL-TIME FEATURES
 
-All emails use `from: "IIMS Cybersecurity Club <noreply@iimscollege.edu.np>"`.
+### Direct Messages
 
-| Email | Trigger | Subject |
-|---|---|---|
-| Magic Link | Login request | `[IIMS CyberSec] Your login link` |
-| Welcome | Member approved by admin | `Welcome to IIMS Cybersecurity Club 🛡️` |
-| Rejection | Admin rejects application | `Your application status — IIMS CyberSec Club` |
-| Event Reminder | 24hr before RSVPd event | `Reminder: [Event Name] is tomorrow` |
-| Contact Confirmation | Public contact form submitted | `We received your message — IIMS CyberSec` |
-| Admin Alert | New pending member registration | `New member application — action required` |
+```typescript
+'use client'
+import { useEffect, useRef } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import type { Message } from '@/types/database'
+
+export function useMessages(receiverId: string, onNew: (msg: Message) => void) {
+  const supabase = createClient()
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
+
+  useEffect(() => {
+    channelRef.current = supabase
+      .channel(`messages:${receiverId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${receiverId}`,
+        },
+        (payload) => onNew(payload.new as Message)
+      )
+      .subscribe()
+
+    return () => {
+      channelRef.current?.unsubscribe()
+    }
+  }, [receiverId])
+}
+```
+
+### Post Reactions (Optimistic UI)
+
+```typescript
+// Update local state instantly, then sync to DB
+async function handleReaction(postId: string, emoji: string) {
+  // 1. Optimistic update
+  setPosts(prev => prev.map(p => p.id === postId ? { ...p, reacted: true } : p))
+
+  // 2. DB sync
+  const { error } = await supabase.from('post_reactions').upsert({
+    post_id: postId,
+    member_id: currentMemberId,
+    emoji,
+  })
+
+  // 3. Rollback on failure
+  if (error) {
+    setPosts(prev => prev.map(p => p.id === postId ? { ...p, reacted: false } : p))
+  }
+}
+```
 
 ---
 
-## 16. CODING RULES & STANDARDS
+## 16. EMAIL TEMPLATES (Resend)
 
-### Security
-- `lib/supabase-server.ts` **MUST** use `process.env.SUPABASE_SERVICE_ROLE_KEY` — never the anon key
-- CTF flag column stores **SHA256 hash** only. Flag comparison is server-side only in `/api/ctf/submit`
-- The `flag` column must **never** appear in any `SELECT` statement accessible to clients
-- All admin API routes must re-verify the caller's `role` server-side using the service client
-- Signed URLs for private buckets: generate server-side, max 1hr expiry
-- Rate-limit public endpoints (contact form: 3 req/IP/hr)
+All emails use IIMS branding: Maroon `#58151C` header, IIMS Red `#C3161C` CTA buttons, white body.
+
+```typescript
+// lib/email/templates.ts
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+export async function sendWelcomeEmail(to: string, name: string) {
+  return resend.emails.send({
+    from: 'IIMS Cybersecurity Club <cybersec@iimscollege.edu.np>',
+    to,
+    subject: 'Welcome to IIMS Cybersecurity Club!',
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto">
+        <div style="background:#58151C;padding:24px;text-align:center">
+          <h1 style="color:#fff;margin:0;font-family:Poppins,sans-serif">IIMS Cybersecurity Club</h1>
+        </div>
+        <div style="padding:32px;background:#fff">
+          <h2 style="color:#111827">Welcome, ${name}!</h2>
+          <p style="color:#6B7280">Your account has been approved. You now have full access to the member portal.</p>
+          <a href="${process.env.NEXT_PUBLIC_SITE_URL}/portal/dashboard"
+             style="display:inline-block;background:#C3161C;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:16px">
+            Access Portal
+          </a>
+        </div>
+      </div>
+    `
+  })
+}
+
+export async function sendRejectionEmail(to: string, name: string) {
+  return resend.emails.send({
+    from: 'IIMS Cybersecurity Club <cybersec@iimscollege.edu.np>',
+    to,
+    subject: 'IIMS Cybersecurity Club — Application Update',
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto">
+        <div style="background:#58151C;padding:24px;text-align:center">
+          <h1 style="color:#fff;margin:0;font-family:Poppins,sans-serif">IIMS Cybersecurity Club</h1>
+        </div>
+        <div style="padding:32px;background:#fff">
+          <h2 style="color:#111827">Dear ${name},</h2>
+          <p style="color:#6B7280">After review, we are unable to approve your application at this time. Please contact us at cybersec@iimscollege.edu.np for more information.</p>
+        </div>
+      </div>
+    `
+  })
+}
+```
+
+---
+
+## 17. TYPE DEFINITIONS
+
+`types/database.ts` — Keep in sync with DB schema.
+
+```typescript
+export type MemberRole = 'member' | 'bod' | 'admin' | 'superadmin'
+export type MemberStatus = 'pending' | 'approved' | 'rejected' | 'banned'
+export type PostType = 'post' | 'announcement' | 'resource'
+export type CTFCategory = 'web' | 'crypto' | 'forensics' | 'pwn' | 'reverse' | 'osint' | 'misc'
+export type CTFDifficulty = 'easy' | 'medium' | 'hard' | 'expert'
+export type EventType = 'workshop' | 'ctf' | 'seminar' | 'meetup' | 'competition'
+
+export interface Member {
+  id: string
+  user_id: string
+  full_name: string
+  email: string
+  student_id: string | null
+  club_post: string
+  role: MemberRole
+  status: MemberStatus
+  bio: string | null
+  avatar_url: string | null
+  skills: string[]
+  points: number
+  joined_at: string
+  updated_at: string
+}
+
+export interface Post {
+  id: string
+  author_id: string
+  title: string | null
+  content: string
+  type: PostType
+  is_pinned: boolean
+  created_at: string
+  updated_at: string
+  author?: Member  // join
+}
+
+export interface Message {
+  id: string
+  sender_id: string
+  receiver_id: string
+  content: string
+  is_read: boolean
+  created_at: string
+}
+
+export interface CTFChallenge {
+  id: string
+  title: string
+  description: string
+  category: CTFCategory
+  difficulty: CTFDifficulty
+  points: number
+  // flag is NEVER returned to client — omit from client-side types
+  hints: string[]
+  file_url: string | null
+  is_active: boolean
+  created_by: string | null
+  created_at: string
+}
+
+export interface Notification {
+  id: string
+  member_id: string
+  title: string
+  body: string
+  type: 'info' | 'success' | 'warning' | 'error'
+  is_read: boolean
+  link: string | null
+  created_at: string
+}
+
+// Database shape for Supabase client typing
+export type Database = {
+  public: {
+    Tables: {
+      members: { Row: Member; Insert: Partial<Member>; Update: Partial<Member> }
+      posts: { Row: Post; Insert: Partial<Post>; Update: Partial<Post> }
+      messages: { Row: Message; Insert: Partial<Message>; Update: Partial<Message> }
+      ctf_challenges: { Row: CTFChallenge; Insert: Partial<CTFChallenge>; Update: Partial<CTFChallenge> }
+      notifications: { Row: Notification; Insert: Partial<Notification>; Update: Partial<Notification> }
+    }
+  }
+}
+```
+
+---
+
+## 18. CODING RULES & STANDARDS
 
 ### TypeScript
-- All DB response types come from `types/database.ts`
-- No `any` types. Use `unknown` and narrow properly.
-- All API handlers return `NextResponse<T | { error: string }>`
+- `"strict": true` in `tsconfig.json` — no exceptions
+- No `any` types — use `unknown` and narrow with type guards
+- All function return types must be explicit
+- All API route handlers must be typed with `NextRequest` / `NextResponse`
 
-### UI / UX
-- Never `window.alert()` or `window.confirm()` — use `Modal.tsx` or `Toast.tsx`
-- Every async button: `disabled` + `"PROCESSING..."` text + `<Loader2 className="animate-spin" />`
-- Every loading state: `<Skeleton />` placeholders — never blank space
-- Empty states: descriptive message + relevant CTA button — never just empty
+### Components
+- Every page defaults to **Server Component** — add `'use client'` only when needed (hooks, event handlers, browser APIs)
+- Never call Supabase service role client from a Client Component
+- All form inputs must have `aria-label` or associated `<label>` — accessibility is required
 
 ### Data Fetching
-- Never `.select('*')` without `.limit()` on any table expected to grow
-- All paginated queries use `.range(from, to)` — max 20 records by default
-- No client-side filtering for > 50 rows
-- All DB calls wrapped in `try/catch` with error toast on failure
-- `if (error) throw error` immediately after every Supabase call
+- Always use `.range(from, to)` for lists with potentially many rows (feed, members, leaderboard)
+- Default page size: `20` items
+- Always handle both `data` and `error` from Supabase calls — never assume success
 
-### Forms & Validation
-- All form inputs validated with Zod schemas (defined in `lib/validations.ts`)
-- Server API routes validate request body with the **same** Zod schemas
-- Validation errors shown as inline field-level errors — not just a generic toast
+### Imports
+- Use `@/` path aliases — never relative paths like `../../`
+- Import order: React → Next.js → third-party → internal (`@/lib`, `@/components`, `@/types`)
 
 ---
 
-## 17. PERFORMANCE & SCALABILITY RULES
+## 19. SECURITY CHECKLIST
 
-| Rule | Implementation |
-|---|---|
-| Paginate everything | `.range(from, to)` — 20 records default, 30 for notifications, audit logs |
-| Index all FK columns | Done in schema Section 7 |
-| Denormalize counts | `members.points` and `ctf_challenges.solves_count` managed via DB trigger — no aggregation queries |
-| Image optimization | Always use Next.js `<Image />`. Set explicit `width` and `height`. Use `priority` for above-fold images. |
-| Default to Server Components | Only use `'use client'` when interactivity is required |
-| Parallel fetching | Use `Promise.all()` in Server Components to avoid waterfall |
-| Cache public data | `next: { revalidate: 60 }` on public event/member fetches |
-| Scope Realtime | Subscribe to specific `conversation_id` / `member_id` — never subscribe to entire table |
-| Avoid N+1 | Join related data in single queries using Supabase's embedded select syntax |
-
----
-
-## 18. SECURITY CHECKLIST
-
-Before deploying to production, verify every item:
-
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` is NOT prefixed with `NEXT_PUBLIC_`
-- [ ] RLS is enabled on **every** table in Supabase
-- [ ] `flag` column is excluded from all client-facing SELECT queries
-- [ ] All admin API routes verify the caller's `role` server-side
-- [ ] Signed URLs for `club-documents` and `ctf-files` have ≤ 1 hour expiry
-- [ ] Contact form has IP-based rate limiting
-- [ ] Magic Link redirect URL is whitelisted in Supabase Auth settings
-- [ ] `NEXT_PUBLIC_SITE_URL` updated to actual Vercel production domain
-- [ ] No `console.log` statements containing emails, flags, or tokens in production
-- [ ] File upload endpoint validates MIME type and size server-side (not just client-side)
-- [ ] All Resend API calls are server-side only
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` never in any client-facing file
+- [ ] Every admin API route verifies session + role before any DB write
+- [ ] CTF flag column never selected in any client query
+- [ ] RLS enabled on all tables
+- [ ] All user inputs validated with Zod before DB insertion
+- [ ] Password minimum 8 characters enforced at Zod + Supabase level
+- [ ] `rejected` and `banned` members are signed out at middleware level
+- [ ] File uploads validated by MIME type and file size at API level
+- [ ] No SQL string concatenation — always use Supabase parameterized queries
+- [ ] `superadmin` role is immutable by `admin` role (enforced in API)
 
 ---
 
-## 19. QUICK REFERENCE — DO / DON'T
+## 20. ERROR HANDLING PATTERNS
+
+### Client-Side
+```typescript
+const [error, setError] = useState<string | null>(null)
+
+// In async handlers:
+try {
+  const { error } = await supabase.from('posts').insert(...)
+  if (error) throw error
+} catch (err: unknown) {
+  setError(err instanceof Error ? err.message : 'Something went wrong')
+}
+```
+
+### Server-Side (API Routes)
+```typescript
+// Always return structured errors
+return NextResponse.json({ error: 'Descriptive message' }, { status: 400 })
+// Never expose raw DB errors to client — log them server-side
+console.error('[route-name]', err)
+return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+```
+
+### Supabase Query Pattern
+```typescript
+const { data, error } = await supabase.from('members').select('*').eq('id', id).single()
+if (error) {
+  // Handle: log error, return fallback UI or redirect
+  console.error('[members fetch]', error.message)
+  return null
+}
+// data is now typed and safe to use
+```
+
+---
+
+## 21. PERFORMANCE RULES
+
+- Use Next.js Server Components for all initial data loads — reduces client JS bundle
+- Paginate all list queries: `.range(page * 20, page * 20 + 19)`
+- Use `select('id, full_name, avatar_url')` — never `select('*')` in list queries; fetch only needed columns
+- Images from `public-gallery` bucket: Use `next/image` with `sizes` prop
+- Realtime subscriptions: Always unsubscribe in `useEffect` cleanup
+- Memoize expensive computations with `useMemo` — especially leaderboard sorting
+
+---
+
+## 22. COMMON BUGS TO AVOID
+
+| Bug | Root Cause | Fix |
+|---|---|---|
+| Middleware infinite redirect loop | Missing exclusion for `/portal/pending` | Always exclude `/portal/pending`, `/portal/login`, `/portal/signup` from auth redirects |
+| `members` row not found after signup | Race condition between auth user creation and member insert | Always use admin client for registration; insert member in same API route |
+| CTF flag exposed to client | Using `select('*')` on ctf_challenges | Always use `select('id, title, description, category, difficulty, points, hints, file_url, is_active')` — never include `flag` |
+| Realtime subscription memory leak | No cleanup in useEffect | Always return `() => channel.unsubscribe()` from useEffect |
+| Service role key in client bundle | Importing `server.ts` from a client component | Only import server client inside `app/api/` or Server Components |
+| Broken pagination | Using `.limit()` alone | Always use `.range(from, to)` for correct offset pagination |
+| Role check bypass | Only checking `role`, not `status` | Always check BOTH `role IN (...)` AND `status = 'approved'` |
+| Double signup | No unique constraint on email | `email UNIQUE` enforced at DB level + catch `409` in API |
+
+---
+
+## 23. QUICK REFERENCE — DO / DON'T
 
 | ✅ DO | ❌ DON'T |
 |---|---|
-| Use `bg-[#09090B]` for card surfaces | Use `bg-white`, `bg-gray-100` |
-| Use `Toast.tsx` for all alerts | Use `window.alert()` |
-| Use `ConfirmModal.tsx` for deletions | Use `window.confirm()` |
-| Show `<Skeleton />` while loading | Leave content areas blank |
-| Hash CTF flags with SHA256 server-side | Store or compare raw flags |
-| Use `SERVICE_ROLE_KEY` server-side only | Prefix it with `NEXT_PUBLIC_` |
-| Paginate all lists with `.range()` | Fetch all rows without limit |
-| Validate all inputs with Zod | Trust raw user input |
-| Show `disabled + PROCESSING...` on submit | Leave buttons clickable during async ops |
-| Use Lucide React icons | Use emojis as UI elements |
-| Use `JetBrains Mono` for headings/buttons | Mix font families |
-| Wrap all DB calls in `try/catch` | Ignore Supabase error objects |
-| Use Next.js `<Image />` | Use raw `<img>` tags |
-| Subscribe Realtime to specific IDs | Subscribe to entire tables |
-| Write all files as `.tsx` / `.ts` | Create `.js` or `.jsx` files |
-| Exclude `flag` from all client SELECT | Return flag column in any query |
-| Use `<Loader2 className="animate-spin" />` | Use text-only loading states |
-| Scope Realtime to specific resource IDs | Broad table-wide subscriptions |
-
----
-
-*This file is the single source of truth for the IIMS Cybersecurity Club portal. Every AI session, every contributor, and every code generation task must align with these specifications before writing a single line of code.*
+| Use `bg-[#C3161C]` for primary actions | Use default Tailwind blue, green, or purple |
+| Use Email + Password auth | Use magic links or OAuth |
+| Register users via API route with service role | Insert directly from client with anon key |
+| Validate all inputs with Zod | Trust raw request bodies |
+| Check `role` AND `status` in every RLS policy | Check only role |
+| Paginate all list queries | Fetch unlimited rows |
+| Use Server Components for data fetching | Fetch data in Client Components unnecessarily |
+| Return from `useEffect` with `channel.unsubscribe()` | Leave realtime subscriptions open |
+| Handle both `data` and `error` from Supabase | Assume Supabase calls always succeed |
+| Exclude CTF `flag` column from client queries | Use `select('*')` on ctf_challenges |
+| Use `@/` import aliases | Use relative `../../` imports |
+| Keep `SUPABASE_SERVICE_ROLE_KEY` server-only | Import server client in any component file |
+| Rollback auth user creation if member insert fails | Leave orphaned auth users in Supabase |

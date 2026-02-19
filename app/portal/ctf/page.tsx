@@ -1,5 +1,5 @@
-// app/portal/ctf/page.tsx — Stealth Terminal CTF Arena
-import { createClient } from '@/utils/supabase/server'
+// app/portal/ctf/page.tsx — IIMS Collegiate CTF Arena
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import CTFClient from '@/components/portal/CTFClient'
 import type { CTFChallenge, Member } from '@/types/database'
 import { redirect } from 'next/navigation'
@@ -7,53 +7,51 @@ import { redirect } from 'next/navigation'
 export const revalidate = 0
 
 export default async function CTFPage() {
-    const supabase = await createClient()
+    const supabase = await createServerSupabaseClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) redirect('/portal/login')
 
-    // Fetch challenges
-    const { data: challenges } = await supabase
-        .from('ctf_challenges')
-        .select('*')
-        .eq('is_active', true)
+    // Get current member info
+    const { data: member } = await (supabase
+        .from('members' as any) as any)
+        .select('id, points')
+        .eq('user_id', session.user.id)
+        .single()
 
-    // Fetch user solves
-    const { data: userSolves } = await supabase
-        .from('ctf_solves')
+    if (!member) redirect('/portal/login')
+
+    // Fetch challenges (explicitly NOT selecting 'flag')
+    const { data: challenges } = await (supabase
+        .from('ctf_challenges' as any) as any)
+        .select('id, title, description, category, difficulty, points, is_active, hint, created_at')
+    const activeChallenges = (challenges || []).filter((c: any) => c.is_active)
+
+    // Fetch user solves from new 'ctf_submissions' table
+    const { data: userSubmissions } = await (supabase
+        .from('ctf_submissions' as any) as any)
         .select('challenge_id')
-        .eq('member_id', session.user.id)
+        .eq('member_id', (member as any).id)
 
-    const solvedIds = new Set(userSolves?.map(s => s.challenge_id))
+    const solvedIds = new Set(userSubmissions?.map((s: any) => s.challenge_id))
 
-    const formattedChallenges = (challenges || []).map((c: any) => ({
+    const formattedChallenges = activeChallenges.map((c: any) => ({
         ...c,
         solved: solvedIds.has(c.id)
     }))
 
     // Fetch leaderboard (Top 10)
-    const { data: leaderboard } = await supabase
-        .from('members')
+    const { data: leaderboard } = await (supabase
+        .from('members' as any) as any)
         .select('id, full_name, points, avatar_url')
         .order('points', { ascending: false })
         .limit(10)
 
-    // Get current user rank
-    // In a real app with many users, we'd use a more efficient query (e.g., recursive CTE or window function)
-    // For small scale, fetching all points or using a count > user.points is fine.
-    // Let's do a quick count query for rank.
-    const { data: currentUser } = await supabase
-        .from('members')
-        .select('points')
-        .eq('id', session.user.id)
-        .single()
-
-    const userPoints = currentUser?.points || 0
-
-    const { count: rankCount } = await supabase
-        .from('members')
+    // Get current user rank via optimized count
+    const { count: rankCount } = await (supabase
+        .from('members' as any) as any)
         .select('id', { count: 'exact', head: true })
-        .gt('points', userPoints)
+        .gt('points', (member as any).points || 0)
 
     const userRank = (rankCount || 0) + 1
 
@@ -62,7 +60,7 @@ export default async function CTFPage() {
             <CTFClient
                 challenges={formattedChallenges as (CTFChallenge & { solved: boolean })[]}
                 leaderboard={(leaderboard || []) as Pick<Member, 'id' | 'full_name' | 'points' | 'avatar_url'>[]}
-                userPoints={userPoints}
+                userPoints={(member as any).points || 0}
                 userRank={userRank}
             />
         </div>

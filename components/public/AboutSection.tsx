@@ -1,68 +1,97 @@
-// components/public/AboutSection.tsx — Stealth Terminal About
+// components/public/AboutSection.tsx — IIMS Collegiate Public About
 import Link from 'next/link'
-import { Terminal, Cpu, Globe, Shield } from 'lucide-react'
+import { ShieldCheck, Target, Award, ArrowRight } from 'lucide-react'
 
 export default function AboutSection({ aboutText }: { aboutText?: string | null }) {
     return (
-        <section className="py-24 bg-black border-b border-[#27272A]">
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <section className="py-24 bg-white relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                 {/* Content */}
-                <div className="space-y-8">
-                    <div className="inline-flex items-center gap-2 text-[#10B981] font-mono text-sm tracking-wider uppercase">
-                        <Terminal className="h-4 w-4" />
-                        <span>Who_We_Are</span>
+                <div className="space-y-8 animate-fade-up">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#58151C]/5 text-[#58151C] font-poppins text-sm font-bold tracking-wider uppercase">
+                        <Target className="h-4 w-4" />
+                        <span>Our Identity</span>
                     </div>
 
-                    <h2 className="text-3xl md:text-5xl font-mono font-bold text-[#F8FAFC]">
-                        Forging the <span className="text-[#06B6D4]">Guardians</span> of<br />
-                        Tomorrow's Digital World
+                    <h2 className="text-4xl md:text-5xl font-poppins font-bold text-[#111827] leading-tight">
+                        Forging the <span className="text-[#C3161C]">Digital Guardians</span> of Tomorrow's World
                     </h2>
 
-                    <div className="prose prose-invert prose-p:text-[#A1A1AA] prose-p:font-mono prose-p:leading-relaxed">
+                    <div className="space-y-6 text-[#4B5563] text-lg leading-relaxed">
                         {aboutText ? (
                             <p>{aboutText}</p>
                         ) : (
                             <>
                                 <p>
-                                    IIMS Cybersecurity Club is not just a student organization; it is a dedicated task force of aspiring security professionals, ethical hackers, and digital defenders.
+                                    The IIMS Cybersecurity Club is a dedicated task force of aspiring security professionals, ethical hackers, and digital defenders at IIMS College.
                                 </p>
                                 <p>
-                                    Founded at IIMS College, we bridge the gap between academic theory and real-world application. Through rigorous training, CTF competitions, and collaborative research, we prepare our members to tackle the evolving landscape of cyber threats.
+                                    We bridge the gap between academic theory and industry reality. Through rigorous training, CTF competitions, and collaborative research, we prepare our members to lead in the evolving landscape of cyber threats.
                                 </p>
                             </>
                         )}
                     </div>
 
                     <div className="flex flex-wrap gap-4 pt-4">
-                        <FeatureBadge icon={<Shield className="h-4 w-4" />} label="Ethical Hacking" />
-                        <FeatureBadge icon={<Cpu className="h-4 w-4" />} label="Reverse Engineering" />
-                        <FeatureBadge icon={<Globe className="h-4 w-4" />} label="Network Defense" />
+                        <FeatureBadge icon={<ShieldCheck className="h-4 w-4" />} label="Ethical Hacking" />
+                        <FeatureBadge icon={<Award className="h-4 w-4" />} label="Security Research" />
+                        <FeatureBadge icon={<Award className="h-4 w-4" />} label="Network Defense" />
                     </div>
 
-                    <div className="pt-4">
-                        <Link href="/about" className="text-[#10B981] font-mono hover:underline decoration-[#10B981] underline-offset-4 pointer-events-auto">
-                            Read_Full_Manifesto &gt;
+                    <div className="pt-6">
+                        <Link
+                            href="/about"
+                            className="inline-flex items-center gap-2 text-[#C3161C] font-bold hover:gap-3 transition-all"
+                        >
+                            Learn More About Our Mission
+                            <ArrowRight className="h-5 w-5" />
                         </Link>
                     </div>
                 </div>
 
                 {/* Visual/Image Area */}
-                <div className="relative">
-                    <div className="absolute -inset-4 bg-gradient-to-r from-[#10B981] to-[#06B6D4] opacity-20 blur-2xl rounded-lg" />
-                    <div className="relative bg-[#09090B] border border-[#27272A] rounded-lg p-1 overflow-hidden">
-                        {/* Terminal Window Graphic */}
-                        <div className="bg-[#111113] border-b border-[#27272A] p-3 flex gap-2">
-                            <div className="w-3 h-3 rounded-full bg-[#EF4444]" />
-                            <div className="w-3 h-3 rounded-full bg-[#F59E0B]" />
-                            <div className="w-3 h-3 rounded-full bg-[#10B981]" />
+                <div className="relative animate-fade-up">
+                    <div className="absolute -inset-4 bg-gradient-to-tr from-[#58151C]/10 to-[#C3161C]/10 blur-3xl rounded-[2rem]" />
+                    <div className="relative bg-[#F9FAFB] border border-[#E5E7EB] rounded-2xl shadow-2xl overflow-hidden aspect-square flex flex-col">
+                        {/* Collegiate Window Decor */}
+                        <div className="bg-white border-b border-[#E5E7EB] p-4 flex items-center justify-between">
+                            <div className="flex gap-2">
+                                <div className="w-3 h-3 rounded-full bg-[#E5E7EB]" />
+                                <div className="w-3 h-3 rounded-full bg-[#E5E7EB]" />
+                                <div className="w-3 h-3 rounded-full bg-[#E5E7EB]" />
+                            </div>
+                            <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-widest">
+                                Security_Terminal_v2.0
+                            </span>
                         </div>
-                        <div className="p-6 font-mono text-xs md:text-sm text-[#A1A1AA] space-y-2">
-                            <p><span className="text-[#10B981]">user@iims-cyber</span>:<span className="text-[#06B6D4]">~</span>$ ./init_protocol.sh</p>
-                            <p className="text-[#F8FAFC]">&gt; Initializing learning modules...</p>
-                            <p className="text-[#F8FAFC]">&gt; Loading CTF environments... [DONE]</p>
-                            <p className="text-[#F8FAFC]">&gt; Establishing secure connection...</p>
-                            <p className="text-[#10B981]">Access Granted. Welcome to the future.</p>
-                            <div className="h-4 w-2 bg-[#10B981] animate-pulse mt-2" />
+
+                        <div className="flex-1 p-8 font-mono text-sm overflow-hidden flex flex-col justify-center">
+                            <div className="space-y-4">
+                                <p className="flex items-center gap-2">
+                                    <span className="text-[#C3161C]">➜</span>
+                                    <span className="text-[#111827] font-bold">~</span>
+                                    <span className="text-[#6B7280]">./init_core_protocol.sh</span>
+                                </p>
+                                <div className="pl-6 space-y-2 text-[#4B5563]">
+                                    <p className="flex items-center gap-3">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />
+                                        Learning modules initialized
+                                    </p>
+                                    <p className="flex items-center gap-3">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />
+                                        CTF environments active
+                                    </p>
+                                    <p className="flex items-center gap-3 text-[#C3161C] font-bold">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-[#C3161C] animate-pulse" />
+                                        Security Gateway Established
+                                    </p>
+                                </div>
+                                <div className="h-px bg-[#E5E7EB] w-full my-6" />
+                                <div className="bg-[#58151C] text-white p-4 rounded-xl shadow-lg transform rotate-[-2deg]">
+                                    <p className="text-xs opacity-80 uppercase tracking-widest mb-1">Status Report</p>
+                                    <p className="font-bold text-lg">System: Operational</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -73,8 +102,8 @@ export default function AboutSection({ aboutText }: { aboutText?: string | null 
 
 function FeatureBadge({ icon, label }: { icon: React.ReactNode; label: string }) {
     return (
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#27272A] border border-[#3F3F46] text-[#E4E4E7] text-xs font-mono">
-            {icon}
+        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-50 border border-gray-100 text-[#374151] text-xs font-bold shadow-sm transition-all hover:border-[#58151C]/20">
+            <div className="text-[#C3161C]">{icon}</div>
             <span>{label}</span>
         </div>
     )

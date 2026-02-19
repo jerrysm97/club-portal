@@ -1,7 +1,8 @@
+// components/portal/NotificationsList.tsx — IIMS Collegiate Alerts
 'use client'
 
 import { useState } from 'react'
-import { Bell, Check, Info, AlertCircle, MessageSquare, Trophy, Calendar } from 'lucide-react'
+import { Bell, Check, Info, AlertCircle, MessageSquare, Trophy, Calendar, ShieldCheck, ChevronRight } from 'lucide-react'
 import type { Notification } from '@/types/database'
 import { markNotificationRead, markAllNotificationsRead } from '@/app/portal/notifications/actions'
 import { formatDate } from '@/lib/utils'
@@ -20,74 +21,87 @@ export default function NotificationsList({ initialNotifications }: { initialNot
     async function handleMarkAllRead() {
         setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
         await markAllNotificationsRead()
-        toast.success('All logs marked as read')
+        toast.success('All mission logs updated to read status')
     }
 
     const getIcon = (type: string) => {
         switch (type) {
-            case 'new_message': return <MessageSquare className="h-4 w-4 text-[#8B5CF6]" />
-            case 'ctf_new_challenge': return <Trophy className="h-4 w-4 text-[#EAB308]" />
-            case 'event_reminder': return <Calendar className="h-4 w-4 text-[#10B981]" />
-            case 'announcement': return <AlertCircle className="h-4 w-4 text-[#EF4444]" />
-            default: return <Info className="h-4 w-4 text-[#A1A1AA]" />
+            case 'new_message': return <MessageSquare className="h-5 w-5 text-indigo-600" />
+            case 'ctf_new_challenge': return <Trophy className="h-5 w-5 text-amber-600" />
+            case 'event_reminder': return <Calendar className="h-5 w-5 text-emerald-600" />
+            case 'announcement': return <AlertCircle className="h-5 w-5 text-red-600" />
+            default: return <Info className="h-5 w-5 text-gray-400" />
         }
     }
 
     return (
-        <div className="animate-fade-up">
-            <div className="flex justify-end mb-4">
+        <div className="space-y-8 animate-fade-up">
+            <div className="flex justify-end">
                 <button
                     onClick={handleMarkAllRead}
-                    className="text-xs font-mono text-[#10B981] hover:underline uppercase flex items-center gap-1"
+                    className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C3161C] hover:text-[#58151C] transition-colors flex items-center gap-2"
                 >
-                    <Check className="h-3 w-3" /> Mark_All_Read
+                    <Check className="h-4 w-4" /> Finalize All Logs
                 </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-4">
                 {notifications.length > 0 ? (
                     notifications.map(notification => (
                         <div
                             key={notification.id}
-                            className={cn(
-                                "p-4 border rounded-sm flex gap-4 transition-all hover:bg-[#27272A]/20",
-                                notification.is_read
-                                    ? "bg-[#09090B] border-[#27272A] opacity-70"
-                                    : "bg-[#111113] border-[#10B981]/30 shadow-[0_0_10px_-4px_rgba(16,185,129,0.1)]"
-                            )}
                             onClick={() => !notification.is_read && handleMarkRead(notification.id)}
+                            className={cn(
+                                "group relative p-6 rounded-[2rem] border transition-all cursor-pointer flex gap-6 items-center",
+                                notification.is_read
+                                    ? "bg-white border-gray-100 opacity-60"
+                                    : "bg-white border-gray-100 shadow-xl shadow-red-100/20 hover:border-[#58151C]/10"
+                            )}
                         >
-                            <div className="mt-1 flex-shrink-0">
+                            <div className={cn(
+                                "p-4 rounded-2xl flex-shrink-0 transition-transform group-hover:scale-110",
+                                notification.is_read ? "bg-gray-50" : "bg-gray-50 shadow-inner"
+                            )}>
                                 {getIcon(notification.type)}
                             </div>
-                            <div className="flex-1">
-                                <h4 className={cn(
-                                    "font-mono text-sm mb-1",
-                                    notification.is_read ? "text-[#A1A1AA]" : "text-[#F8FAFC] font-bold"
-                                )}>
-                                    {notification.title}
-                                </h4>
-                                <p className="text-[#52525B] font-mono text-xs mb-2">{notification.body}</p>
 
-                                <div className="flex items-center gap-4">
-                                    <span className="text-[10px] text-[#27272A] bg-[#52525B] px-1 rounded-sm font-mono">
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                                    <h4 className={cn(
+                                        "text-sm font-poppins font-bold truncate",
+                                        notification.is_read ? "text-gray-400" : "text-[#111827]"
+                                    )}>
+                                        {notification.title}
+                                    </h4>
+                                    <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-1">
                                         {formatDate(notification.created_at)}
                                     </span>
-                                    {notification.link && (
-                                        <Link href={notification.link} className="text-[10px] uppercase font-mono text-[#10B981] hover:underline">
-                                            View_Details
-                                        </Link>
-                                    )}
                                 </div>
+                                <p className="text-gray-500 font-medium text-xs line-clamp-1">{notification.body}</p>
+
+                                {/* Simplified Link Handling */}
+                                {notification.link && (
+                                    <Link
+                                        href={notification.link}
+                                        className="mt-3 inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-[#C3161C] border-b border-transparent hover:border-[#C3161C] transition-all"
+                                    >
+                                        View Intel <ChevronRight className="h-3 w-3" />
+                                    </Link>
+                                )}
                             </div>
+
                             {!notification.is_read && (
-                                <div className="w-2 h-2 rounded-full bg-[#10B981] mt-2" />
+                                <div className="h-3 w-3 rounded-full bg-[#C3161C] border-2 border-white shadow-lg shadow-red-200" />
                             )}
                         </div>
                     ))
                 ) : (
-                    <div className="text-center py-12 border border-dashed border-[#27272A] text-[#52525B] font-mono italic">
-                        All systems nominal. No new logs.
+                    <div className="py-24 rounded-[3rem] border-2 border-dashed border-gray-100 bg-white text-center">
+                        <div className="h-16 w-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Bell className="h-8 w-8 text-gray-200" />
+                        </div>
+                        <p className="text-gray-400 font-black text-lg uppercase tracking-[0.2em]">Sector Nominal</p>
+                        <p className="text-gray-300 mt-2 font-medium">No active alerts detected in your sector.</p>
                     </div>
                 )}
             </div>

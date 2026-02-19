@@ -1,8 +1,10 @@
+// app/portal/admin/page.tsx — IIMS Collegiate Base Command
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { ShieldCheck, Loader2, AlertTriangle } from 'lucide-react'
 import AdminSidebar, { AdminTab } from '@/components/portal/admin/AdminSidebar'
 import OverviewTab from '@/components/portal/admin/OverviewTab'
 import MembersTab from '@/components/portal/admin/MembersTab'
@@ -10,30 +12,13 @@ import FeedTab from '@/components/portal/admin/FeedTab'
 import ResourcesTab from '@/components/portal/admin/ResourcesTab'
 import EventsTab from '@/components/portal/admin/EventsTab'
 import CTFTab from '@/components/portal/admin/CTFTab'
-import NotificationsTab from '@/components/portal/admin/NotificationsTab'
-import InboxTab from '@/components/portal/admin/InboxTab'
-import SettingsTab from '@/components/portal/admin/SettingsTab'
-import AuditTab from '@/components/portal/admin/AuditTab'
-import TeamTab from '@/components/portal/admin/TeamTab'
-
-// Types
-import type { Member, Post, PublicEvent, CTFChallenge, Document, SiteSettings, ContactMessage, AuditLog, TeamMember } from '@/types/database'
 
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<AdminTab>('overview')
     const [loading, setLoading] = useState(true)
-    const [data, setData] = useState<{
-        members: Member[]
-        posts: Post[]
-        events: PublicEvent[]
-        challenges: CTFChallenge[]
-        resources: Document[]
-        settings: SiteSettings | null
-        inbox: ContactMessage[]
-        audit: AuditLog[]
-        team: TeamMember[]
-    }>({
-        members: [], posts: [], events: [], challenges: [], resources: [], settings: null, inbox: [], audit: [], team: []
+    const [error, setError] = useState<string | null>(null)
+    const [data, setData] = useState<any>({
+        members: [], posts: [], events: [], challenges: [], resources: []
     })
 
     const supabase = createClient()
@@ -41,87 +26,100 @@ export default function AdminPage() {
 
     const loadData = useCallback(async () => {
         setLoading(true)
+        setError(null)
 
-        // Parallel data fetching
-        const [m, p, e, c, r, s, i, a, t] = await Promise.all([
-            supabase.from('members').select('*').order('created_at', { ascending: false }),
-            supabase.from('posts').select('*, author:members(*)').order('created_at', { ascending: false }),
-            supabase.from('public_events').select('*').order('event_date', { ascending: false }),
-            supabase.from('ctf_challenges').select('*').order('points', { ascending: true }),
-            supabase.from('documents').select('*, uploader:members(*)').order('created_at', { ascending: false }),
-            supabase.from('site_settings').select('*').eq('id', 'global').single(),
-            supabase.from('contact_messages').select('*').order('created_at', { ascending: false }),
-            supabase.from('audit_logs').select('*, admin:members(*)').order('created_at', { ascending: false }).limit(100),
-            supabase.from('team_members').select('*').order('sort_order')
-        ])
+        try {
+            // Check session and admin status
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) {
+                router.push('/portal/login')
+                return
+            }
 
-        setData({
-            members: m.data || [],
-            posts: p.data || [],
-            events: e.data || [],
-            challenges: c.data || [],
-            resources: r.data || [],
-            settings: s.data,
-            inbox: i.data || [],
-            audit: a.data || [],
-            team: t.data || []
-        })
-        setLoading(false)
-    }, [supabase])
+            const { data: member } = await supabase
+                .from('members' as any)
+                .select('role')
+                .eq('user_id', session.user.id)
+                .single()
+
+            if (!member || !['admin', 'superadmin'].includes((member as any).role)) {
+                router.push('/portal/dashboard')
+                return
+            }
+
+            // Parallel data fetching with updated table names
+            const [m, p, e, c, r] = await Promise.all([
+                supabase.from('members').select('*').order('joined_at', { ascending: false }),
+                supabase.from('posts').select('*, author:members(full_name, avatar_url)').order('created_at', { ascending: false }),
+                supabase.from('events').select('*').order('starts_at', { ascending: false }),
+                supabase.from('ctf_challenges').select('*, solved_count:ctf_submissions(count)').order('points', { ascending: true }),
+                supabase.from('documents').select('*, uploader:members(full_name)').order('created_at', { ascending: false })
+            ])
+
+            setData({
+                members: m.data || [],
+                posts: p.data || [],
+                events: e.data || [],
+                challenges: c.data || [],
+                resources: r.data || []
+            })
+        } catch (err: any) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
+    }, [supabase, router])
 
     useEffect(() => {
         loadData()
     }, [loadData])
 
-    // Calculate generic stats for Overview
-    const stats = {
-        members: data.members.length,
-        pendingMembers: data.members.filter(m => m.status === 'pending').length,
-        posts: data.posts.filter(p => !p.type || p.type === 'announcement').length,
-        events: data.events.length,
-        solves: data.challenges.reduce((acc, curr) => acc + (curr.solves_count || 0), 0),
-        messages: data.inbox.filter(m => !m.is_read).length
-    }
-
     if (loading) {
         return (
-            <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-[#09090B]">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#10B981] border-t-transparent" />
-                    <p className="text-[#10B981] font-mono text-xs animate-pulse">ESTABLISHING_UPLINK...</p>
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-100px)] animate-pulse">
+                <div className="h-16 w-16 bg-gray-50 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
+                    <Loader2 className="h-8 w-8 text-[#C3161C] animate-spin" />
                 </div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">Synchronizing Command Center</p>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-100px)] text-center p-12">
+                <AlertTriangle className="h-12 w-12 text-red-500 mb-6" />
+                <h2 className="text-2xl font-poppins font-black text-gray-900 mb-2">Tactical Link Severed</h2>
+                <p className="text-gray-500 max-w-sm mb-8">{error}</p>
+                <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[#58151C] text-white rounded-2xl font-bold shadow-xl shadow-red-900/10">Re-establish Connection</button>
             </div>
         )
     }
 
     return (
-        <div className="flex h-[calc(100vh-64px)] bg-[#09090B] overflow-hidden">
+        <div className="flex h-[calc(100vh-64px)] bg-white overflow-hidden -m-8">
             <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-            <main className="flex-1 overflow-y-auto p-8">
-                {activeTab === 'overview' && <OverviewTab stats={stats} />}
-                {activeTab === 'members' && <MembersTab members={data.members} />}
-                {activeTab === 'feed' && <FeedTab posts={data.posts} />}
-                {activeTab === 'resources' && <ResourcesTab resources={data.resources} />}
-                {activeTab === 'events' && <EventsTab events={data.events} />}
-                {activeTab === 'ctf' && <CTFTab challenges={data.challenges} />}
-                {activeTab === 'notifications' && <NotificationsTab />}
-                {activeTab === 'inbox' && <InboxTab messages={data.inbox} />}
-                {activeTab === 'settings' && data.settings && <SettingsTab settings={data.settings} />}
-                {activeTab === 'audit' && <AuditTab logs={data.audit} />}
-                {activeTab === 'team' && <TeamTab team={data.team} />}
+            <main className="flex-1 overflow-y-auto p-12 custom-scrollbar animate-fade-up">
+                <header className="mb-12 flex items-center justify-between">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#58151C]/5 text-[#58151C] font-black text-[10px] uppercase tracking-widest mb-4 border border-[#58151C]/10">
+                            <ShieldCheck className="h-3.5 w-3.5" /> Sector Command
+                        </div>
+                        <h1 className="text-4xl font-poppins font-black text-[#111827] capitalize">
+                            {activeTab.replace('-', ' ')} <span className="text-[#C3161C]">Console</span>
+                        </h1>
+                    </div>
+                </header>
 
-                {/* Placeholders for minor tabs */}
-                {activeTab === 'messages' && (
-                    <div className="p-12 border border-dashed border-[#27272A] text-center text-[#52525B] font-mono">
-                        Encrypted comms monitoring is restricted. (Privacy Protocol Active)
-                    </div>
-                )}
-                {activeTab === 'gallery' && (
-                    <div className="p-12 border border-dashed border-[#27272A] text-center text-[#52525B] font-mono">
-                        Gallery module offline. Use Supabase Storage directly.
-                    </div>
-                )}
+                <div className="pb-20">
+                    {activeTab === 'overview' && <OverviewTab data={data} />}
+                    {activeTab === 'members' && <MembersTab members={data.members} refresh={loadData} />}
+                    {activeTab === 'posts' && <FeedTab posts={data.posts} refresh={loadData} />}
+                    {activeTab === 'events' && <EventsTab events={data.events} refresh={loadData} />}
+                    {activeTab === 'ctf' && <CTFTab challenges={data.challenges} refresh={loadData} />}
+                    {activeTab === 'documents' && <ResourcesTab resources={data.resources} refresh={loadData} />}
+                </div>
             </main>
         </div>
     )

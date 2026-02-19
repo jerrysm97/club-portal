@@ -1,121 +1,124 @@
+// components/portal/EventCard.tsx — IIMS Collegiate Event Item
 'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Calendar, MapPin, Clock, ArrowRight, Activity, Users } from 'lucide-react'
+import { Calendar, MapPin, Clock, ArrowRight, ShieldCheck, Users, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
-import type { PublicEvent } from '@/types/database'
+import type { Event } from '@/types/database'
 import { toggleRsvp } from '@/app/portal/events/actions'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
 interface EventCardProps {
-    event: PublicEvent & { user_rsvp?: string }
+    event: Event & { user_rsvp?: string }
 }
 
 export default function EventCard({ event }: EventCardProps) {
     const [rsvpStatus, setRsvpStatus] = useState(event.user_rsvp || null)
-    const isCTF = event.type.toLowerCase().includes('ctf')
+    const isCTF = (event.type || '').toLowerCase().includes('ctf')
+    const eventDate = event.starts_at || (event as any).event_date // fallback for migration safety
 
     async function handleRsvp(status: 'going' | 'maybe' | 'not_going') {
-        // Optimistic update
         const oldStatus = rsvpStatus
-        setRsvpStatus(status === 'not_going' ? null : status)
+        const newStatus = status === 'not_going' ? null : status
+        setRsvpStatus(newStatus)
 
         const res = await toggleRsvp(event.id, status)
         if (res?.error) {
             toast.error(res.error)
-            setRsvpStatus(oldStatus) // Revert
+            setRsvpStatus(oldStatus)
         } else {
-            toast.success(`RSVP updated: ${status.replace('_', ' ').toUpperCase()}`)
+            toast.success(`Mission status updated: ${status.replace('_', ' ').toUpperCase()}`)
         }
     }
 
     return (
-        <div className="group relative p-6 bg-[#09090B] border border-[#27272A] rounded-sm hover:border-[#10B981]/50 transition-all flex flex-col md:flex-row gap-6 animate-fade-up">
-            {/* Date Box */}
-            <div className="flex-shrink-0 w-full md:w-24 h-24 bg-[#111113] border border-[#27272A] rounded-sm flex flex-col items-center justify-center text-center">
-                <span className="text-[#10B981] font-mono text-xs uppercase">{formatDate(event.event_date).split(',')[0]}</span>
-                <span className="text-[#F8FAFC] font-mono text-2xl font-bold">{new Date(event.event_date).getDate()}</span>
-                <span className="text-[#52525B] font-mono text-xs uppercase">{new Date(event.event_date).toLocaleString('default', { month: 'short' })}</span>
+        <div className="group bg-white rounded-[2rem] border border-gray-100 p-6 md:p-8 shadow-sm hover:shadow-2xl hover:border-[#58151C]/10 transition-all animate-fade-up flex flex-col md:flex-row gap-8">
+            {/* Visual Indicator / Date */}
+            <div className="flex-shrink-0 w-full md:w-32 h-32 rounded-2xl bg-gray-50 flex flex-col items-center justify-center text-center border border-gray-100 group-hover:bg-[#58151C] group-hover:text-white transition-all">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-60 mb-1">
+                    {new Date(eventDate).toLocaleString('default', { month: 'short' })}
+                </span>
+                <span className="text-3xl font-poppins font-black leading-none">
+                    {new Date(eventDate).getDate()}
+                </span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] mt-2 text-[#C3161C] group-hover:text-white transition-colors">
+                    {new Date(eventDate).getFullYear()}
+                </span>
             </div>
 
-            {/* Info */}
-            <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2">
+            {/* Main Intel */}
+            <div className="flex-1 space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
                     <span className={cn(
-                        "px-2 py-0.5 rounded-sm text-[10px] font-mono uppercase border",
+                        "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
                         isCTF
-                            ? "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20"
-                            : "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20"
+                            ? "bg-red-50 text-red-600 border-red-100"
+                            : "bg-emerald-50 text-emerald-600 border-emerald-100"
                     )}>
                         {event.type}
                     </span>
                     {rsvpStatus && (
-                        <span className="text-[#F8FAFC] text-[10px] font-mono flex items-center gap-1">
-                            <Activity className="h-3 w-3 text-[#EAB308]" />
-                            RSVP: {rsvpStatus === 'going' ? 'ACCEPTED' : 'TENTATIVE'}
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 border border-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest">
+                            <ShieldCheck className="h-3 w-3" /> Clearance: {rsvpStatus === 'going' ? 'Confirmed' : 'Interested'}
                         </span>
                     )}
                 </div>
 
-                <Link href={`/portal/events/${event.id}`} className="block group-hover:underline decoration-[#10B981]">
-                    <h3 className="text-xl text-[#F8FAFC] font-mono font-bold">{event.title}</h3>
+                <Link href={`/portal/events/${event.id}`} className="block">
+                    <h3 className="text-2xl font-poppins font-bold text-[#111827] group-hover:text-[#C3161C] transition-colors leading-tight">
+                        {event.title}
+                    </h3>
                 </Link>
 
-                <div className="flex flex-wrap gap-4 text-xs font-mono text-[#A1A1AA]">
-                    <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                    <span className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {event.location || 'TBA'}
-                    </span>
-                    {event.max_attendees && (
-                        <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            Limit: {event.max_attendees}
-                        </span>
-                    )}
+                <div className="flex flex-wrap gap-5 text-xs font-bold text-gray-400">
+                    <div className="flex items-center gap-1.5">
+                        <Clock className="h-4 w-4" />
+                        {new Date(eventDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <MapPin className="h-4 w-4" />
+                        {event.location || 'College Base'}
+                    </div>
                 </div>
 
-                <p className="text-[#52525B] font-mono text-sm line-clamp-2 pt-2">
-                    {event.short_desc || event.description}
+                <p className="text-gray-500 font-medium text-sm leading-relaxed line-clamp-2 max-w-2xl">
+                    {event.short_desc || (event.description?.substring(0, 150) + '...')}
                 </p>
             </div>
 
-            {/* Action Area */}
-            <div className="flex flex-col gap-2 min-w-[140px]">
+            {/* Control Panel */}
+            <div className="flex flex-col gap-3 min-w-[180px] justify-center pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-gray-50 md:pl-8">
                 <button
                     onClick={() => handleRsvp('going')}
                     className={cn(
-                        "w-full px-4 py-2 rounded-sm font-mono text-xs font-bold transition-colors border",
+                        "w-full h-12 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-sm",
                         rsvpStatus === 'going'
-                            ? "bg-[#10B981] text-black border-[#10B981]"
-                            : "bg-transparent text-[#10B981] border-[#10B981] hover:bg-[#10B981]/10"
+                            ? "bg-[#C3161C] text-white shadow-red-100"
+                            : "bg-white text-[#C3161C] border-2 border-[#C3161C] hover:bg-red-50"
                     )}
                 >
-                    {rsvpStatus === 'going' ? 'MISSION_ACCEPTED' : 'ACCEPT_MISSION'}
+                    {rsvpStatus === 'going' ? 'Mission Accepted' : 'Join Mission'}
                 </button>
 
                 <button
                     onClick={() => handleRsvp(rsvpStatus === 'maybe' ? 'not_going' : 'maybe')}
                     className={cn(
-                        "w-full px-4 py-2 rounded-sm font-mono text-xs font-bold transition-colors border",
+                        "w-full h-12 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
                         rsvpStatus === 'maybe'
-                            ? "bg-[#EAB308]/10 text-[#EAB308] border-[#EAB308]/20"
-                            : "bg-transparent text-[#52525B] border-[#27272A] hover:text-[#F8FAFC] hover:border-[#F8FAFC]"
+                            ? "bg-amber-50 text-amber-700 border-2 border-amber-200"
+                            : "bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                     )}
                 >
-                    {rsvpStatus === 'maybe' ? 'TENTATIVE' : 'INTERESTED'}
+                    {rsvpStatus === 'maybe' ? 'Tentative' : 'Interested'}
                 </button>
 
                 <Link
                     href={`/portal/events/${event.id}`}
-                    className="mt-auto flex items-center justify-center gap-1 text-[#52525B] hover:text-[#F8FAFC] font-mono text-[10px] uppercase"
+                    className="flex items-center justify-center gap-2 text-gray-300 font-black text-[10px] uppercase tracking-[0.2em] mt-2 hover:text-[#58151C] transition-colors group/link"
                 >
-                    Details <ArrowRight className="h-3 w-3" />
+                    Detailed Intel <ChevronRight className="h-3.5 w-3.5 group-hover/link:translate-x-1 transition-transform" />
                 </Link>
             </div>
         </div>

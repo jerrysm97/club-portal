@@ -1,89 +1,117 @@
-// app/(public)/about/page.tsx — Stealth Terminal About Page
-import { createClient } from '@supabase/supabase-js'
+// app/(public)/about/page.tsx — IIMS Collegiate Public About Page
 import TeamSection from '@/components/public/TeamSection'
 import StatsSection from '@/components/public/StatsSection'
-import { Terminal, Target, Shield, Cpu } from 'lucide-react'
-import type { SiteSettings, TeamMember } from '@/types/database'
+import { Target, ShieldCheck, Award, Zap } from 'lucide-react'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export const revalidate = 60
 
 export default async function AboutPage() {
-    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const sb = await createServerSupabaseClient()
 
-    const [settingsRes, teamRes] = await Promise.all([
-        sb.from('site_settings').select('*').eq('id', 'global').single(),
+    const [teamRes] = await Promise.all([
         sb.from('team_members').select('*').order('sort_order'),
     ])
 
-    const settings = settingsRes.data as SiteSettings | null
-    const team = (teamRes.data || []) as TeamMember[]
+    const team = teamRes.data || []
+
+    // Defaults for stats and settings since site_settings is being simplified
+    const settings = {
+        about_text: null,
+        stat_members: '150+',
+        stat_events: '25+',
+        stat_competitions: '10+',
+        stat_partners: '5+',
+    }
 
     return (
-        <div className="bg-black min-h-screen">
+        <div className="bg-white min-h-screen">
             {/* Header */}
-            <section className="py-20 border-b border-[#27272A] relative overflow-hidden">
-                <div className="absolute inset-0 hero-grid opacity-20" />
-                <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-                    <h1 className="text-4xl md:text-6xl font-mono font-bold text-[#F8FAFC] mb-6">
-                        About <span className="text-[#10B981]">IIMS Cyber</span>
+            <section className="py-32 bg-[#58151C] relative overflow-hidden">
+                <div className="absolute inset-0 hero-grid opacity-10 pointer-events-none" />
+                <div className="max-w-4xl mx-auto px-6 text-center relative z-10 transition-all duration-700 animate-fade-up">
+                    <h1 className="text-5xl md:text-7xl font-poppins font-bold text-white mb-8">
+                        Our <span className="text-[#FCD34D]">Mission</span>
                     </h1>
-                    <p className="text-[#A1A1AA] font-mono text-lg leading-relaxed">
-                        We are a collective of student researchers, developers, and security enthusiasts dedicated to mastering the art of information security.
+                    <p className="text-[#FECACA] font-medium text-xl leading-relaxed max-w-2xl mx-auto">
+                        Empowering the next generation of cybersecurity leaders through technical excellence and ethical community building.
                     </p>
                 </div>
             </section>
 
             {/* Mission & Vision */}
-            <section className="py-24 border-b border-[#27272A]">
+            <section className="py-24 relative">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="p-8 rounded-sm bg-[#09090B] border border-[#27272A] hover:border-[#10B981]/50 transition-colors">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 rounded-sm bg-[#10B981]/10 text-[#10B981]"><Target className="h-6 w-6" /></div>
-                            <h2 className="text-2xl font-mono font-bold text-[#F8FAFC]">Our Mission</h2>
+                    <div className="p-10 rounded-3xl bg-gray-50 border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="p-3 rounded-2xl bg-[#58151C] text-white shadow-lg shadow-red-100">
+                                <Target className="h-7 w-7" />
+                            </div>
+                            <h2 className="text-3xl font-poppins font-bold text-[#111827]">Our Mission</h2>
                         </div>
-                        <p className="text-[#A1A1AA] font-mono leading-relaxed">
-                            To cultivate a culture of security awareness and technical excellence. We aim to bridge the gap between theoretical knowledge and practical application through hands-on workshops, CTFs, and collaborative projects.
+                        <p className="text-[#4B5563] text-lg leading-relaxed font-medium">
+                            To cultivate a culture of security awareness and technical curiosity. We bridge the gap between classroom theory and real-world security challenges through hands-on labs, research, and competitive hacking.
                         </p>
                     </div>
 
-                    <div className="p-8 rounded-sm bg-[#09090B] border border-[#27272A] hover:border-[#06B6D4]/50 transition-colors">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 rounded-sm bg-[#06B6D4]/10 text-[#06B6D4]"><Shield className="h-6 w-6" /></div>
-                            <h2 className="text-2xl font-mono font-bold text-[#F8FAFC]">Our Vision</h2>
+                    <div className="p-10 rounded-3xl bg-gray-50 border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="p-3 rounded-2xl bg-[#C3161C] text-white shadow-lg shadow-red-100">
+                                <ShieldCheck className="h-7 w-7" />
+                            </div>
+                            <h2 className="text-3xl font-poppins font-bold text-[#111827]">Our Vision</h2>
                         </div>
-                        <p className="text-[#A1A1AA] font-mono leading-relaxed">
-                            To be the leading student cybersecurity community in Nepal, producing world-class professionals capable of defending critical infrastructure and advancing the field of information security.
+                        <p className="text-[#4B5563] text-lg leading-relaxed font-medium">
+                            To be the premier student-led security hub in Nepal, fostering a community of skilled professionals capable of defending global infrastructure and innovating in the face of emerging digital threats.
                         </p>
                     </div>
                 </div>
             </section>
 
             {/* Values */}
-            <section className="py-24 border-b border-[#27272A] bg-[#09090B]">
+            <section className="py-24 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-6">
-                    <h2 className="text-3xl font-mono font-bold text-[#F8FAFC] mb-12 text-center">Core <span className="text-[#10B981]">Values</span></h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <ValueCard title="Integrity" desc="We operate with the highest ethical standards. Responsibility is paramount." icon={<Shield className="h-5 w-5" />} />
-                        <ValueCard title="Curiosity" desc="We never stop questioning how things work. Deconstruction is the first step to understanding." icon={<Terminal className="h-5 w-5" />} />
-                        <ValueCard title="Innovation" desc="We push boundaries and explore new frontiers in technology and security." icon={<Cpu className="h-5 w-5" />} />
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl font-poppins font-bold text-[#111827] mb-6">Foundational <span className="text-[#C3161C]">Values</span></h2>
+                        <div className="h-1.5 w-24 bg-[#FCD34D] mx-auto rounded-full" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <ValueCard
+                            title="Ethical Integrity"
+                            desc="We hold ourselves to the highest moral standards, ensuring our skills are used exclusively for building and defending."
+                            icon={<ShieldCheck className="h-6 w-6" />}
+                            accent="text-emerald-600 bg-emerald-50"
+                        />
+                        <ValueCard
+                            title="Technical Depth"
+                            desc="We dive deep into how systems work, valuing fundamental understanding over superficial knowledge."
+                            icon={<Zap className="h-6 w-6" />}
+                            accent="text-amber-600 bg-amber-50"
+                        />
+                        <ValueCard
+                            title="Collaborative Growth"
+                            desc="Security is a team sport. We succeed by sharing knowledge and lifting each other up as a collective."
+                            icon={<Award className="h-6 w-6" />}
+                            accent="text-blue-600 bg-blue-50"
+                        />
                     </div>
                 </div>
             </section>
 
             <TeamSection team={team} />
-            <StatsSection settings={settings} />
+            <StatsSection settings={settings as any} />
         </div>
     )
 }
 
-function ValueCard({ title, desc, icon }: { title: string; desc: string; icon: React.ReactNode }) {
+function ValueCard({ title, desc, icon, accent }: { title: string; desc: string; icon: React.ReactNode; accent: string }) {
     return (
-        <div className="text-center group">
-            <div className="mx-auto w-12 h-12 rounded-sm bg-[#111113] border border-[#27272A] flex items-center justify-center text-[#10B981] mb-6 group-hover:scale-110 group-hover:border-[#10B981] transition-all">
+        <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform ${accent}`}>
                 {icon}
             </div>
-            <h3 className="text-xl font-mono font-bold text-[#F8FAFC] mb-3">{title}</h3>
-            <p className="text-[#A1A1AA] text-sm leading-relaxed">{desc}</p>
+            <h3 className="text-2xl font-poppins font-bold text-[#111827] mb-4">{title}</h3>
+            <p className="text-[#6B7280] text-base leading-relaxed font-medium">{desc}</p>
         </div>
     )
 }

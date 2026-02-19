@@ -1,15 +1,32 @@
+// app/portal/messages/page.tsx — IIMS Collegiate Messaging Placeholder
+import { MessageSquare, ShieldCheck } from 'lucide-react'
+
 export default function MessagesPage() {
     return (
-        <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-            <div className="p-4 rounded-full bg-[#10B981]/10 border border-[#10B981]/20">
-                <svg className="h-8 w-8 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
+        <div className="flex flex-col items-center justify-center h-full text-center p-12 bg-white/50 backdrop-blur-sm animate-fade-up">
+            <div className="relative mb-8 group">
+                <div className="absolute inset-0 bg-[#58151C]/10 rounded-full blur-2xl scale-150 group-hover:scale-[2] transition-transform duration-700 pointer-events-none" />
+                <div className="relative p-6 rounded-3xl bg-white shadow-2xl border border-gray-100 group-hover:rotate-12 transition-transform h-24 w-24 flex items-center justify-center">
+                    <MessageSquare className="h-10 w-10 text-[#C3161C]" />
+                </div>
             </div>
-            <h2 className="text-xl font-mono font-bold text-[#F8FAFC]">Secure Channel Ready</h2>
-            <p className="text-[#A1A1AA] font-mono text-sm max-w-md">
-                Select an operative from the list to establish encrypted communication uplink.
+
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#10B981]/5 text-[#10B981] font-black text-[10px] uppercase tracking-[0.2em] mb-4 border border-[#10B981]/10">
+                <ShieldCheck className="h-3 w-3" /> Secure Gateway Ready
+            </div>
+
+            <h2 className="text-3xl font-poppins font-black text-[#111827] mb-4">
+                Sector Communications
+            </h2>
+            <p className="text-gray-400 font-medium text-base max-w-sm leading-relaxed">
+                Select an operative from the mission roster to establish a point-to-point encrypted session.
             </p>
+
+            <div className="mt-12 grid grid-cols-3 gap-6 opacity-20 filter grayscale">
+                {[1, 2, 3].map(i => (
+                    <div key={i} className="h-1 w-12 bg-[#58151C] rounded-full animate-pulse" style={{ animationDelay: `${i * 200}ms` }} />
+                ))}
+            </div>
         </div>
     )
 }

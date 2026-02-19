@@ -1,13 +1,19 @@
-// app/layout.tsx — Root layout: JetBrains Mono + Inter fonts, dark theme, ToastProvider
+// app/layout.tsx — Root layout: IIMS Collegiate fonts + light theme
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Inter, Poppins, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  weight: ['300', '400', '600'],
+  weight: ['400', '500', '600'],
+})
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  variable: '--font-poppins',
+  weight: ['500', '600', '700'],
 })
 
 const jetbrains = JetBrains_Mono({
@@ -18,13 +24,13 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'IIMS Cybersecurity Club',
-  description: 'Nepal\'s premier college cybersecurity community — IIMS College, Kathmandu',
+  description: "Nepal's premier college cybersecurity community — IIMS College, Kathmandu",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
-      <body className="font-sans bg-black text-[#F8FAFC] min-h-screen antialiased">
+    <html lang="en" className={`${inter.variable} ${poppins.variable} ${jetbrains.variable}`}>
+      <body className="font-sans bg-white text-[#111827] min-h-screen antialiased">
         <ToastProvider>
           {children}
         </ToastProvider>

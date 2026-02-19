@@ -1,103 +1,128 @@
-// components/portal/PortalNavbar.tsx — Stealth Terminal Mobile Navbar
+// components/portal/PortalNavbar.tsx — IIMS Collegiate Mobile Portal Navbar
 'use client'
-
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Menu, X, Terminal, LogOut, LayoutDashboard, MessageSquare, Calendar, FileText, Trophy, User, ShieldAlert } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { Menu, X, ShieldCheck, LogOut, LayoutDashboard, MessageSquare, Calendar, FileText, Terminal, User, Bell, Rss, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { createClient } from '@/utils/supabase/client'
-import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import Avatar from '@/components/ui/Avatar'
 import type { Member } from '@/types/database'
+
+const NAV_ITEMS = [
+    { href: '/portal/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/portal/feed', label: 'Feed', icon: Rss },
+    { href: '/portal/events', label: 'Events', icon: Calendar },
+    { href: '/portal/ctf', label: 'CTF Arena', icon: Terminal },
+    { href: '/portal/resources', label: 'Documents', icon: FileText },
+    { href: '/portal/messages', label: 'Messages', icon: MessageSquare },
+    { href: '/portal/notifications', label: 'Alerts', icon: Bell },
+    { href: '/portal/profile', label: 'Profile', icon: User },
+]
 
 export default function PortalNavbar({ member }: { member: Member }) {
     const [isOpen, setIsOpen] = useState(false)
     const pathname = usePathname()
     const router = useRouter()
-    const supabase = createClient()
 
-    const handleSignOut = async () => {
+    const isAdmin = member.role === 'admin' || member.role === 'superadmin'
+
+    async function handleSignOut() {
+        const supabase = createClient()
         await supabase.auth.signOut()
-        router.refresh()
         router.push('/portal/login')
+        router.refresh()
     }
 
-    const NAV_ITEMS = [
-        { href: '/portal/dashboard', label: 'Command_Center', icon: LayoutDashboard },
-        { href: '/portal/feed', label: 'Intel_Feed', icon: MessageSquare },
-        { href: '/portal/events', label: 'Mission_Log', icon: Calendar },
-        { href: '/portal/resources', label: 'Archives', icon: FileText },
-        { href: '/portal/ctf', label: 'CTF_Arena', icon: Trophy },
-        { href: '/portal/profile', label: 'My_Profile', icon: User },
-    ]
-
     return (
-        <nav className="md:hidden sticky top-0 z-40 bg-black border-b border-[#27272A]">
-            <div className="flex items-center justify-between px-4 h-16">
-                <Link href="/portal/dashboard" className="flex items-center gap-2 text-[#10B981]">
-                    <Terminal className="h-5 w-5" />
-                    <span className="font-mono font-bold tracking-wider">IIMS_CYBER</span>
+        <nav className="md:hidden sticky top-0 z-[60] bg-[#58151C] shadow-lg">
+            <div className="flex items-center justify-between px-6 h-16">
+                <Link href="/portal/dashboard" className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center shadow-lg transform rotate-[-3deg]">
+                        <ShieldCheck className="h-4.5 w-4.5 text-[#58151C]" />
+                    </div>
+                    <span className="font-poppins font-black text-white text-sm tracking-tight">IIMS CYBER</span>
                 </Link>
-                <button onClick={() => setIsOpen(!isOpen)} className="text-[#A1A1AA] hover:text-[#F8FAFC]">
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="text-white bg-white/10 p-2 rounded-xl active:scale-95 transition-all"
+                    aria-label={isOpen ? 'Close menu' : 'Open menu'}
+                >
                     {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 </button>
             </div>
 
             {/* Mobile Menu Overlay */}
             {isOpen && (
-                <div className="fixed inset-0 top-16 bg-black z-30 flex flex-col p-4 animate-fade-up">
-                    {/* User Info */}
-                    <div className="flex items-center gap-3 mb-6 pb-6 border-b border-[#27272A]">
-                        <Avatar src={member.avatar_url} name={member.full_name} />
-                        <div>
-                            <h3 className="text-[#F8FAFC] font-mono font-bold">{member.full_name}</h3>
-                            <p className="text-[#52525B] font-mono text-xs">{member.points} PTS</p>
+                <div className="fixed inset-0 top-16 bg-white z-[70] flex flex-col overflow-y-auto animate-fade-up">
+                    {/* Identity Summary */}
+                    <div className="flex items-center gap-4 p-6 border-b border-gray-100 bg-gray-50">
+                        <Avatar src={member.avatar_url} name={member.full_name} size="md" className="ring-2 ring-white shadow-md" />
+                        <div className="min-w-0">
+                            <p className="font-poppins font-bold text-[#111827] truncate">{member.full_name}</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 truncate">
+                                {member.club_post || member.role} • {member.points} PTS
+                            </p>
                         </div>
                     </div>
 
-                    {/* Links */}
-                    <div className="flex-1 space-y-1 overflow-y-auto">
-                        {NAV_ITEMS.map((item) => {
-                            const isActive = pathname.startsWith(item.href)
+                    {/* Navigation Links */}
+                    <div className="flex-1 p-4 space-y-1">
+                        <div className="px-4 py-2 mt-4 mb-2">
+                            <span className="text-gray-300 text-[10px] font-black uppercase tracking-[0.2em]">Core Operations</span>
+                        </div>
+
+                        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+                            const active = pathname === href || pathname.startsWith(href + '/')
                             return (
                                 <Link
-                                    key={item.href}
-                                    href={item.href}
+                                    key={href}
+                                    href={href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
-                                        "flex items-center gap-3 px-3 py-3 rounded-sm font-mono text-sm transition-all",
-                                        isActive
-                                            ? "bg-[#10B981]/10 text-[#10B981] border-l-2 border-[#10B981]"
-                                            : "text-[#A1A1AA] hover:text-[#F8FAFC] hover:bg-[#27272A]/50 border-l-2 border-transparent"
+                                        'flex items-center gap-4 px-5 py-4 rounded-2xl text-sm transition-all transition-colors',
+                                        active
+                                            ? 'bg-[#58151C] text-white shadow-xl shadow-red-100 font-bold'
+                                            : 'text-gray-600 hover:bg-gray-50 hover:text-[#58151C]'
                                     )}
                                 >
-                                    <item.icon className="h-4 w-4" />
-                                    <span>{item.label}</span>
+                                    <Icon className={cn("h-5 w-5", active ? "text-white" : "text-gray-400")} />
+                                    <span className="flex-1">{label}</span>
+                                    {active && <ChevronRight className="h-4 w-4 opacity-50" />}
                                 </Link>
                             )
                         })}
 
-                        {(member.role === 'admin' || member.role === 'superadmin') && (
-                            <Link
-                                href="/portal/admin"
-                                onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-3 px-3 py-3 rounded-sm font-mono text-sm text-[#EF4444] hover:bg-[#EF4444]/10 transition-all border-l-2 border-transparent hover:border-[#EF4444]"
-                            >
-                                <ShieldAlert className="h-4 w-4" />
-                                <span>Admin_Console</span>
-                            </Link>
+                        {isAdmin && (
+                            <div className="mt-6 border-t border-gray-100 pt-4">
+                                <div className="px-4 pb-4">
+                                    <span className="text-gray-300 text-[10px] font-black uppercase tracking-[0.2em]">Administration</span>
+                                </div>
+                                <Link
+                                    href="/portal/admin"
+                                    onClick={() => setIsOpen(false)}
+                                    className={cn(
+                                        'flex items-center gap-4 px-5 py-4 rounded-2xl text-sm transition-all font-bold',
+                                        pathname.startsWith('/portal/admin')
+                                            ? 'bg-[#FCD34D] text-[#58151C] shadow-lg shadow-amber-100'
+                                            : 'text-[#58151C] bg-[#FCD34D]/10 hover:bg-[#FCD34D]/20'
+                                    )}
+                                >
+                                    <ShieldCheck className="h-5 w-5" />
+                                    <span className="flex-1">Base Command Panel</span>
+                                </Link>
+                            </div>
                         )}
                     </div>
 
-                    {/* Logout */}
-                    <div className="pt-6 border-t border-[#27272A]">
+                    {/* Bottom Actions */}
+                    <div className="p-6 border-t border-gray-100 mt-auto">
                         <button
                             onClick={handleSignOut}
-                            className="w-full flex items-center gap-3 px-3 py-3 rounded-sm font-mono text-sm text-[#EF4444] hover:bg-[#EF4444]/10 transition-all"
+                            className="flex w-full items-center justify-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-red-50 hover:text-[#C3161C] transition-all"
                         >
-                            <LogOut className="h-4 w-4" />
-                            <span>Disconnect</span>
+                            <LogOut className="h-5 w-5" />
+                            <span>Terminate Session</span>
                         </button>
                     </div>
                 </div>

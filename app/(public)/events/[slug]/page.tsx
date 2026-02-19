@@ -1,116 +1,133 @@
-// app/(public)/events/[slug]/page.tsx — Stealth Terminal Event Detail
-import { createClient } from '@supabase/supabase-js'
+// app/(public)/events/[slug]/page.tsx — IIMS Collegiate Public Event Detail
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Calendar, MapPin, Clock, Users, ArrowLeft, ExternalLink } from 'lucide-react'
+import { Calendar, MapPin, Clock, Users, ArrowLeft, ExternalLink, ShieldCheck, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer'
 import type { PublicEvent } from '@/types/database'
 
 export const revalidate = 60
-
-// Force dynamic rendering since we might look up by ID or slug
 export const dynamic = 'force-dynamic'
 
 export default async function EventDetailPage({ params }: { params: { slug: string } }) {
     const { slug } = params
-    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const sb = await createServerSupabaseClient()
 
-    // improved lookup: try slug first, then ID
+    // Improved lookup: try slug first, then ID
     let event: PublicEvent | null = null
 
-    // Try finding by slug
-    const { data: bySlug } = await sb.from('public_events').select('*').eq('slug', slug).single()
+    // Using new table name 'events' per CONTEXT.md §17
+    const { data: bySlug } = await sb.from('events').select('*').eq('slug', slug).maybeSingle()
     if (bySlug) {
-        event = bySlug
+        event = bySlug as unknown as PublicEvent
     } else {
-        // Try finding by ID (if slug looks like UUID)
-        const { data: byId } = await sb.from('public_events').select('*').eq('id', slug).single()
-        event = byId
+        const { data: byId } = await sb.from('events').select('*').eq('id', slug).maybeSingle()
+        event = byId as unknown as PublicEvent
     }
 
     if (!event) return notFound()
 
-    const isWorkshop = event.type.toLowerCase().includes('workshop')
-    const typeColor = isWorkshop ? 'text-[#10B981] border-[#10B981]/30 bg-[#10B981]/10' : 'text-[#06B6D4] border-[#06B6D4]/30 bg-[#06B6D4]/10'
+    const isWorkshop = (event.type || '').toLowerCase().includes('workshop')
+    const typeStyles = isWorkshop
+        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+        : 'bg-blue-50 text-blue-700 border-blue-100'
     const imgUrl = event.cover_image_url || event.image_url
+    const eventDate = event.event_date || event.starts_at || ''
 
     return (
-        <div className="bg-black min-h-screen">
+        <div className="bg-white min-h-screen">
             {/* Hero / Header */}
-            <div className="relative h-[40vh] md:h-[50vh] overflow-hidden border-b border-[#27272A]">
+            <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
                 {imgUrl ? (
-                    <img src={imgUrl} alt={event.title} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                    <img src={imgUrl} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
                 ) : (
-                    <div className="absolute inset-0 hero-grid opacity-30 bg-[#111113]" />
+                    <div className="absolute inset-0 hero-grid opacity-10 bg-[#58151C]/5" />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
 
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 max-w-7xl mx-auto">
-                    <Link href="/events" className="inline-flex items-center gap-2 text-[#A1A1AA] hover:text-[#F8FAFC] mb-6 transition-colors font-mono text-sm group">
-                        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                        Back_to_Mission_Log
-                    </Link>
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
+                    <div className="max-w-7xl mx-auto">
+                        <Link
+                            href="/events"
+                            className="inline-flex items-center gap-2 text-[#58151C] hover:text-[#C3161C] mb-8 transition-colors font-bold text-sm group"
+                        >
+                            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                            Return to Mission Log
+                        </Link>
 
-                    <div className={`inline-block px-3 py-1 mb-4 rounded-full border text-xs font-mono font-bold uppercase tracking-wider ${typeColor}`}>
-                        {event.type}
+                        <div className={`inline-block px-4 py-1.5 mb-6 rounded-xl border text-xs font-black uppercase tracking-widest shadow-sm ${typeStyles}`}>
+                            {event.type}
+                        </div>
+
+                        <h1 className="text-4xl md:text-6xl font-poppins font-bold text-[#111827] max-w-4xl leading-tight">
+                            {event.title}
+                        </h1>
                     </div>
-
-                    <h1 className="text-3xl md:text-5xl font-mono font-bold text-[#F8FAFC] mb-4 shadow-black drop-shadow-lg">
-                        {event.title}
-                    </h1>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-3 gap-16">
                 {/* Main Content */}
-                <div className="lg:col-span-2">
-                    <div className="prose prose-invert prose-p:font-mono prose-headings:font-mono max-w-none">
-                        <MarkdownRenderer content={event.description || ''} />
+                <div className="lg:col-span-2 space-y-12 animate-fade-up">
+                    <div className="prose prose-slate prose-lg max-w-none prose-headings:font-poppins prose-headings:font-bold prose-headings:text-[#111827] prose-p:text-[#4B5563] prose-a:text-[#C3161C] prose-strong:text-[#111827]">
+                        <MarkdownRenderer content={event.description || event.short_desc || ''} />
                     </div>
                 </div>
 
                 {/* Sidebar / Info Panel */}
-                <div className="space-y-8">
-                    <div className="p-6 rounded-sm bg-[#09090B] border border-[#27272A] space-y-6 sticky top-24">
-                        <h3 className="font-mono font-bold text-[#F8FAFC] border-b border-[#27272A] pb-3 mb-3">
-                            Mission_Parameters
-                        </h3>
+                <div className="space-y-8 animate-fade-up" style={{ animationDelay: '100ms' }}>
+                    <div className="p-8 rounded-3xl bg-gray-50 border border-gray-100 shadow-xl lg:sticky lg:top-32">
+                        <div className="flex items-center gap-3 mb-8 pb-4 border-b border-gray-200">
+                            <ShieldCheck className="h-6 w-6 text-[#C3161C]" />
+                            <h3 className="font-poppins font-bold text-[#111827] text-xl">
+                                Mission Intel
+                            </h3>
+                        </div>
 
-                        <div className="space-y-4">
-                            <InfoRow icon={<Calendar className="h-4 w-4" />} label="Date" value={formatDate(event.event_date)} />
-                            <InfoRow icon={<Clock className="h-4 w-4" />} label="Time" value={new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} />
-                            <InfoRow icon={<MapPin className="h-4 w-4" />} label="Location" value={event.location || 'Online'} />
+                        <div className="space-y-6 mb-10">
+                            <InfoRow icon={<Calendar className="h-5 w-5" />} label="Event Date" value={formatDate(eventDate)} />
+                            <InfoRow
+                                icon={<Clock className="h-5 w-5" />}
+                                label="Scheduled Time"
+                                value={new Date(eventDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            />
+                            <InfoRow icon={<MapPin className="h-5 w-5" />} label="Location" value={event.location || 'IIMS College Campus'} />
                             {event.max_attendees && (
-                                <InfoRow icon={<Users className="h-4 w-4" />} label="Capacity" value={`${event.max_attendees} Operatives`} />
+                                <InfoRow icon={<Users className="h-5 w-5" />} label="Availability" value={`${event.max_attendees} Operatives Max`} />
                             )}
                         </div>
 
-                        <div className="pt-6 border-t border-[#27272A]">
-                            {new Date(event.event_date) > new Date() ? (
+                        <div className="pt-2">
+                            {new Date(eventDate) > new Date() ? (
                                 event.meeting_link ? (
                                     <a
                                         href={event.meeting_link}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="block w-full text-center py-3 bg-[#10B981] text-black font-mono font-bold rounded-sm hover:bg-[#059669] transition-all hover:scale-105"
+                                        className="flex items-center justify-center gap-2 w-full py-4 bg-[#C3161C] text-white font-bold rounded-2xl hover:bg-[#A31217] transition-all shadow-lg shadow-red-100 hover:scale-[1.02] active:scale-95"
                                     >
-                                        Join_Mission <ExternalLink className="ml-2 h-4 w-4 inline" />
+                                        Launch Mission <ExternalLink className="h-4 w-4" />
                                     </a>
                                 ) : (
                                     <Link
                                         href="/portal/login"
-                                        className="block w-full text-center py-3 bg-[#F8FAFC] text-black font-mono font-bold rounded-sm hover:bg-[#E2E8F0] transition-colors"
+                                        className="flex items-center justify-center gap-2 w-full py-4 bg-[#58151C] text-white font-bold rounded-2xl hover:bg-[#431015] transition-all shadow-lg active:scale-95"
                                     >
-                                        Register_Now
+                                        Register for Mission
+                                        <ChevronRight className="h-5 w-5" />
                                     </Link>
                                 )
                             ) : (
-                                <button disabled className="w-full py-3 bg-[#27272A] text-[#71717A] font-mono font-bold rounded-sm cursor-not-allowed">
-                                    Mission_Concluded
-                                </button>
+                                <div className="w-full py-4 bg-gray-200 text-gray-500 font-bold rounded-2xl text-center cursor-not-allowed">
+                                    Mission Concluded
+                                </div>
                             )}
                         </div>
+
+                        <p className="mt-6 text-center text-xs text-gray-400 font-medium">
+                            Join the portal to track your points and participation.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -120,11 +137,13 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
 
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
     return (
-        <div className="flex items-start gap-4">
-            <div className="mt-0.5 text-[#10B981]">{icon}</div>
+        <div className="flex items-start gap-4 group">
+            <div className="mt-1 p-2 rounded-lg bg-white text-[#C3161C] shadow-sm group-hover:bg-[#C3161C] group-hover:text-white transition-all">
+                {icon}
+            </div>
             <div>
-                <span className="block text-xs font-mono text-[#52525B] uppercase tracking-wide">{label}</span>
-                <span className="block text-sm font-mono text-[#F8FAFC]">{value}</span>
+                <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{label}</span>
+                <span className="block text-sm font-bold text-[#111827]">{value}</span>
             </div>
         </div>
     )

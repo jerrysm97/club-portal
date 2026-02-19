@@ -1,15 +1,18 @@
+// components/portal/admin/AdminSidebar.tsx — IIMS Collegiate Maroon Admin Nav
 'use client'
 
 import {
-    LayoutDashboard, Users, MessageSquare, FileText, Calendar,
-    Trophy, Bell, Mail, Image, Briefcase, Settings, Inbox, Activity, CheckSquare
+    Users,
+    MessageSquare,
+    FileText,
+    Calendar,
+    Trophy,
+    LayoutDashboard,
+    ShieldAlert
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export type AdminTab =
-    | 'overview' | 'members' | 'feed' | 'resources' | 'events'
-    | 'ctf' | 'notifications' | 'messages' | 'gallery' | 'team'
-    | 'settings' | 'inbox' | 'audit'
+export type AdminTab = 'overview' | 'members' | 'posts' | 'events' | 'ctf' | 'documents'
 
 interface AdminSidebarProps {
     activeTab: AdminTab
@@ -18,38 +21,52 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
     const tabs = [
-        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-        { id: 'members', label: 'Members', icon: Users },
-        { id: 'feed', label: 'Feed', icon: MessageSquare },
-        { id: 'resources', label: 'Resources', icon: FileText },
-        { id: 'events', label: 'Events', icon: Calendar },
-        { id: 'ctf', label: 'CTF Arena', icon: Trophy },
-        { id: 'notifications', label: 'Notifications', icon: Bell },
-        { id: 'messages', label: 'Messages', icon: Mail },
-        { id: 'gallery', label: 'Gallery', icon: Image },
-        { id: 'team', label: 'Team', icon: Briefcase },
-        { id: 'inbox', label: 'Inbox', icon: Inbox },
-        { id: 'settings', label: 'Settings', icon: Settings },
-        { id: 'audit', label: 'Audit Logs', icon: CheckSquare },
+        { id: 'overview', label: 'Command Center', icon: LayoutDashboard },
+        { id: 'members', label: 'Operatives', icon: Users },
+        { id: 'posts', label: 'Transmissions', icon: MessageSquare },
+        { id: 'events', label: 'Mission Log', icon: Calendar },
+        { id: 'ctf', label: 'Arena Ops', icon: Trophy },
+        { id: 'documents', label: 'Intell Base', icon: FileText },
     ]
 
     return (
-        <div className="w-64 border-r border-[#27272A] p-4 space-y-1 h-[calc(100vh-100px)] overflow-y-auto hidden lg:block">
-            {tabs.map((tab) => (
-                <button
-                    key={tab.id}
-                    onClick={() => onTabChange(tab.id as AdminTab)}
-                    className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2 rounded-sm font-mono text-sm transition-all text-left",
-                        activeTab === tab.id
-                            ? "bg-[#10B981]/10 text-[#10B981] border-l-2 border-[#10B981]"
-                            : "text-[#A1A1AA] hover:text-[#F8FAFC] hover:bg-[#27272A]/50 border-l-2 border-transparent"
-                    )}
-                >
-                    <tab.icon className="h-4 w-4" />
-                    <span>{tab.label}</span>
-                </button>
-            ))}
-        </div>
+        <aside className="w-72 bg-[#58151C] h-[calc(100vh-64px)] overflow-y-auto hidden lg:flex flex-col border-r border-white/5 shadow-2xl z-40">
+            <div className="p-8">
+                <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/5 border border-white/5 mb-8">
+                    <ShieldAlert className="h-5 w-5 text-[#FCD34D]" />
+                    <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Elevated Access</span>
+                </div>
+
+                <nav className="space-y-1">
+                    {tabs.map((tab) => {
+                        const active = activeTab === tab.id
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => onTabChange(tab.id as AdminTab)}
+                                className={cn(
+                                    "w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-sm transition-all group relative",
+                                    active
+                                        ? "bg-white text-[#58151C] font-bold shadow-xl translate-x-1"
+                                        : "text-[#FECACA] hover:bg-white/10 hover:text-white"
+                                )}
+                            >
+                                <tab.icon className={cn("h-5 w-5 transition-transform", active ? "scale-110" : "group-hover:scale-110")} />
+                                <span className="flex-1 text-left">{tab.label}</span>
+                                {active && (
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#C3161C] rounded-r-full" />
+                                )}
+                            </button>
+                        )
+                    })}
+                </nav>
+            </div>
+
+            <div className="mt-auto p-8 border-t border-white/5 bg-black/10">
+                <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] leading-relaxed">
+                    IIMS Collegiate Command <br /> Protocols v2.0.4
+                </p>
+            </div>
+        </aside>
     )
 }
