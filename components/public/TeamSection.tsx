@@ -1,38 +1,32 @@
-// components/public/TeamSection.tsx
-// Dynamic team section — receives team_members from DB.
-
+// components/public/TeamSection.tsx — Premium minimal
 import type { TeamMember } from '@/types/database'
 
-export default function TeamSection({ team }: { team: TeamMember[] }) {
+interface Props { team: TeamMember[] }
+
+export default function TeamSection({ team }: Props) {
     return (
-        <section className="py-24 px-4 bg-black">
-            <div className="max-w-7xl mx-auto">
-                <p className="font-[var(--font-mono)] text-[#10B981] text-sm mb-3 uppercase">{'>'} 04_TEAM</p>
-                <h2 className="font-[var(--font-mono)] font-bold text-3xl md:text-4xl text-[#F8FAFC] mb-12">
-                    Meet the Team
-                </h2>
+        <section id="team" className="py-24 bg-[#FAFAFA]">
+            <div className="max-w-6xl mx-auto px-6">
+                <p className="text-sm font-semibold text-[#6366F1] uppercase tracking-wider mb-2">Our Team</p>
+                <h2 className="text-3xl md:text-4xl font-bold text-[#111827] mb-12">Meet the Team</h2>
 
                 {team.length === 0 ? (
-                    <div className="bg-[#09090B] border border-[#27272A] rounded-md p-12 text-center max-w-lg mx-auto">
-                        <p className="font-[var(--font-mono)] text-[#10B981] text-sm mb-3">{'>'} TEAM_DATA_LOADING</p>
-                        <p className="text-[#A1A1AA] text-sm">Admin can add team members from the Admin Panel.</p>
+                    <div className="bg-white rounded-xl p-12 text-center border border-[#E5E7EB]">
+                        <p className="text-[#6B7280]">Team members will appear here once added by an admin.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {team.map((member) => (
-                            <div key={member.id} className="bg-[#09090B] border border-[#27272A] rounded-md p-6 text-center hover:border-[#10B981] transition-colors duration-200">
-                                {/* Avatar */}
-                                <div className="w-14 h-14 mx-auto rounded-sm bg-[#10B981] flex items-center justify-center mb-4">
-                                    {member.image_url ? (
-                                        <img src={member.image_url} alt={member.name} className="w-full h-full object-cover rounded-sm" />
-                                    ) : (
-                                        <span className="font-[var(--font-mono)] font-bold text-black text-lg">
-                                            {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                        </span>
-                                    )}
-                                </div>
-                                <h4 className="font-[var(--font-mono)] font-bold text-[#F8FAFC] text-sm mb-1">{member.name}</h4>
-                                <p className="font-[var(--font-mono)] text-[#10B981] text-xs">{member.role}</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {team.map((m) => (
+                            <div key={m.id} className="bg-white rounded-xl p-6 text-center border border-[#E5E7EB] hover:shadow-md transition-shadow">
+                                {m.avatar_url ? (
+                                    <img src={m.avatar_url} alt={m.name} className="w-20 h-20 rounded-full mx-auto mb-4 object-cover" />
+                                ) : (
+                                    <div className="w-20 h-20 rounded-full mx-auto mb-4 bg-[#EEF2FF] flex items-center justify-center text-[#6366F1] text-xl font-bold">
+                                        {m.name.charAt(0)}
+                                    </div>
+                                )}
+                                <h3 className="font-semibold text-[#111827]">{m.name}</h3>
+                                <p className="text-sm text-[#6366F1] mt-0.5">{m.position}</p>
                             </div>
                         ))}
                     </div>

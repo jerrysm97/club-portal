@@ -1,38 +1,37 @@
-// app/portal/pending/page.tsx
-// Membership pending page — Stealth Terminal theme.
-
+// app/portal/pending/page.tsx — Pending approval (premium minimal)
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
 export default function PendingPage() {
     const router = useRouter()
 
-    async function handleSignOut() {
+    async function handleLogout() {
         await supabase.auth.signOut()
         router.push('/portal/login')
-        router.refresh()
     }
 
     return (
-        <div className="min-h-screen bg-black bg-grid flex items-center justify-center px-4">
-            <div className="w-full max-w-sm text-center">
-                <p className="font-[var(--font-mono)] text-[#10B981] text-xs mb-4">{'>'} APPLICATION_STATUS</p>
-                <div className="bg-[#09090B] border border-[#27272A] rounded-md p-8 mb-6">
-                    <p className="font-[var(--font-mono)] font-bold text-[#F8FAFC] text-lg mb-2">Under Review</p>
-                    <p className="text-[#A1A1AA] text-sm leading-relaxed">
-                        Your membership application is being reviewed by an admin. You&apos;ll be notified once approved.
+        <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-4">
+            <div className="w-full max-w-md text-center">
+                <div className="bg-white rounded-xl p-10 border border-[#E5E7EB] shadow-sm">
+                    <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-amber-50 flex items-center justify-center">
+                        <span className="text-2xl">⏳</span>
+                    </div>
+                    <h1 className="text-xl font-bold text-[#111827] mb-2">Pending Approval</h1>
+                    <p className="text-sm text-[#6B7280] leading-relaxed">
+                        Your membership application is being reviewed. An admin will approve your access shortly. You&apos;ll be able to log in once approved.
                     </p>
-                </div>
-                <div className="flex flex-col gap-3">
-                    <Link href="/" className="font-[var(--font-mono)] text-[#A1A1AA] text-sm hover:text-[#F8FAFC] transition-colors">
-                        ← Back to Club Website
-                    </Link>
-                    <button onClick={handleSignOut} className="font-[var(--font-mono)] text-[#EF4444] text-sm hover:opacity-80 transition-opacity">
+                    <button onClick={handleLogout} className="mt-6 text-sm text-[#6366F1] font-medium hover:underline">
                         Sign Out
                     </button>
+                </div>
+                <div className="mt-6">
+                    <Link href="/" className="text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
+                        ← Back to website
+                    </Link>
                 </div>
             </div>
         </div>

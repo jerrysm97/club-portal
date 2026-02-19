@@ -1,23 +1,22 @@
-// app/(public)/contact/page.tsx
-// Contact page — Stealth Terminal themed, reuses ContactSection component.
-
-import { supabaseServer } from '@/lib/supabase-server'
-import type { SiteSettings } from '@/types/database'
+// app/(public)/contact/page.tsx — Contact page
+import { createClient } from '@supabase/supabase-js'
 import ContactSection from '@/components/public/ContactSection'
 
+export const revalidate = 60
+
 export default async function ContactPage() {
-    const { data } = await supabaseServer.from('site_settings').select('*').eq('id', 'global').single()
-    const settings = data as SiteSettings | null
+    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const { data } = await sb.from('site_settings').select('contact_email').eq('id', 'global').single()
 
     return (
-        <div className="bg-black min-h-screen">
-            <section className="py-20 px-4 bg-black bg-grid border-b border-[#27272A]">
-                <div className="max-w-7xl mx-auto">
-                    <p className="font-[var(--font-mono)] text-[#A1A1AA] text-xs mb-2">Home / Contact</p>
-                    <h1 className="font-[var(--font-mono)] font-bold text-4xl md:text-5xl text-[#F8FAFC]">Contact</h1>
+        <>
+            <div className="bg-gradient-to-br from-[#111827] to-[#1E1B4B] text-white py-20 px-6">
+                <div className="max-w-6xl mx-auto">
+                    <p className="text-sm text-[#C7D2FE]/60 mb-1">Home / Contact</p>
+                    <h1 className="text-4xl md:text-5xl font-bold">Contact Us</h1>
                 </div>
-            </section>
-            <ContactSection contactEmail={settings?.contact_email || 'cybersec@iimscollege.edu.np'} />
-        </div>
+            </div>
+            <ContactSection contactEmail={data?.contact_email} />
+        </>
     )
 }

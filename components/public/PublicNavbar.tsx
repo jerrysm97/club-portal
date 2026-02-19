@@ -1,107 +1,86 @@
-// components/public/PublicNavbar.tsx
-// Stealth Terminal navbar — fixed top, matte dark, emerald accents, no blur.
-
+// components/public/PublicNavbar.tsx — Premium minimal navbar
 'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Events', href: '/events' },
-    { name: 'Contact', href: '/contact' },
+const links = [
+    { label: 'Home', href: '/' },
+    { label: 'About', href: '/about' },
+    { label: 'Events', href: '/events' },
+    { label: 'Contact', href: '/contact' },
 ]
 
 export default function PublicNavbar() {
     const pathname = usePathname()
-    const [mobileOpen, setMobileOpen] = useState(false)
+    const [open, setOpen] = useState(false)
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-[#27272A]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-14">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E5E7EB]">
+            <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+                {/* Logo */}
+                <Link href="/" className="text-xl font-semibold text-[#111827] tracking-tight">
+                    IIMS <span className="text-[#6366F1]">Cyber</span>
+                </Link>
 
-                    {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2">
-                        <span className="text-[#10B981] font-[var(--font-mono)] font-bold text-sm">{'>'}_</span>
-                        <span className="text-[#F8FAFC] font-[var(--font-mono)] font-bold text-sm">
-                            IIMS_CYBER
-                        </span>
-                    </Link>
-
-                    {/* Desktop nav */}
-                    <nav className="hidden md:flex items-center gap-1">
-                        {navLinks.map((link) => {
-                            const isActive = pathname === link.href
-                            return (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className={`px-4 py-2 text-sm font-[var(--font-mono)] transition-colors duration-200 ${isActive
-                                            ? 'text-[#10B981]'
-                                            : 'text-[#A1A1AA] hover:text-[#F8FAFC]'
-                                        }`}
-                                >
-                                    {link.name}
-                                </Link>
-                            )
-                        })}
+                {/* Desktop nav */}
+                <div className="hidden md:flex items-center gap-8">
+                    {links.map((l) => (
                         <Link
-                            href="/portal/login"
-                            className="ml-4 px-5 py-2 text-sm font-bold font-[var(--font-mono)] border border-[#10B981] text-[#10B981] rounded-sm hover:bg-[#10B981]/10 transition-colors duration-200"
+                            key={l.href}
+                            href={l.href}
+                            className={`text-sm font-medium transition-colors ${pathname === l.href
+                                    ? 'text-[#6366F1]'
+                                    : 'text-[#6B7280] hover:text-[#111827]'
+                                }`}
                         >
-                            Portal →
+                            {l.label}
                         </Link>
-                    </nav>
-
-                    {/* Mobile hamburger */}
-                    <button
-                        onClick={() => setMobileOpen(!mobileOpen)}
-                        className="md:hidden p-2 text-[#A1A1AA] hover:text-[#F8FAFC] transition-colors"
-                        aria-label="Toggle menu"
+                    ))}
+                    <Link
+                        href="/portal/login"
+                        className="text-sm font-semibold px-5 py-2 rounded-lg bg-[#6366F1] text-white hover:bg-[#4F46E5] transition-colors"
                     >
-                        {mobileOpen ? (
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        ) : (
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        )}
-                    </button>
+                        Portal
+                    </Link>
                 </div>
+
+                {/* Mobile toggle */}
+                <button onClick={() => setOpen(!open)} className="md:hidden p-2 text-[#6B7280]">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {open ? (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        ) : (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        )}
+                    </svg>
+                </button>
             </div>
 
             {/* Mobile menu */}
-            {mobileOpen && (
-                <div className="md:hidden bg-black border-t border-[#27272A]">
-                    <div className="px-4 py-3 space-y-1">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                onClick={() => setMobileOpen(false)}
-                                className={`block px-4 py-3 text-sm font-[var(--font-mono)] transition-colors ${pathname === link.href
-                                        ? 'text-[#10B981]'
-                                        : 'text-[#A1A1AA] hover:text-[#F8FAFC]'
-                                    }`}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
+            {open && (
+                <div className="md:hidden bg-white border-t border-[#E5E7EB] px-6 py-4 space-y-3">
+                    {links.map((l) => (
                         <Link
-                            href="/portal/login"
-                            onClick={() => setMobileOpen(false)}
-                            className="block px-4 py-3 text-sm font-bold font-[var(--font-mono)] text-black bg-[#10B981] text-center rounded-sm mt-2"
+                            key={l.href}
+                            href={l.href}
+                            onClick={() => setOpen(false)}
+                            className={`block text-sm font-medium ${pathname === l.href ? 'text-[#6366F1]' : 'text-[#6B7280]'
+                                }`}
                         >
-                            Portal →
+                            {l.label}
                         </Link>
-                    </div>
+                    ))}
+                    <Link
+                        href="/portal/login"
+                        onClick={() => setOpen(false)}
+                        className="block text-sm font-semibold text-[#6366F1]"
+                    >
+                        Portal →
+                    </Link>
                 </div>
             )}
-        </header>
+        </nav>
     )
 }

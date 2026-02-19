@@ -1,9 +1,5 @@
-// app/(public)/page.tsx
-// Homepage — Server Component. Fetches all dynamic data and passes to sections.
-
-import { supabaseServer } from '@/lib/supabase-server'
-import type { PublicEvent, GalleryImage, TeamMember, SiteSettings } from '@/types/database'
-
+// app/(public)/page.tsx — Homepage: all sections, dynamic data
+import { createClient } from '@supabase/supabase-js'
 import HeroSection from '@/components/public/HeroSection'
 import AboutSection from '@/components/public/AboutSection'
 import DomainsSection from '@/components/public/DomainsSection'
@@ -13,35 +9,33 @@ import StatsSection from '@/components/public/StatsSection'
 import GallerySection from '@/components/public/GallerySection'
 import ContactSection from '@/components/public/ContactSection'
 
+export const revalidate = 60
+
 export default async function HomePage() {
-    // Fetch all data in parallel
-    const [eventsRes, galleryRes, teamRes, settingsRes] = await Promise.all([
-        supabaseServer.from('public_events').select('*').eq('status', 'upcoming').order('event_date', { ascending: true }),
-        supabaseServer.from('public_gallery').select('*').order('sort_order', { ascending: true }),
-        supabaseServer.from('team_members').select('*').order('sort_order', { ascending: true }),
-        supabaseServer.from('site_settings').select('*').eq('id', 'global').single(),
+    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+
+    const [settingsRes, teamRes, eventsRes, galleryRes] = await Promise.all([
+        sb.from('site_settings').select('*').eq('id', 'global').single(),
+        sb.from('team_members').select('*').order('sort_order'),
+        sb.from('public_events').select('*').order('event_date', { ascending: false }),
+        sb.from('public_gallery').select('*').order('sort_order'),
     ])
 
-    const events = (eventsRes.data as PublicEvent[]) || []
-    const gallery = (galleryRes.data as GalleryImage[]) || []
-    const team = (teamRes.data as TeamMember[]) || []
-    const settings = settingsRes.data as SiteSettings | null
+    const settings = settingsRes.data
+    const team = teamRes.data || []
+    const events = eventsRes.data || []
+    const gallery = galleryRes.data || []
 
     return (
-        <div className="bg-black">
+        <>
             <HeroSection />
-            <AboutSection aboutText={settings?.about_text || 'IIMS Cybersecurity Club is the premier technical club at IIMS College, Kathmandu.'} />
+            <AboutSection aboutText={settings?.about_text} />
             <DomainsSection />
             <EventsSection events={events} />
             <TeamSection team={team} />
-            <StatsSection
-                statMembers={settings?.stat_members || '50+'}
-                statEvents={settings?.stat_events || '15+'}
-                statCompetitions={settings?.stat_competitions || '5+'}
-                statPartners={settings?.stat_partners || '3+'}
-            />
-            <GallerySection gallery={gallery} />
-            <ContactSection contactEmail={settings?.contact_email || 'cybersec@iimscollege.edu.np'} />
-        </div>
+            <StatsSection settings={settings} />
+            <GallerySection images={gallery} />
+            <ContactSection contactEmail={settings?.contact_email} />
+        </>
     )
 }

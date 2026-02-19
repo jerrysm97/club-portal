@@ -1,51 +1,11 @@
-/* app/globals.css */
-/* Stealth Terminal design system — minimal, flat, terminal-inspired */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import "tailwindcss";
-
-/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Terminal grid background — subtle emerald lines */
-.bg-grid {
-  background-image:
-    linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-
-/* Blinking terminal cursor */
-@keyframes blink {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0;
-  }
-}
-
-.cursor-blink {
-  animation: blink 1s step-end infinite;
-}
-
-/* Counter animation for stats */
-@keyframes countUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-count-up {
-  animation: countUp 0.4s ease-out forwards;
+body {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
 }

@@ -1,6 +1,4 @@
-// components/portal/PortalNavbar.tsx
-// Portal topbar — Stealth Terminal theme.
-
+// components/portal/PortalNavbar.tsx — Premium minimal portal topbar
 'use client'
 
 import Link from 'next/link'
@@ -10,36 +8,28 @@ import { supabase } from '@/lib/supabase'
 export default function PortalNavbar() {
     const router = useRouter()
 
-    async function handleSignOut() {
+    async function handleLogout() {
         await supabase.auth.signOut()
         router.push('/portal/login')
-        router.refresh()
     }
 
     return (
-        <header className="h-14 bg-[#09090B] border-b border-[#27272A] flex items-center justify-between px-4 lg:px-6">
-            {/* Left: Branding */}
-            <div className="flex items-center gap-2">
-                <span className="text-[#10B981] font-[var(--font-mono)] font-bold text-sm">{'>'}_</span>
-                <span className="text-[#F8FAFC] font-[var(--font-mono)] font-bold text-sm">IIMS_CYBER</span>
-                <span className="text-[#A1A1AA] font-[var(--font-mono)] text-xs hidden sm:inline">// Portal</span>
-            </div>
-
-            {/* Right: Links */}
+        <header className="h-14 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-6">
             <div className="flex items-center gap-4">
-                <Link
-                    href="/"
-                    className="text-[#A1A1AA] hover:text-[#10B981] text-sm font-[var(--font-mono)] transition-colors hidden sm:block"
-                >
-                    ← Public Website
+                <Link href="/portal/dashboard" className="text-base font-semibold text-[#111827]">
+                    IIMS <span className="text-[#6366F1]">Portal</span>
                 </Link>
-                <button
-                    onClick={handleSignOut}
-                    className="text-[#A1A1AA] hover:text-[#EF4444] text-sm font-[var(--font-mono)] transition-colors"
-                >
-                    Logout
-                </button>
+                <span className="text-[#E5E7EB]">|</span>
+                <Link href="/" className="text-xs text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
+                    ← Website
+                </Link>
             </div>
+            <button
+                onClick={handleLogout}
+                className="text-sm text-[#6B7280] hover:text-red-500 transition-colors"
+            >
+                Sign Out
+            </button>
         </header>
     )
 }
