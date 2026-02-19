@@ -1,7 +1,6 @@
 // app/(public)/layout.tsx
-// Layout for all PUBLIC website pages (/, /about, /events, /contact).
-// Wraps children with the PublicNavbar at top and PublicFooter at bottom.
-// The pt-16 accounts for the fixed navbar height (h-16 = 4rem).
+// Public website layout — wraps all public pages with Navbar + Footer.
+// Uses pt-16 to clear the fixed 64px navbar.
 
 import PublicNavbar from '@/components/public/PublicNavbar'
 import PublicFooter from '@/components/public/PublicFooter'
@@ -14,10 +13,7 @@ export default function PublicLayout({
     return (
         <>
             <PublicNavbar />
-            {/* Main content area — padded top to clear the fixed navbar */}
-            <main className="pt-16 min-h-screen bg-slate-950">
-                {children}
-            </main>
+            <main className="pt-16 bg-[#0D0D0D]">{children}</main>
             <PublicFooter />
         </>
     )
