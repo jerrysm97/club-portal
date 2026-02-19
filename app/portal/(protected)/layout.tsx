@@ -1,7 +1,7 @@
 // app/portal/(protected)/layout.tsx — Auth gate for approved members only
 // This layout ONLY wraps pages inside (protected)/ — login, pending, register
 // are OUTSIDE this route group, preventing infinite redirect loops.
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createAdminSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Sidebar from '@/components/portal/Sidebar'
 import PortalNavbar from '@/components/portal/PortalNavbar'
@@ -19,8 +19,9 @@ export default async function ProtectedPortalLayout({
     if (!user) redirect('/portal/login')
 
     // ── Step 2: Fetch member and check status ──
-    // ✅ CORRECT: query by user_id (auth.users FK), NOT by id (members PK)
-    const { data: memberData } = await supabase
+    // Use admin client to bypass RLS and guarantee we get the member profile
+    const adminSupabase = createAdminSupabaseClient()
+    const { data: memberData } = await adminSupabase
         .from('members')
         .select('id, user_id, full_name, email, student_id, club_post, role, status, bio, avatar_url, skills, points, joined_at, updated_at')
         .eq('user_id', user.id)
