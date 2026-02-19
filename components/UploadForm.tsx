@@ -5,7 +5,6 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
 
 type UploadFormProps = {
     onSuccess: () => void
@@ -72,37 +71,17 @@ export default function UploadForm({ onSuccess, onClose }: UploadFormProps) {
         setError(null)
 
         try {
-            // Get current user
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) throw new Error('You must be logged in to upload documents')
+            const fd = new FormData()
+            fd.append('file', file)
+            fd.append('title', title)
 
-            // Create a unique file name to avoid collisions
-            const fileExt = file.name.split('.').pop()
-            const fileName = `${session.user.id}/${Date.now()}.${fileExt}`
+            const res = await fetch('/api/documents/upload', {
+                method: 'POST',
+                body: fd,
+            })
 
-            // Upload the file to Supabase Storage bucket called "documents"
-            const { error: uploadError } = await supabase.storage
-                .from('documents')
-                .upload(fileName, file)
-
-            if (uploadError) throw uploadError
-
-            // Get the public URL for the uploaded file
-            const { data: urlData } = supabase.storage
-                .from('documents')
-                .getPublicUrl(fileName)
-
-            // Save the document record in the database
-            const { error: insertError } = await supabase
-                .from('documents')
-                .insert({
-                    title,
-                    file_url: urlData.publicUrl,
-                    file_type: getFileType(file.name),
-                    uploaded_by: session.user.id,
-                })
-
-            if (insertError) throw insertError
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Upload failed')
 
             // Success! Refresh the list
             onSuccess()

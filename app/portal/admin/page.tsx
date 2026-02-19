@@ -54,6 +54,53 @@ function Badge({ children, color = 'gray' }: { children: React.ReactNode; color?
     return <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${styles[color]}`}>{children}</span>
 }
 
+// ─── Image Upload ────────────────────────────
+function ImageUpload({ onUploaded, onRemoved, bucket = 'events' }: { onUploaded: (url: string) => void; onRemoved: () => void; bucket?: string }) {
+    const [preview, setPreview] = useState('')
+    const [uploading, setUploading] = useState(false)
+
+    async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0]
+        if (!file) return
+        setPreview(URL.createObjectURL(file))
+        setUploading(true)
+        try {
+            const fd = new FormData()
+            fd.append('file', file)
+            fd.append('bucket', bucket)
+            const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+            const data = await res.json()
+            if (res.ok && data.url) { onUploaded(data.url) }
+            else { alert(data.error || 'Upload failed'); setPreview('') }
+        } catch { alert('Upload failed'); setPreview('') }
+        finally { setUploading(false) }
+    }
+
+    return (
+        <div>
+            <label className="flex items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-[#E5E7EB] hover:border-[#6366F1]/40 transition-colors cursor-pointer bg-[#F9FAFB] relative overflow-hidden">
+                {preview ? (
+                    <img src={preview} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                    <div className="text-center">
+                        <span className="text-2xl block mb-1">📷</span>
+                        <span className="text-xs text-[#9CA3AF]">Click to upload photo</span>
+                    </div>
+                )}
+                {uploading && (
+                    <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
+                        <div className="w-6 h-6 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" />
+                    </div>
+                )}
+                <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
+            </label>
+            {preview && !uploading && (
+                <button onClick={() => { setPreview(''); onRemoved() }} className="text-xs text-red-500 hover:text-red-600 mt-1">Remove photo</button>
+            )}
+        </div>
+    )
+}
+
 // ─── Tabs ────────────────────────────────────
 const TABS = ['Dashboard', 'Members', 'Posts', 'Events', 'Gallery', 'Team', 'Settings', 'Inbox'] as const
 type Tab = typeof TABS[number]
@@ -268,7 +315,7 @@ function PostsTab({ posts, api, reload }: { posts: Post[]; api: (path: string, m
 }
 
 function EventsTab({ events, api, reload }: { events: PublicEvent[]; api: (path: string, method: string, body?: Record<string, unknown>) => Promise<boolean>; reload: () => void }) {
-    const [form, setForm] = useState({ title: '', description: '', event_date: '', location: '', type: 'workshop' })
+    const [form, setForm] = useState({ title: '', description: '', event_date: '', location: '', type: 'Workshop', image_url: '' })
     const [creating, setCreating] = useState(false)
 
     return (
@@ -288,11 +335,18 @@ function EventsTab({ events, api, reload }: { events: PublicEvent[]; api: (path:
                             <label className="block text-sm font-medium text-[#374151] mb-1.5">Type</label>
                             <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
                                 className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] bg-white">
-                                <option value="ctf">CTF</option><option value="workshop">Workshop</option><option value="competition">Competition</option><option value="seminar">Seminar</option>
+                                <option value="CTF">CTF</option><option value="Workshop">Workshop</option><option value="Competition">Competition</option><option value="Seminar">Seminar</option><option value="Other">Other</option>
                             </select>
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#374151] mb-1.5">Event Photo (optional)</label>
+                            <ImageUpload
+                                onUploaded={(url) => setForm(f => ({ ...f, image_url: url }))}
+                                onRemoved={() => setForm(f => ({ ...f, image_url: '' }))}
+                            />
+                        </div>
                         <div className="flex gap-2">
-                            <Btn onClick={async () => { if (await api('events', 'POST', form)) { setCreating(false); setForm({ title: '', description: '', event_date: '', location: '', type: 'workshop' }); reload() } }}>Create</Btn>
+                            <Btn onClick={async () => { if (await api('events', 'POST', form)) { setCreating(false); setForm({ title: '', description: '', event_date: '', location: '', type: 'Workshop', image_url: '' }); reload() } }}>Create</Btn>
                             <Btn variant="ghost" onClick={() => setCreating(false)}>Cancel</Btn>
                         </div>
                     </div>
@@ -300,12 +354,17 @@ function EventsTab({ events, api, reload }: { events: PublicEvent[]; api: (path:
             )}
             {events.map((ev) => (
                 <Card key={ev.id} className="flex items-start justify-between">
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h3 className="font-medium text-[#111827]">{ev.title}</h3>
-                            <Badge color="indigo">{ev.type}</Badge>
+                    <div className="flex items-start gap-3">
+                        {ev.image_url && (
+                            <img src={ev.image_url} alt={ev.title} className="w-16 h-16 rounded-lg object-cover shrink-0" />
+                        )}
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-medium text-[#111827]">{ev.title}</h3>
+                                <Badge color="indigo">{ev.type}</Badge>
+                            </div>
+                            <p className="text-sm text-[#6B7280] mt-1">{new Date(ev.event_date).toLocaleDateString()} {ev.location && `· ${ev.location}`}</p>
                         </div>
-                        <p className="text-sm text-[#6B7280] mt-1">{new Date(ev.event_date).toLocaleDateString()} {ev.location && `· ${ev.location}`}</p>
                     </div>
                     <Btn variant="danger" onClick={async () => { if (confirm('Delete?') && await api('events', 'DELETE', { id: ev.id })) reload() }}>Delete</Btn>
                 </Card>

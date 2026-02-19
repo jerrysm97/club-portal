@@ -41,6 +41,9 @@ export default function EventsSection({ events }: Props) {
                     <div className="grid md:grid-cols-3 gap-5">
                         {upcoming.map((e) => (
                             <div key={e.id} className="group bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                                {e.image_url && (
+                                    <img src={e.image_url} alt={e.title} className="w-full h-40 object-cover" />
+                                )}
                                 <div className="p-6">
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${typeBadge[e.type] || 'bg-gray-50 text-gray-600 border-gray-100'}`}>
