@@ -1,54 +1,77 @@
-// components/public/HeroSection.tsx
+// components/public/HeroSection.tsx — Stealth Terminal Hero
 import Link from 'next/link'
+import { Terminal, Shield, ChevronRight } from 'lucide-react'
 
 export default function HeroSection() {
     return (
-        <section className="relative min-h-[100vh] flex items-center justify-center bg-gradient-to-br from-[#0F172A] via-[#1E1B4B] to-[#312E81] overflow-hidden">
-            {/* Ambient gradient blobs */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#6366F1]/15 rounded-full blur-[150px] animate-pulse" />
-                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#8B5CF6]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#818CF8]/8 rounded-full blur-[180px]" />
-            </div>
+        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-[#27272A]">
+            {/* Background Grid */}
+            <div className="absolute inset-0 bg-black hero-grid" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-            {/* Subtle grid pattern */}
-            <div className="absolute inset-0 opacity-[0.03]"
-                style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
-
-            <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-                <div className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/[0.1] fade-up">
-                    <span className="w-2 h-2 rounded-full bg-[#818CF8] animate-pulse" />
-                    <span className="text-sm text-[#C7D2FE] font-medium tracking-wide">IIMS College · Est. 2024</span>
+            <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+                {/* Terminal Badge */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10B981]/10 border border-[#10B981]/20 mb-8 animate-fade-up">
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]"></span>
+                    </span>
+                    <span className="font-mono text-xs font-bold text-[#10B981] tracking-wide">
+                        SYSTEM_ONLINE_V2.0
+                    </span>
                 </div>
 
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white leading-[1.05] tracking-tight fade-up fade-up-delay-1">
-                    Securing the<br />
-                    <span className="text-gradient">Digital Future</span>
+                {/* Headline */}
+                <h1 className="font-mono font-bold text-4xl md:text-7xl mb-6 tracking-tight text-[#F8FAFC] animate-fade-up animate-fade-up-delay-1">
+                    Securing the <span className="text-[#10B981]">Future</span><br />
+                    One Byte at a Time<span className="animate-pulse text-[#10B981]">_</span>
                 </h1>
 
-                <p className="mt-8 text-lg md:text-xl text-[#C7D2FE]/70 max-w-2xl mx-auto leading-relaxed fade-up fade-up-delay-2">
-                    Nepal&apos;s next generation of ethical hackers, defenders, and security researchers.
+                <p className="font-mono text-[#A1A1AA] text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up animate-fade-up-delay-2">
+                    Nepal's premier student-led cybersecurity community.
+                    We research, build, and defend the digital frontier.
                 </p>
 
-                <div className="mt-12 flex flex-wrap justify-center gap-4 fade-up fade-up-delay-3">
+                {/* CTA Buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up animate-fade-up-delay-3">
+                    <Link
+                        href="/portal/signup"
+                        className="w-full sm:w-auto px-8 py-3 rounded-sm bg-[#10B981] text-black font-mono font-bold hover:bg-[#059669] transition-all hover:scale-105 flex items-center justify-center gap-2 group"
+                    >
+                        <Terminal className="h-5 w-5" />
+                        Initialize_Access
+                    </Link>
                     <Link
                         href="/about"
-                        className="group px-8 py-4 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#4F46E5] text-white font-semibold shadow-2xl shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 active:translate-y-0 transition-all duration-300"
+                        className="w-full sm:w-auto px-8 py-3 rounded-sm bg-[#111113] border border-[#27272A] text-[#F8FAFC] font-mono hover:border-[#10B981] transition-all hover:-translate-y-1 flex items-center justify-center gap-2 group"
                     >
-                        Explore Club Life
-                        <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform duration-200">→</span>
-                    </Link>
-                    <Link
-                        href="/portal/login"
-                        className="px-8 py-4 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 hover:border-white/30 transition-all duration-300 backdrop-blur-sm"
-                    >
-                        Member Portal
+                        <Shield className="h-5 w-5 text-[#A1A1AA] group-hover:text-[#10B981] transition-colors" />
+                        Learn More
+                        <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                     </Link>
                 </div>
-            </div>
 
-            {/* Bottom gradient fade */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#F8FAFC] to-transparent" />
+                {/* Stats Row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-8 border-t border-[#27272A]/50 animate-fade-up animate-fade-up-delay-3">
+                    <Stat label="Active Members" value="150+" />
+                    <Stat label="CTF Challenges" value="45+" />
+                    <Stat label="Workshops" value="12+" />
+                    <Stat label="GitHub Stars" value="850+" />
+                </div>
+            </div>
         </section>
+    )
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="text-center group cursor-default">
+            <div className="font-mono font-bold text-3xl text-[#F8FAFC] group-hover:text-[#10B981] transition-colors mb-1">
+                {value}
+            </div>
+            <div className="text-xs font-mono text-[#52525B] uppercase tracking-wider">
+                {label}
+            </div>
+        </div>
     )
 }

@@ -1,13 +1,15 @@
-// app/(public)/layout.tsx — Public layout
-import PublicNavbar from '@/components/public/PublicNavbar'
-import PublicFooter from '@/components/public/PublicFooter'
+// app/(public)/layout.tsx — Public layout with Navbar and Footer
+import Navbar from '@/components/public/Navbar'
+import Footer from '@/components/public/Footer'
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="min-h-screen bg-[#F8FAFC]">
-            <PublicNavbar />
-            <main className="pt-16">{children}</main>
-            <PublicFooter />
+        <div className="flex flex-col min-h-screen bg-black">
+            <Navbar />
+            <main className="flex-1 pt-20">
+                {children}
+            </main>
+            <Footer />
         </div>
     )
 }

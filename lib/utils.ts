@@ -1,0 +1,30 @@
+// lib/utils.ts — Utility functions
+import { clsx, type ClassValue } from 'clsx'
+import { format, formatDistanceToNow } from 'date-fns'
+import { createHash } from 'crypto'
+
+/** Merge Tailwind classes (clsx-only, no tailwind-merge needed) */
+export function cn(...inputs: ClassValue[]) {
+    return clsx(inputs)
+}
+
+/** Format a date string to "Jan 15, 2025" */
+export function formatDate(date: string | Date): string {
+    return format(new Date(date), 'MMM d, yyyy')
+}
+
+/** Format a date to relative time "2 hours ago" */
+export function timeAgo(date: string | Date): string {
+    return formatDistanceToNow(new Date(date), { addSuffix: true })
+}
+
+/** Truncate text with ellipsis */
+export function truncate(str: string, length: number = 60): string {
+    if (str.length <= length) return str
+    return str.slice(0, length).trimEnd() + '…'
+}
+
+/** SHA256 hash a CTF flag for comparison */
+export function hashFlag(flag: string): string {
+    return createHash('sha256').update(flag.trim()).digest('hex')
+}

@@ -1,183 +1,145 @@
-// app/dashboard/page.tsx
-// The main dashboard page — shows the post feed.
-// Displays all posts (pinned first), lets users create/edit/delete posts.
+// app/portal/dashboard/page.tsx — Stealth Terminal Command Center
+import { createClient } from '@/utils/supabase/server'
+import Link from 'next/link'
+import { Terminal, Shield, AlertTriangle, Activity, Calendar, FileText, ArrowUpRight } from 'lucide-react'
+import { formatDate } from '@/lib/utils'
+import type { Member, PublicEvent, Post } from '@/types/database'
 
-'use client'
+export const revalidate = 60
 
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
-import type { Post } from '@/lib/types'
-import PostCard from '@/components/PostCard'
-import PostForm from '@/components/PostForm'
+export default async function DashboardPage() {
+    const supabase = await createClient()
+    const { data: { session } } = await supabase.auth.getSession()
 
-export default function DashboardPage() {
-    // State for posts data
-    const [posts, setPosts] = useState<Post[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+    // Parallel data fetching
+    const [memberRes, eventsRes, announcementsRes] = await Promise.all([
+        supabase.from('members').select('*').eq('id', session?.user?.id!).single(),
+        supabase.from('public_events').select('*').gte('event_date', new Date().toISOString()).order('event_date').limit(3),
+        supabase.from('posts').select('*, author:members(full_name, avatar_url)').eq('type', 'announcement').order('created_at', { ascending: false }).limit(3)
+    ])
 
-    // State for current user info (needed to show/hide edit/delete buttons)
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null)
-    const [currentUserRole, setCurrentUserRole] = useState<string | null>(null)
-
-    // State for the post form modal
-    const [showForm, setShowForm] = useState(false)
-    const [editingPost, setEditingPost] = useState<Post | null>(null)
-
-    // Fetch all posts from the database, with author info joined in
-    const fetchPosts = useCallback(async () => {
-        try {
-            setError(null)
-            const { data, error: fetchError } = await supabase
-                .from('posts')
-                .select(`
-          *,
-          author:members!posts_author_id_fkey (id, name, email, avatar_url)
-        `)
-                .order('pinned', { ascending: false })   // Pinned posts first
-                .order('created_at', { ascending: false }) // Then newest first
-
-            if (fetchError) throw fetchError
-            setPosts(data || [])
-        } catch (err: any) {
-            setError(err.message || 'Failed to load posts')
-        } finally {
-            setLoading(false)
-        }
-    }, [])
-
-    // Get the current user's ID and role on page load
-    useEffect(() => {
-        const getCurrentUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            if (session) {
-                setCurrentUserId(session.user.id)
-
-                // Get their role from the members table
-                const { data: member } = await supabase
-                    .from('members')
-                    .select('role')
-                    .eq('id', session.user.id)
-                    .single()
-
-                if (member) setCurrentUserRole(member.role)
-            }
-        }
-
-        getCurrentUser()
-        fetchPosts()
-    }, [fetchPosts])
-
-    // Delete a post
-    const handleDelete = async (postId: string) => {
-        // Show a confirmation dialog before deleting
-        if (!confirm('Are you sure you want to delete this post?')) return
-
-        try {
-            const { error: deleteError } = await supabase
-                .from('posts')
-                .delete()
-                .eq('id', postId)
-
-            if (deleteError) throw deleteError
-
-            // Refresh the posts list after deletion
-            fetchPosts()
-        } catch (err: any) {
-            alert(err.message || 'Failed to delete post')
-        }
-    }
-
-    // Open the form in "edit mode" for a specific post
-    const handleEdit = (post: Post) => {
-        setEditingPost(post)
-        setShowForm(true)
-    }
-
-    // Called when a post is successfully created or updated
-    const handleFormSuccess = () => {
-        setShowForm(false)
-        setEditingPost(null)
-        fetchPosts() // Refresh the list
-    }
-
-    // Close the form and reset editing state
-    const handleFormClose = () => {
-        setShowForm(false)
-        setEditingPost(null)
-    }
+    const member = memberRes.data as Member
+    const events = (eventsRes.data || []) as PublicEvent[]
+    const announcements = (announcementsRes.data || []) as Post[]
 
     return (
-        <div className="max-w-3xl mx-auto">
-            {/* Page header */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Post Feed</h1>
-                    <p className="text-sm text-slate-500 mt-1">
-                        Stay updated with the latest from the club
-                    </p>
+        <div className="space-y-8 animate-fade-up">
+            {/* Welcome Banner */}
+            <div className="relative p-8 rounded-sm bg-[#09090B] border border-[#27272A] overflow-hidden">
+                <div className="absolute inset-0 hero-grid opacity-10" />
+                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                        <div className="flex items-center gap-2 text-[#10B981] mb-2 font-mono text-xs uppercase tracking-wider">
+                            <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+                            System_Online
+                        </div>
+                        <h1 className="text-2xl md:text-3xl font-mono font-bold text-[#F8FAFC]">
+                            Welcome back, <span className="text-[#10B981]">{member.full_name.split(' ')[0]}</span>
+                        </h1>
+                        <p className="text-[#A1A1AA] font-mono text-sm mt-1">
+                            Clearance Level: <span className="text-[#F8FAFC] uppercase">{member.role}</span>
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-6 bg-black/50 p-4 rounded-sm border border-[#27272A]">
+                        <div className="text-center">
+                            <span className="block text-xs font-mono text-[#52525B] uppercase">Rank_PTS</span>
+                            <span className="block text-xl font-mono font-bold text-[#10B981]">{member.points}</span>
+                        </div>
+                        <div className="w-px h-8 bg-[#27272A]" />
+                        <div className="text-center">
+                            <span className="block text-xs font-mono text-[#52525B] uppercase">ID_Ref</span>
+                            <span className="block text-xl font-mono font-bold text-[#F8FAFC]">#{member.student_id || 'N/A'}</span>
+                        </div>
+                    </div>
                 </div>
-                <button
-                    onClick={() => setShowForm(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-sm transition-all cursor-pointer"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    New Post
-                </button>
             </div>
 
-            {/* Loading spinner */}
-            {loading && (
-                <div className="flex justify-center py-20">
-                    <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-                </div>
-            )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Feed / Announcements */}
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h2 className="flex items-center gap-2 font-mono font-bold text-[#F8FAFC]">
+                            <AlertTriangle className="h-4 w-4 text-[#EAB308]" />
+                            Priority_Intel
+                        </h2>
+                        <Link href="/portal/feed" className="text-xs font-mono text-[#10B981] hover:underline">View_All_Comms &gt;</Link>
+                    </div>
 
-            {/* Error message */}
-            {error && (
-                <div className="p-4 rounded-xl bg-red-50 text-red-700 text-sm mb-6">
-                    {error}
+                    <div className="space-y-4">
+                        {announcements.length > 0 ? (
+                            announcements.map(post => (
+                                <div key={post.id} className="p-5 rounded-sm bg-[#111113] border border-[#27272A] hover:border-[#27272A]/80 transition-colors">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <span className="px-2 py-0.5 rounded-full bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/20 text-[10px] font-mono uppercase">Announcement</span>
+                                        <span className="text-[#52525B] text-xs font-mono">{formatDate(post.created_at)}</span>
+                                    </div>
+                                    <h3 className="text-lg font-mono font-bold text-[#F8FAFC] mb-2">{post.title}</h3>
+                                    <p className="text-[#A1A1AA] text-sm line-clamp-2">{post.content}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="p-8 text-center border border-dashed border-[#27272A] rounded-sm text-[#52525B] font-mono italic">
+                                No active priority communications.
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
 
-            {/* Posts list */}
-            {!loading && !error && (
-                <div className="space-y-4">
-                    {posts.length === 0 ? (
-                        // Empty state — no posts yet
-                        <div className="text-center py-20 bg-white rounded-xl border border-slate-100">
-                            <svg className="w-12 h-12 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                            </svg>
-                            <p className="text-slate-500 font-medium">No posts yet</p>
-                            <p className="text-sm text-slate-400 mt-1">Be the first to share something!</p>
+                {/* Sidebar Widgets */}
+                <div className="space-y-8">
+                    {/* Upcoming Missions */}
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="flex items-center gap-2 font-mono font-bold text-[#F8FAFC]">
+                                <Calendar className="h-4 w-4 text-[#06B6D4]" />
+                                Upcoming_Missions
+                            </h2>
+                            <Link href="/portal/events" className="text-xs font-mono text-[#06B6D4] hover:underline">View_Log &gt;</Link>
                         </div>
-                    ) : (
-                        // Render each post using the PostCard component
-                        posts.map((post) => (
-                            <PostCard
-                                key={post.id}
-                                post={post}
-                                currentUserId={currentUserId}
-                                currentUserRole={currentUserRole}
-                                onDelete={handleDelete}
-                                onEdit={handleEdit}
-                            />
-                        ))
-                    )}
-                </div>
-            )}
 
-            {/* Post form modal — only shown when showForm is true */}
-            {showForm && (
-                <PostForm
-                    editingPost={editingPost}
-                    onSuccess={handleFormSuccess}
-                    onClose={handleFormClose}
-                />
-            )}
+                        <div className="space-y-3">
+                            {events.length > 0 ? (
+                                events.map(event => (
+                                    <Link key={event.id} href={`/portal/events/${event.id}`} className="block p-4 rounded-sm bg-[#111113] border border-[#27272A] hover:border-[#06B6D4]/50 transition-colors group">
+                                        <div className="flex justify-between mb-1">
+                                            <span className="text-[#06B6D4] font-mono text-xs">{formatDate(event.event_date)}</span>
+                                            <ArrowUpRight className="h-3 w-3 text-[#52525B] group-hover:text-[#06B6D4] transition-colors" />
+                                        </div>
+                                        <h4 className="font-mono font-bold text-[#F8FAFC] text-sm truncate">{event.title}</h4>
+                                        <div className="flex items-center gap-1 mt-2 text-[#52525B] text-xs font-mono">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${event.type.toLowerCase().includes('ctf') ? 'bg-[#EF4444]' : 'bg-[#10B981]'}`} />
+                                            {event.type}
+                                        </div>
+                                    </Link>
+                                ))
+                            ) : (
+                                <div className="p-4 text-center border border-dashed border-[#27272A] rounded-sm text-[#52525B] font-mono text-xs">
+                                    No upcoming missions.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div>
+                        <h2 className="flex items-center gap-2 font-mono font-bold text-[#F8FAFC] mb-4">
+                            <Terminal className="h-4 w-4 text-[#10B981]" />
+                            Quick_Access
+                        </h2>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Link href="/portal/ctf" className="p-3 rounded-sm bg-[#27272A]/30 border border-[#27272A] hover:bg-[#27272A]/50 hover:text-[#10B981] transition-colors text-center">
+                                <Shield className="h-5 w-5 mx-auto mb-2 text-[#A1A1AA]" />
+                                <span className="block text-xs font-mono font-bold">CTF_Arena</span>
+                            </Link>
+                            <Link href="/portal/resources" className="p-3 rounded-sm bg-[#27272A]/30 border border-[#27272A] hover:bg-[#27272A]/50 hover:text-[#10B981] transition-colors text-center">
+                                <FileText className="h-5 w-5 mx-auto mb-2 text-[#A1A1AA]" />
+                                <span className="block text-xs font-mono font-bold">Archives</span>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

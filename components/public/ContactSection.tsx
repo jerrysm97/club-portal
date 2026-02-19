@@ -1,116 +1,170 @@
-// components/public/ContactSection.tsx
+// components/public/ContactSection.tsx — Stealth Terminal Contact
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react' // Import React and useState
+import { Send, Loader2, CheckCircle, Mail, MapPin } from 'lucide-react'
+import { contactFormSchema } from '@/lib/validations'
+import { z } from 'zod'
 
-interface Props { contactEmail?: string }
-
-export default function ContactSection({ contactEmail }: Props) {
-    const [form, setForm] = useState({ name: '', email: '', subject: 'General Inquiry', message: '' })
-    const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle')
+export default function ContactSection({ contactEmail }: { contactEmail?: string | null }) {
+    const [loading, setLoading] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' })
+    const [errors, setErrors] = useState<Record<string, string>>({})
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
-        if (!form.name || !form.email || !form.message) return
-        setStatus('loading')
+        setLoading(true)
+        setErrors({}) // Clear previous errors
+
         try {
+            // Validate form
+            contactFormSchema.parse(formData)
+
+            // Simulate API call (replace with actual fetch later)
             const res = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify(formData),
             })
-            if (!res.ok) throw new Error()
-            setStatus('sent')
-            setForm({ name: '', email: '', subject: 'General Inquiry', message: '' })
-        } catch {
-            setStatus('error')
+
+            if (!res.ok) throw new Error('Failed to send message')
+
+            setSuccess(true)
+            setFormData({ name: '', email: '', subject: '', message: '' })
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                const fieldErrors: Record<string, string> = {}; // Added semicolon to prevent ASI issues
+
+                // Type assertion to fix build error
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (err as any).errors.forEach((e: any) => {
+                    if (e.path[0]) fieldErrors[e.path[0] as string] = e.message
+                })
+                setErrors(fieldErrors)
+            } else {
+                alert('Transmission failed. Check network connection.')
+            }
+        } finally {
+            setLoading(false)
         }
     }
 
     return (
-        <section id="contact" className="py-28 bg-[#F8FAFC]">
-            <div className="max-w-6xl mx-auto px-6">
-                <div className="grid md:grid-cols-5 gap-12">
-                    {/* Info */}
-                    <div className="md:col-span-2">
-                        <span className="inline-block text-xs font-bold text-[#6366F1] uppercase tracking-[0.2em] mb-3">Contact</span>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#0F172A] mb-6">Get in Touch</h2>
-                        <p className="text-[#64748B] leading-relaxed mb-10">
-                            Interested in cybersecurity? Join IIMS Cybersecurity Club to gain hands-on experience, compete in CTFs, and connect with like-minded students.
-                        </p>
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-[#6366F1]">✉️</div>
-                                <div>
-                                    <p className="text-xs text-[#94A3B8] font-medium uppercase tracking-wider">Email</p>
-                                    <p className="text-sm text-[#0F172A] font-medium">{contactEmail || 'cybersec@iimscollege.edu.np'}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-[#6366F1]">📍</div>
-                                <div>
-                                    <p className="text-xs text-[#94A3B8] font-medium uppercase tracking-wider">Location</p>
-                                    <p className="text-sm text-[#0F172A] font-medium">IIMS College, Kathmandu</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <section className="py-24 bg-[#09090B] border-t border-[#27272A]">
+            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16">
+                {/* Contact Info */}
+                <div>
+                    <h2 className="text-3xl md:text-5xl font-mono font-bold text-[#F8FAFC] mb-8">
+                        Establish <span className="text-[#10B981]">Uplink</span>
+                    </h2>
+                    <p className="text-[#A1A1AA] font-mono mb-12 leading-relaxed">
+                        Have a query about our operations? Want to collaborate on a security project?
+                        Initiate a secure transmission below.
+                    </p>
 
-                    {/* Form */}
-                    <div className="md:col-span-3">
-                        <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm">
-                            {status === 'sent' ? (
-                                <div className="text-center py-12">
-                                    <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
-                                        <span className="text-2xl">✅</span>
-                                    </div>
-                                    <h3 className="text-xl font-bold text-[#0F172A] mb-2">Message Sent!</h3>
-                                    <p className="text-sm text-[#64748B] mb-4">We&apos;ll get back to you soon.</p>
-                                    <button onClick={() => setStatus('idle')} className="text-sm font-semibold text-[#6366F1] hover:underline">
-                                        Send another message
-                                    </button>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleSubmit} className="space-y-5">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-[#0F172A] mb-2">Name</label>
-                                            <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                                className="input-premium" placeholder="Your name" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-[#0F172A] mb-2">Email</label>
-                                            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                                                className="input-premium" placeholder="you@email.com" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-[#0F172A] mb-2">Subject</label>
-                                        <select value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                                            className="input-premium bg-white">
-                                            <option>General Inquiry</option>
-                                            <option>Membership</option>
-                                            <option>Collaboration</option>
-                                            <option>Other</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-[#0F172A] mb-2">Message</label>
-                                        <textarea required rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
-                                            className="input-premium resize-none" placeholder="Your message..." />
-                                    </div>
-                                    {status === 'error' && (
-                                        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-100">
-                                            <span className="text-red-500 text-sm">⚠️ Something went wrong. Please try again.</span>
-                                        </div>
-                                    )}
-                                    <button type="submit" disabled={status === 'loading'} className="btn-primary">
-                                        {status === 'loading' ? 'Sending...' : 'Send Message'}
-                                    </button>
-                                </form>
-                            )}
+                    <div className="space-y-6">
+                        <div className="flex items-start gap-4 p-6 rounded-sm bg-black border border-[#27272A]">
+                            <Mail className="h-6 w-6 text-[#10B981] mt-1" />
+                            <div>
+                                <h4 className="font-mono font-bold text-[#F8FAFC] mb-1">Electronic Mail</h4>
+                                <a href={`mailto:${contactEmail || 'cybersec@iimscollege.edu.np'}`} className="text-[#A1A1AA] hover:text-[#10B981] transition-colors font-mono text-sm">
+                                    {contactEmail || 'cybersec@iimscollege.edu.np'}
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-4 p-6 rounded-sm bg-black border border-[#27272A]">
+                            <MapPin className="h-6 w-6 text-[#10B981] mt-1" />
+                            <div>
+                                <h4 className="font-mono font-bold text-[#F8FAFC] mb-1">Base of Operations</h4>
+                                <p className="text-[#A1A1AA] font-mono text-sm">
+                                    IIMS College<br />
+                                    Putalisadak, Kathmandu
+                                </p>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Contact Form */}
+                <div className="bg-black border border-[#27272A] rounded-sm p-8">
+                    {success ? (
+                        <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                            <div className="w-16 h-16 rounded-full bg-[#10B981]/10 flex items-center justify-center mb-6">
+                                <CheckCircle className="h-8 w-8 text-[#10B981]" />
+                            </div>
+                            <h3 className="font-mono font-bold text-xl text-[#F8FAFC] mb-2">Transmission Received</h3>
+                            <p className="text-[#A1A1AA] font-mono text-sm">Our operatives will respond shortly.</p>
+                            <button
+                                onClick={() => setSuccess(false)}
+                                className="mt-8 text-[#10B981] font-mono text-xs hover:underline"
+                            >
+                                Send_Another_Transmission
+                            </button>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="block font-mono text-xs text-[#A1A1AA] mb-2 uppercase">Identity</label>
+                                <input
+                                    type="text"
+                                    placeholder="John Doe"
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm px-4 py-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors placeholder:text-[#3F3F46]"
+                                />
+                                {errors.name && <p className="text-[#EF4444] text-xs font-mono mt-1">{errors.name}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block font-mono text-xs text-[#A1A1AA] mb-2 uppercase">Return Address</label>
+                                <input
+                                    type="email"
+                                    placeholder="john@example.com"
+                                    value={formData.email}
+                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm px-4 py-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors placeholder:text-[#3F3F46]"
+                                />
+                                {errors.email && <p className="text-[#EF4444] text-xs font-mono mt-1">{errors.email}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block font-mono text-xs text-[#A1A1AA] mb-2 uppercase">Subject Line</label>
+                                <input
+                                    type="text"
+                                    placeholder="Collaboration Inquiry"
+                                    value={formData.subject}
+                                    onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm px-4 py-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors placeholder:text-[#3F3F46]"
+                                />
+                                {errors.subject && <p className="text-[#EF4444] text-xs font-mono mt-1">{errors.subject}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block font-mono text-xs text-[#A1A1AA] mb-2 uppercase">Payload</label>
+                                <textarea
+                                    rows={4}
+                                    placeholder="Type your message here..."
+                                    value={formData.message}
+                                    onChange={e => setFormData({ ...formData, message: e.target.value })}
+                                    className="w-full bg-[#111113] border border-[#27272A] rounded-sm px-4 py-3 text-[#F8FAFC] font-mono text-sm focus:border-[#10B981] focus:outline-none transition-colors placeholder:text-[#3F3F46] resize-none"
+                                />
+                                {errors.message && <p className="text-[#EF4444] text-xs font-mono mt-1">{errors.message}</p>}
+                            </div>
+
+                            <div>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full bg-[#F8FAFC] text-black font-mono font-bold py-3 rounded-sm hover:bg-[#E2E8F0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                                    {loading ? 'Transmitting...' : 'Send_Transmission'}
+                                </button>
+                            </div>
+                        </form>
+                    )}
                 </div>
             </div>
         </section>
