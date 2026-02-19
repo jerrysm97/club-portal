@@ -1,137 +1,109 @@
-// components/public/Footer.tsx — IIMS College Modern Footer
+// components/public/Footer.tsx — ICEHC Dark Terminal Footer
 import Link from 'next/link'
-import { GraduationCap, Github, Facebook, Instagram, Mail, MapPin, Phone, ExternalLink } from 'lucide-react'
+import { Shield, Mail, ExternalLink } from 'lucide-react'
+
+const QUICK_LINKS = [
+    { href: '/', label: 'Home' },
+    { href: '/about', label: 'About' },
+    { href: '/events', label: 'Events' },
+    { href: '/contact', label: 'Contact' },
+    { href: '/portal/login', label: 'Member Portal' },
+]
+
+const EXTERNAL_LINKS = [
+    { href: 'https://iimscollege.edu.np/capture-the-flag/', label: 'IIMS CTF Page' },
+    { href: 'https://iimscollege.edu.np/it-club/', label: 'IIMS IT Club' },
+    { href: 'https://iimscollege.edu.np/', label: 'IIMS College' },
+]
 
 export default function Footer() {
-    const currentYear = new Date().getFullYear()
-
     return (
-        <footer className="bg-[#1A1A2E] text-white pt-20 pb-8 overflow-hidden relative">
-            {/* Subtle Grid Overlay */}
-            <div className="absolute inset-0 hero-grid opacity-[0.06] pointer-events-none" />
-
-            <div className="max-w-7xl mx-auto px-6 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                    {/* Brand */}
-                    <div className="lg:col-span-1 space-y-6">
-                        <Link href="/" className="flex items-center gap-3 group w-fit">
-                            <div className="h-11 w-11 rounded-xl bg-[#D32F2F] flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                                <GraduationCap className="h-6 w-6 text-white" />
+        <footer className="bg-[#0A0A0F] border-t border-[#1E1E2E]">
+            <div className="max-w-7xl mx-auto px-6 py-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    {/* Col 1 — Brand */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="h-8 w-8 rounded-md bg-black border border-[#2D2D44] flex items-center justify-center">
+                                <Shield className="h-4 w-4 text-[#00FF87]" />
                             </div>
-                            <div className="flex flex-col">
-                                <span className="font-poppins font-bold text-xl leading-none">
-                                    IIMS<span className="text-[#F4C542]"> College</span>
-                                </span>
-                                <span className="text-xs text-white/40 font-medium tracking-wider uppercase mt-1">
-                                    Since 2005
-                                </span>
-                            </div>
-                        </Link>
-                        <p className="text-white/50 text-sm leading-relaxed max-w-xs">
-                            Empowering students with world-class education in management, information technology, and beyond.
-                        </p>
-                        <div className="flex items-center gap-3 pt-2">
-                            <SocialLink href="https://github.com/iimscollege" icon={<Github className="h-4 w-4" />} label="GitHub" />
-                            <SocialLink href="https://facebook.com/iimscollege" icon={<Facebook className="h-4 w-4" />} label="Facebook" />
-                            <SocialLink href="https://instagram.com/iimscollege" icon={<Instagram className="h-4 w-4" />} label="Instagram" />
+                            <span className="font-mono font-bold text-[#F0F0FF] text-sm">ICEHC</span>
                         </div>
+                        <p className="font-mono text-xs text-[#00FF87] mb-3">
+                            Hack the future. Secure the present.
+                        </p>
+                        <p className="text-[#8888AA] text-sm font-sans">
+                            A club under{' '}
+                            <a
+                                href="https://iimscollege.edu.np/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#00D4FF] hover:underline"
+                            >
+                                IIMS College
+                            </a>
+                            , Kathmandu
+                        </p>
                     </div>
 
-                    {/* Quick Links */}
+                    {/* Col 2 — Quick Links */}
                     <div>
-                        <h3 className="font-poppins font-bold text-white text-sm uppercase tracking-wider mb-6 relative inline-block">
+                        <h3 className="font-mono font-bold text-[#F0F0FF] text-xs uppercase tracking-widest mb-4">
                             Quick Links
-                            <span className="absolute -bottom-2 left-0 w-8 h-0.5 bg-[#D32F2F] rounded-full" />
                         </h3>
-                        <ul className="space-y-3">
-                            <FooterLink href="/about" label="About Us" />
-                            <FooterLink href="/events" label="Events & News" />
-                            <FooterLink href="/portal/login" label="Student Portal" />
-                            <FooterLink href="/portal/signup" label="Apply Now" />
+                        <ul className="space-y-2">
+                            {QUICK_LINKS.map(({ href, label }) => (
+                                <li key={href}>
+                                    <Link
+                                        href={href}
+                                        className="text-[#8888AA] text-sm font-sans hover:text-[#00D4FF] transition-colors"
+                                    >
+                                        {label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* Programs */}
+                    {/* Col 3 — Contact & External */}
                     <div>
-                        <h3 className="font-poppins font-bold text-white text-sm uppercase tracking-wider mb-6 relative inline-block">
-                            Programs
-                            <span className="absolute -bottom-2 left-0 w-8 h-0.5 bg-[#D32F2F] rounded-full" />
-                        </h3>
-                        <ul className="space-y-3">
-                            <FooterLink href="#" label="BBA / BIM" />
-                            <FooterLink href="#" label="BIT / CSIT" />
-                            <FooterLink href="#" label="MBA" />
-                            <FooterLink href="#" label="Cybersecurity" />
-                        </ul>
-                    </div>
-
-                    {/* Contact */}
-                    <div>
-                        <h3 className="font-poppins font-bold text-white text-sm uppercase tracking-wider mb-6 relative inline-block">
+                        <h3 className="font-mono font-bold text-[#F0F0FF] text-xs uppercase tracking-widest mb-4">
                             Contact
-                            <span className="absolute -bottom-2 left-0 w-8 h-0.5 bg-[#D32F2F] rounded-full" />
                         </h3>
-                        <ul className="space-y-4">
-                            <li className="flex items-start gap-3 text-white/50 text-sm">
-                                <MapPin className="h-4 w-4 text-[#F4C542] mt-0.5 flex-shrink-0" />
-                                <span>
-                                    IIMS College Campus,<br />
-                                    Putalisadak, Kathmandu
-                                </span>
-                            </li>
-                            <li className="flex items-center gap-3 text-white/50 text-sm">
-                                <Mail className="h-4 w-4 text-[#F4C542] flex-shrink-0" />
-                                <a href="mailto:info@iimscollege.edu.np" className="hover:text-white transition-colors">
-                                    info@iimscollege.edu.np
+                        <a
+                            href="mailto:cybersec@iimscollege.edu.np"
+                            className="flex items-center gap-2 text-[#8888AA] text-sm font-sans hover:text-[#00D4FF] transition-colors mb-4"
+                        >
+                            <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                            cybersec@iimscollege.edu.np
+                        </a>
+                        <div className="space-y-2">
+                            {EXTERNAL_LINKS.map(({ href, label }) => (
+                                <a
+                                    key={href}
+                                    href={href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 text-[#8888AA] text-sm font-sans hover:text-[#00D4FF] transition-colors"
+                                >
+                                    <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                                    {label}
                                 </a>
-                            </li>
-                            <li className="flex items-center gap-3 text-white/50 text-sm">
-                                <Phone className="h-4 w-4 text-[#F4C542] flex-shrink-0" />
-                                <a href="tel:+97714169100" className="hover:text-white transition-colors">
-                                    +977-1-4169100
-                                </a>
-                            </li>
-                        </ul>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/40">
-                    <p>
-                        © {currentYear} IIMS College. All rights reserved.
+                {/* Bottom bar */}
+                <div className="mt-10 pt-6 border-t border-[#1E1E2E] flex flex-col md:flex-row items-center justify-between gap-3">
+                    <p className="text-[#8888AA] text-xs font-sans text-center md:text-left">
+                        © 2025 IIMS Cybersecurity & Ethical Hacking Club. All rights reserved.
                     </p>
-                    <div className="flex items-center gap-6">
-                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-                        <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-                        <Link href="/contact" className="hover:text-white transition-colors">Sitemap</Link>
-                    </div>
+                    <p className="text-[#8888AA]/50 text-xs font-mono text-center md:text-right">
+                        In collaboration with Taylor&apos;s University & GDS
+                    </p>
                 </div>
             </div>
         </footer>
-    )
-}
-
-function SocialLink({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
-    return (
-        <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={label}
-            className="p-2.5 rounded-lg bg-white/5 text-white/50 hover:text-white hover:bg-[#D32F2F] transition-all hover:-translate-y-0.5"
-        >
-            {icon}
-        </a>
-    )
-}
-
-function FooterLink({ href, label }: { href: string; label: string }) {
-    return (
-        <li>
-            <Link href={href} className="text-white/50 hover:text-white transition-all flex items-center gap-2 group text-sm">
-                <span className="h-1 w-1 rounded-full bg-[#D32F2F] opacity-0 group-hover:opacity-100 transition-opacity" />
-                <span className="group-hover:translate-x-1 transition-transform">{label}</span>
-            </Link>
-        </li>
     )
 }

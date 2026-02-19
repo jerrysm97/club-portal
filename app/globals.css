@@ -1,45 +1,45 @@
-/* app/globals.css — IIMS College Modern Educational Design System */
+/* app/globals.css — IIMS Stealth Terminal Design System */
 @import "tailwindcss";
 
-/* ─── Custom Scrollbar ─── */
+/* ─── Custom Scrollbar (dark) ─── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F5F5F5;
+  background: #0A0A0F;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CCCCCC;
+  background: #2D2D44;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #999999;
+  background: #8888AA;
 }
 
 /* ─── Selection ─── */
 ::selection {
-  background: rgba(211, 47, 47, 0.15);
-  color: #1A1A2E;
+  background: rgba(0, 255, 135, 0.2);
+  color: #F0F0FF;
 }
 
 /* ─── Body ─── */
 body {
-  background-color: #FFFFFF;
-  color: #333333;
+  background-color: #000000;
+  color: #F0F0FF;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Hero Subtle Grid ─── */
-.hero-grid {
+/* ─── Terminal Grid ─── */
+.terminal-grid {
   background-image:
-    linear-gradient(rgba(26, 26, 46, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26, 26, 46, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(rgba(0, 255, 135, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 135, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 /* ─── Fade Up Animation ─── */
@@ -60,21 +60,21 @@ body {
 }
 
 .animate-fade-up-delay-1 {
-  animation-delay: 0.1s;
+  animation: fadeUp 0.5s ease-out 0.1s forwards;
   opacity: 0;
 }
 
 .animate-fade-up-delay-2 {
-  animation-delay: 0.2s;
+  animation: fadeUp 0.5s ease-out 0.2s forwards;
   opacity: 0;
 }
 
 .animate-fade-up-delay-3 {
-  animation-delay: 0.3s;
+  animation: fadeUp 0.5s ease-out 0.3s forwards;
   opacity: 0;
 }
 
-/* ─── Slide In Animation ─── */
+/* ─── Slide In ─── */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -91,21 +91,22 @@ body {
   animation: slideIn 0.3s ease-out forwards;
 }
 
-/* ─── Count Up Animation ─── */
-@keyframes countPulse {
+/* ─── Blink cursor ─── */
+@keyframes blink {
 
   0%,
-  100% {
-    transform: scale(1);
+  50% {
+    opacity: 1;
   }
 
-  50% {
-    transform: scale(1.05);
+  51%,
+  100% {
+    opacity: 0;
   }
 }
 
-.animate-count-pulse {
-  animation: countPulse 0.6s ease-out;
+.animate-blink {
+  animation: blink 1s step-end infinite;
 }
 
 /* ─── Smooth scroll ─── */
@@ -113,60 +114,8 @@ html {
   scroll-behavior: smooth;
 }
 
-/* ─── Focus ring override ─── */
+/* ─── Focus ring (terminal green) ─── */
 *:focus-visible {
-  outline: 2px solid #D32F2F;
+  outline: 2px solid #00FF87;
   outline-offset: 2px;
-}
-
-/* ─── Card primitive ─── */
-.iims-card {
-  background: #FFFFFF;
-  border: 1px solid #EEEEEE;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-/* ─── Red CTA button ─── */
-.btn-primary {
-  background-color: #D32F2F;
-  color: #FFFFFF;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-  background-color: #B71C1C;
-  transform: scale(1.02);
-}
-
-/* ─── Navy button ─── */
-.btn-maroon,
-.btn-navy {
-  background-color: #1A1A2E;
-  color: #FFFFFF;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.btn-maroon:hover,
-.btn-navy:hover {
-  background-color: #16162a;
-}
-
-/* ─── Outline button ─── */
-.btn-outline {
-  background-color: transparent;
-  color: #333333;
-  border: 2px solid #EEEEEE;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.btn-outline:hover {
-  border-color: #D32F2F;
-  color: #D32F2F;
 }
