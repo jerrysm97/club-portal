@@ -1,7 +1,7 @@
-// components/public/ContactSection.tsx — IIMS Collegiate Public Contact
+// components/public/ContactSection.tsx — IIMS College Contact & CTA
 'use client'
 import React, { useState } from 'react'
-import { Send, Loader2, CheckCircle, Mail, MapPin, Globe, ArrowRight } from 'lucide-react'
+import { CheckCircle, Mail, MapPin, Phone, ArrowRight, Send } from 'lucide-react'
 import { contactSchema } from '@/lib/validations'
 import { z } from 'zod'
 import Button from '@/components/ui/Button'
@@ -39,7 +39,7 @@ export default function ContactSection({ contactEmail }: { contactEmail?: string
                 })
                 setErrors(fieldErrors)
             } else {
-                alert('Transmission failed. Check network connection.')
+                alert('Message failed to send. Please try again.')
             }
         } finally {
             setLoading(false)
@@ -47,132 +47,162 @@ export default function ContactSection({ contactEmail }: { contactEmail?: string
     }
 
     return (
-        <section className="py-24 bg-white border-t border-gray-100">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
-                    {/* Contact Info */}
-                    <div className="animate-fade-up">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#58151C]/5 text-[#58151C] font-poppins text-sm font-bold tracking-wider uppercase mb-6">
-                            <Mail className="h-4 w-4" />
-                            <span>Get In Touch</span>
-                        </div>
-
-                        <h2 className="text-4xl md:text-5xl font-poppins font-bold text-[#111827] mb-8 leading-tight">
-                            Establish a <span className="text-[#C3161C]">Secure Uplink</span> with Our Team
-                        </h2>
-
-                        <p className="text-[#6B7280] text-lg mb-12 leading-relaxed font-medium">
-                            Have a query about our operations? Want to collaborate on a security project?
-                            Initiate a secure transmission below and our operatives will respond shortly.
-                        </p>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <ContactInfoCard
-                                icon={<Mail className="h-6 w-6" />}
-                                title="Electronic Mail"
-                                value={contactEmail || 'cybersec@iimscollege.edu.np'}
-                                href={`mailto:${contactEmail || 'cybersec@iimscollege.edu.np'}`}
-                            />
-                            <ContactInfoCard
-                                icon={<MapPin className="h-6 w-6" />}
-                                title="Base of Operations"
-                                value="IIMS College Campus, Putalisadak, Kathmandu"
-                                href="#"
-                            />
-                        </div>
+        <>
+            {/* CTA Band */}
+            <section className="py-16 bg-[#1A1A2E] relative overflow-hidden">
+                <div className="absolute inset-0 hero-grid opacity-[0.04] pointer-events-none" />
+                <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+                    <h2 className="text-3xl md:text-4xl font-poppins font-bold text-white mb-4">
+                        Ready to Start Your Journey?
+                    </h2>
+                    <p className="text-white/50 text-lg mb-8 max-w-xl mx-auto">
+                        Take the first step towards a rewarding career. Apply to IIMS College today.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a
+                            href="/portal/signup"
+                            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#D32F2F] text-white font-bold hover:bg-[#B71C1C] transition-all shadow-lg hover:shadow-xl active:scale-95"
+                        >
+                            Apply Now
+                            <ArrowRight className="h-5 w-5" />
+                        </a>
+                        <a
+                            href="/contact"
+                            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-white/20 text-white font-bold hover:bg-white/10 transition-all"
+                        >
+                            Contact Us
+                        </a>
                     </div>
+                </div>
+            </section>
 
-                    {/* Contact Form */}
-                    <div className="relative animate-fade-up">
-                        <div className="absolute -inset-4 bg-gradient-to-br from-[#58151C]/5 to-[#C3161C]/5 blur-3xl rounded-[2rem] -z-10" />
-                        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 md:p-12 shadow-2xl">
-                            {success ? (
-                                <div className="text-center py-12">
-                                    <div className="w-20 h-20 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-8 shadow-inner">
-                                        <CheckCircle className="h-10 w-10" />
+            {/* Contact Form Section */}
+            <section className="py-24 bg-[#F5F5F5]">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                        {/* Contact Info */}
+                        <div className="animate-fade-up">
+                            <span className="text-[#D32F2F] text-xs font-bold uppercase tracking-widest mb-4 block">Get in Touch</span>
+
+                            <h2 className="text-4xl md:text-5xl font-poppins font-bold text-[#1A1A2E] mb-6 leading-tight">
+                                We'd Love to <span className="text-[#D32F2F]">Hear</span> from You
+                            </h2>
+
+                            <p className="text-[#666666] text-lg mb-10 leading-relaxed">
+                                Have questions about admissions, programs, or campus life?
+                                Reach out to our team and we'll get back to you promptly.
+                            </p>
+
+                            <div className="space-y-6">
+                                <ContactInfoCard
+                                    icon={<Mail className="h-5 w-5" />}
+                                    title="Email"
+                                    value={contactEmail || 'info@iimscollege.edu.np'}
+                                    href={`mailto:${contactEmail || 'info@iimscollege.edu.np'}`}
+                                />
+                                <ContactInfoCard
+                                    icon={<Phone className="h-5 w-5" />}
+                                    title="Phone"
+                                    value="+977-1-4169100"
+                                    href="tel:+97714169100"
+                                />
+                                <ContactInfoCard
+                                    icon={<MapPin className="h-5 w-5" />}
+                                    title="Campus"
+                                    value="Putalisadak, Kathmandu, Nepal"
+                                    href="#"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Contact Form */}
+                        <div className="animate-fade-up">
+                            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-lg border border-[#EEEEEE]">
+                                {success ? (
+                                    <div className="text-center py-10">
+                                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-6">
+                                            <CheckCircle className="h-8 w-8" />
+                                        </div>
+                                        <h3 className="text-xl font-poppins font-bold text-[#1A1A2E] mb-2">Message Sent!</h3>
+                                        <p className="text-[#666666] mb-6 text-sm">We'll get back to you as soon as possible.</p>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setSuccess(false)}
+                                            className="rounded-xl border-2 px-6"
+                                        >
+                                            Send Another Message
+                                        </Button>
                                     </div>
-                                    <h3 className="text-2xl font-poppins font-bold text-[#111827] mb-3">Transmission Received</h3>
-                                    <p className="text-[#6B7280] mb-8">Your message has been encrypted and sent to our lead operators.</p>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setSuccess(false)}
-                                        className="rounded-xl border-2 px-8"
-                                    >
-                                        Send Another Transmission
-                                    </Button>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <Input
-                                        label="Identity (Full Name)"
-                                        placeholder="John Doe"
-                                        required
-                                        value={formData.name}
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                        error={errors.name}
-                                    />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                ) : (
+                                    <form onSubmit={handleSubmit} className="space-y-5">
                                         <Input
-                                            label="Return Address (Email)"
-                                            type="email"
-                                            placeholder="john@example.com"
+                                            label="Full Name"
+                                            placeholder="John Doe"
                                             required
-                                            value={formData.email}
-                                            onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                            error={errors.email}
+                                            value={formData.name}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                            error={errors.name}
                                         />
-                                        <Input
-                                            label="Subject Line"
-                                            placeholder="Collaboration Inquiry"
-                                            required
-                                            value={formData.subject}
-                                            onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                            error={errors.subject}
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-sm font-medium text-[#374151]">Payload (Message)</label>
-                                        <textarea
-                                            rows={4}
-                                            placeholder="Type your secure message here..."
-                                            required
-                                            value={formData.message}
-                                            onChange={e => setFormData({ ...formData, message: e.target.value })}
-                                            className="w-full rounded-lg border border-[#D1D5DB] bg-white px-4 py-3 text-sm text-[#111827] focus:ring-2 focus:ring-[#C3161C] focus:border-transparent transition-all outline-none resize-none"
-                                        />
-                                        {errors.message && <p className="text-xs text-red-500 font-medium">{errors.message}</p>}
-                                    </div>
-                                    <Button
-                                        type="submit"
-                                        loading={loading}
-                                        className="w-full h-12 rounded-xl text-base shadow-xl shadow-red-100"
-                                        rightIcon={<ArrowRight className="h-5 w-5" />}
-                                    >
-                                        {loading ? 'Transmitting...' : 'Initiate Transmission'}
-                                    </Button>
-                                </form>
-                            )}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                            <Input
+                                                label="Email Address"
+                                                type="email"
+                                                placeholder="john@example.com"
+                                                required
+                                                value={formData.email}
+                                                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                                error={errors.email}
+                                            />
+                                            <Input
+                                                label="Subject"
+                                                placeholder="Admissions Inquiry"
+                                                required
+                                                value={formData.subject}
+                                                onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                                                error={errors.subject}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-[#333333]">Message</label>
+                                            <textarea
+                                                rows={4}
+                                                placeholder="Your message..."
+                                                required
+                                                value={formData.message}
+                                                onChange={e => setFormData({ ...formData, message: e.target.value })}
+                                                className="w-full rounded-xl border border-[#EEEEEE] bg-white px-4 py-3 text-sm text-[#333333] focus:ring-2 focus:ring-[#D32F2F] focus:border-transparent transition-all outline-none resize-none"
+                                            />
+                                            {errors.message && <p className="text-xs text-red-500 font-medium">{errors.message}</p>}
+                                        </div>
+                                        <Button
+                                            type="submit"
+                                            loading={loading}
+                                            className="w-full h-12 rounded-xl text-sm shadow-lg shadow-red-100"
+                                            rightIcon={<Send className="h-4 w-4" />}
+                                        >
+                                            {loading ? 'Sending...' : 'Send Message'}
+                                        </Button>
+                                    </form>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </>
     )
 }
 
 function ContactInfoCard({ icon, title, value, href }: { icon: React.ReactNode; title: string; value: string; href: string }) {
     return (
-        <div className="group p-6 rounded-2xl bg-gray-50 border border-transparent hover:border-[#58151C]/20 hover:bg-white hover:shadow-xl transition-all duration-300">
-            <div className="p-3 rounded-xl bg-white text-[#58151C] shadow-sm mb-4 w-fit group-hover:scale-110 group-hover:bg-[#C3161C] group-hover:text-white transition-all">
+        <a href={href} className="group flex items-center gap-4 p-4 rounded-xl bg-white border border-[#EEEEEE] hover:border-[#D32F2F]/20 hover:shadow-md transition-all">
+            <div className="p-3 rounded-xl bg-[#D32F2F]/8 text-[#D32F2F] group-hover:bg-[#D32F2F] group-hover:text-white transition-all flex-shrink-0">
                 {icon}
             </div>
-            <h4 className="font-poppins font-bold text-[#111827] mb-2">{title}</h4>
-            <a
-                href={href}
-                className="text-[#6B7280] text-sm font-medium hover:text-[#C3161C] transition-colors inline-block leading-relaxed"
-            >
-                {value}
-            </a>
-        </div>
+            <div>
+                <span className="block text-xs font-semibold text-[#999999] uppercase tracking-wider mb-0.5">{title}</span>
+                <span className="block text-sm font-bold text-[#1A1A2E] group-hover:text-[#D32F2F] transition-colors">{value}</span>
+            </div>
+        </a>
     )
 }
