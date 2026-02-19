@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Routes inside /portal that don't require auth
-const PUBLIC_PORTAL_PATHS = ['/portal/login', '/portal/signup', '/portal/pending']
+const PUBLIC_PORTAL_PATHS = ['/portal/login', '/portal/signup', '/portal/pending', '/portal/register']
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl
@@ -90,7 +90,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
             // Clear the Supabase auth cookies
             request.cookies.getAll().forEach(cookie => {
                 if (cookie.name.startsWith('sb-')) {
-                    signOutResponse.cookies.set(cookie.name, '', { maxAge: 0 })
+                    signOutResponse.cookies.set(cookie.name, '', { maxAge: 0, path: '/' })
                 }
             })
             return signOutResponse

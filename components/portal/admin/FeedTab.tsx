@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { Trash2, Megaphone, Calendar, User, ExternalLink, Link2, Pin, Trash } from 'lucide-react'
-import { deletePost } from '@/app/portal/admin/actions'
+import { deletePost } from '@/app/portal/(protected)/admin/actions'
 import { formatDate } from '@/lib/utils'
 import { toast } from 'sonner'
 import Avatar from '@/components/ui/Avatar'

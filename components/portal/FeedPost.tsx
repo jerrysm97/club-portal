@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Avatar from '@/components/ui/Avatar'
 import { formatDate, cn } from '@/lib/utils'
 import { MessageSquare, Heart, Share2, MoreHorizontal, Megaphone, FileText, ShieldCheck, ChevronRight } from 'lucide-react'
-import { toggleReaction } from '@/app/portal/feed/actions'
+import { toggleReaction } from '@/app/portal/(protected)/feed/actions'
 import type { Post } from '@/types/database'
 import { createClient } from '@/lib/supabase/client'
 

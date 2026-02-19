@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import { Bell, Check, Info, AlertCircle, MessageSquare, Trophy, Calendar, ShieldCheck, ChevronRight } from 'lucide-react'
 import type { Notification } from '@/types/database'
-import { markNotificationRead, markAllNotificationsRead } from '@/app/portal/notifications/actions'
+import { markNotificationRead, markAllNotificationsRead } from '@/app/portal/(protected)/notifications/actions'
 import { formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'

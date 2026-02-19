@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { Trophy, Target, Shield, Globe, Cpu, Key, Plus, Edit2, Trash2, Eye, EyeOff, BarChart3 } from 'lucide-react'
-import { updateChallengeStatus } from '@/app/portal/admin/actions'
+import { updateChallengeStatus } from '@/app/portal/(protected)/admin/actions'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 

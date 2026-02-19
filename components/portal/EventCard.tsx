@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Calendar, MapPin, Clock, ArrowRight, ShieldCheck, Users, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import type { Event } from '@/types/database'
-import { toggleRsvp } from '@/app/portal/events/actions'
+import { toggleRsvp } from '@/app/portal/(protected)/events/actions'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 

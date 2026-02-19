@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Flag, ShieldCheck, Trophy, CheckCircle, AlertTriangle, Loader2, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { CTFChallenge } from '@/types/database'
-import { submitFlag } from '@/app/portal/ctf/actions'
+import { submitFlag } from '@/app/portal/(protected)/ctf/actions'
 import { toast } from 'sonner'
 import Button from '@/components/ui/Button'
 

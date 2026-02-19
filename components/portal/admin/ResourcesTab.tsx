@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { FileText, Download, Trash2, ExternalLink, ShieldCheck, FileType, Database, Plus, Search } from 'lucide-react'
-import { deleteResource } from '@/app/portal/admin/actions'
+import { deleteResource } from '@/app/portal/(protected)/admin/actions'
 import { formatDate, formatFileSize } from '@/lib/utils'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'

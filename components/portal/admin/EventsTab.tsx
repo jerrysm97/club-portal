@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { Calendar, MapPin, Eye, EyeOff, Trash2, Edit2, Plus, Users, ExternalLink } from 'lucide-react'
-import { toggleEventStatus } from '@/app/portal/admin/actions'
+import { toggleEventStatus } from '@/app/portal/(protected)/admin/actions'
 import { formatDate } from '@/lib/utils'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'

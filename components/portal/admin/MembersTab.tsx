@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { BadgeCheck, Ban, Trash2, MoreHorizontal, UserCheck, Shield, ShieldAlert, MoreVertical } from 'lucide-react'
-import { updateMemberStatus, deleteMember } from '@/app/portal/admin/actions'
+import { updateMemberStatus, deleteMember } from '@/app/portal/(protected)/admin/actions'
 import Avatar from '@/components/ui/Avatar'
 import { toast } from 'sonner'
 import type { Member } from '@/types/database'

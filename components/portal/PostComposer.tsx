@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { createPost } from '@/app/portal/feed/actions'
+import { createPost } from '@/app/portal/(protected)/feed/actions'
 import { useFormStatus } from 'react-dom'
 import { Send, Loader2, AlertTriangle, Terminal, Megaphone, FileText, Layout } from 'lucide-react'
 import { toast } from 'sonner'

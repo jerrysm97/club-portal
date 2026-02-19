@@ -1,73 +1,94 @@
-// app/portal/pending/page.tsx — IIMS Collegiate Application Pending Screen
-'use client'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
-import { Clock, LogOut, ShieldCheck, Mail, ChevronRight, CheckCircle2 } from 'lucide-react'
-import Button from '@/components/ui/Button'
+// app/portal/pending/page.tsx — Standalone pending screen (OUTSIDE protected layout)
+// No portal layout wraps this page — prevents infinite redirect loop.
+import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { Clock, Shield, Mail, CheckCircle2 } from 'lucide-react'
+import SignOutButton from './SignOutButton'
 
-export default function PendingPage() {
-    const router = useRouter()
+export default async function PendingPage() {
+    const supabase = await createServerSupabaseClient()
+    const { data: { session } } = await supabase.auth.getSession()
 
-    async function handleSignOut() {
-        const supabase = createClient()
-        await supabase.auth.signOut()
-        router.push('/portal/login')
-        router.refresh()
+    let email: string | null = null
+    if (session) {
+        const { data: member } = await supabase
+            .from('members')
+            .select('email')
+            .eq('user_id', session.user.id)
+            .single()
+        const memberEmail = (member as { email: string } | null)?.email
+        email = memberEmail ?? session.user.email ?? null
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 relative overflow-hidden">
-            {/* Background Decor */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-[#FCD34D]" />
-            <div className="absolute inset-0 hero-grid opacity-5 pointer-events-none" />
+        <div className="min-h-screen bg-black flex items-center justify-center p-6 relative overflow-hidden">
+            {/* Background grid */}
+            <div className="absolute inset-0 opacity-5 pointer-events-none"
+                style={{
+                    backgroundImage: 'linear-gradient(rgba(0,255,135,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,135,0.1) 1px, transparent 1px)',
+                    backgroundSize: '40px 40px',
+                }}
+            />
 
-            <div className="w-full max-w-md relative animate-fade-up text-center">
-                {/* Branding */}
-                <div className="inline-flex items-center justify-center h-20 w-20 rounded-2xl bg-white shadow-2xl border border-gray-100 mb-8 group transition-transform">
-                    <ShieldCheck className="h-10 w-10 text-[#58151C]" />
+            <div className="w-full max-w-md relative">
+                {/* Terminal header */}
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="h-12 w-12 rounded-lg bg-[#0A0A0F] border border-[#2D2D44] flex items-center justify-center">
+                        <Shield className="h-6 w-6 text-[#F59E0B]" />
+                    </div>
+                    <div>
+                        <h2 className="font-mono font-bold text-[#F0F0FF] text-sm tracking-tight">IIMS CYBERSEC</h2>
+                        <span className="font-mono text-[10px] text-[#8888AA] tracking-widest">CLEARANCE PORTAL</span>
+                    </div>
                 </div>
 
-                {/* Card */}
-                <div className="bg-white rounded-[2.5rem] p-10 md:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-gray-100">
-                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-amber-50 text-amber-600 mb-8 shadow-inner animate-pulse">
-                        <Clock className="h-8 w-8" />
+                {/* Main card */}
+                <div className="bg-[#0A0A0F] border border-[#2D2D44] rounded-lg p-8">
+                    {/* Status badge */}
+                    <div className="flex items-center gap-2 mb-6">
+                        <span className="text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 font-mono text-xs px-2 py-0.5 rounded-full flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
+                            PENDING REVIEW
+                        </span>
                     </div>
 
-                    <h1 className="text-2xl font-poppins font-bold text-[#111827] mb-4">
-                        Security Clearance Pending
+                    <h1 className="font-mono font-bold text-[#F0F0FF] text-xl mb-3">
+                        Application Under Review
                     </h1>
-                    <p className="text-[#6B7280] font-medium leading-relaxed mb-10">
-                        Your application is currently under review by our lead operators. You will be cleared for portal access shortly.
+                    <p className="text-[#8888AA] text-sm leading-relaxed mb-8 font-sans">
+                        Your membership request has been received. A club administrator will review and approve your account shortly.
                     </p>
 
-                    <div className="space-y-4 mb-10 text-left">
+                    {/* Status steps */}
+                    <div className="space-y-3 mb-8">
                         <StatusStep status="complete" label="Account created successfully" />
-                        <StatusStep status="pending" label="Awaiting lead administrator review" />
+                        <StatusStep status="pending" label="Awaiting administrator review" />
                         <StatusStep status="locked" label="Access to portal modules" />
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-6 mb-10 text-center border border-gray-100">
-                        <div className="flex items-center justify-center gap-2 text-[#58151C] font-bold text-sm mb-2">
-                            <Mail className="h-4 w-4" />
-                            Email Notification
+                    {/* Email notification */}
+                    <div className="bg-black border border-[#1E1E2E] rounded-md p-4 mb-8">
+                        <div className="flex items-center gap-2 text-[#00D4FF] font-mono font-bold text-xs mb-2">
+                            <Mail className="h-3.5 w-3.5" />
+                            EMAIL NOTIFICATION
                         </div>
-                        <p className="text-xs text-gray-500 font-medium">
-                            A welcome transmission will be sent to your inbox upon approval.
+                        <p className="text-[#8888AA] text-xs font-sans">
+                            {email
+                                ? <>A welcome email will be sent to <span className="text-[#F0F0FF] font-mono">{email}</span> once approved.</>
+                                : 'You will receive an email once your application is approved.'
+                            }
                         </p>
                     </div>
 
-                    <Button
-                        variant="outline"
-                        onClick={handleSignOut}
-                        className="w-full h-12 rounded-xl text-sm border-2 font-bold group"
-                        leftIcon={<LogOut className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />}
-                    >
-                        Abort Session
-                    </Button>
+                    {/* Sign out */}
+                    <SignOutButton />
                 </div>
 
-                <p className="mt-10 text-xs text-gray-400 font-medium">
-                    Need assistance? <a href="mailto:cybersec@iimscollege.edu.np" className="text-[#C3161C] font-bold hover:underline">Contact Base Ops</a>
+                {/* Footer */}
+                <p className="mt-6 text-center text-[10px] text-[#8888AA] font-mono tracking-widest">
+                    NEED HELP?{' '}
+                    <a href="mailto:cybersec@iimscollege.edu.np" className="text-[#00D4FF] hover:underline">
+                        CONTACT OPS
+                    </a>
                 </p>
             </div>
         </div>
@@ -75,23 +96,21 @@ export default function PendingPage() {
 }
 
 function StatusStep({ status, label }: { status: 'complete' | 'pending' | 'locked'; label: string }) {
-    const styles = {
-        complete: 'text-emerald-600 bg-emerald-50 border-emerald-100',
-        pending: 'text-amber-600 bg-amber-50 border-amber-100 font-bold',
-        locked: 'text-gray-400 bg-gray-50 border-gray-100 opacity-50',
-    }
-
     return (
-        <div className={`flex items-center gap-3 p-3 rounded-xl border ${styles[status]} transition-all`}>
+        <div className={`flex items-center gap-3 p-3 rounded-md border font-mono text-sm transition-all ${status === 'complete'
+            ? 'text-[#00FF87] bg-[#00FF87]/5 border-[#00FF87]/20'
+            : status === 'pending'
+                ? 'text-[#F59E0B] bg-[#F59E0B]/5 border-[#F59E0B]/20'
+                : 'text-[#8888AA]/40 bg-transparent border-[#1E1E2E] opacity-50'
+            }`}>
             {status === 'complete' ? (
-                <CheckCircle2 className="h-5 w-5" />
+                <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
             ) : status === 'pending' ? (
-                <div className="h-5 w-5 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                <div className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin flex-shrink-0" />
             ) : (
-                <div className="h-5 w-5 rounded-full border-2 border-current" />
+                <div className="h-4 w-4 rounded-full border-2 border-current flex-shrink-0" />
             )}
-            <span className="text-sm">{label}</span>
-            {status === 'pending' && <ChevronRight className="h-4 w-4 ml-auto opacity-50" />}
+            <span className="text-xs">{label}</span>
         </div>
     )
 }

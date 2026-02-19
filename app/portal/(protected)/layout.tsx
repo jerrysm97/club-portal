@@ -1,52 +1,58 @@
-// app/portal/layout.tsx — IIMS Collegiate Portal Shell
+// app/portal/(protected)/layout.tsx — Auth gate for approved members only
+// This layout ONLY wraps pages inside (protected)/ — login, pending, register
+// are OUTSIDE this route group, preventing infinite redirect loops.
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Sidebar from '@/components/portal/Sidebar'
 import PortalNavbar from '@/components/portal/PortalNavbar'
 import type { Member } from '@/types/database'
 
-export default async function PortalLayout({ children }: { children: React.ReactNode }) {
+export default async function ProtectedPortalLayout({
+    children,
+}: {
+    children: React.ReactNode
+}) {
     const supabase = await createServerSupabaseClient()
 
+    // ── Step 1: Verify session ──
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) redirect('/portal/login')
 
+    // ── Step 2: Fetch member and check status ──
+    // ✅ CORRECT: query by user_id (auth.users FK), NOT by id (members PK)
     const { data: memberData } = await supabase
         .from('members')
-        .select('*')
+        .select('id, user_id, full_name, email, student_id, club_post, role, status, bio, avatar_url, skills, points, joined_at, updated_at')
         .eq('user_id', session.user.id)
         .single()
 
     const member = memberData as unknown as Member | null
 
+    // Redirects go OUTSIDE (protected)/ — no infinite loop possible
     if (!member || member.status === 'pending') redirect('/portal/pending')
-    if (member.status === 'rejected' || member.status === 'banned') {
-        // If they have a session but are banned/rejected, we should sign them out
-        // But middleware handles this more broadly. In layout we just redirect.
-        redirect('/portal/login?error=access_denied')
-    }
+    if (member.status === 'rejected') redirect('/portal/login?reason=rejected')
+    if (member.status === 'banned') redirect('/portal/login?reason=banned')
 
+    // ── Step 3: Fetch unread notification count ──
     const { count: unreadNotifications } = await supabase
         .from('notifications')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('member_id', member.id)
         .eq('is_read', false)
 
+    // ── Step 4: Render portal shell ──
     return (
-        <div className="flex min-h-screen bg-[#F9FAFB]">
+        <div className="flex min-h-screen bg-black">
             {/* Desktop Sidebar */}
             <Sidebar member={member} unreadNotifications={unreadNotifications ?? 0} />
 
             <div className="flex-1 flex flex-col md:ml-64 min-h-screen relative overflow-hidden">
-                {/* Background Decor (Subtle) */}
-                <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-gradient-to-bl from-[#58151C]/5 to-transparent pointer-events-none" />
-
                 {/* Mobile Navbar */}
                 <PortalNavbar member={member} />
 
                 {/* Main Content Area */}
                 <main className="flex-1 p-6 md:p-10 relative z-10">
-                    <div className="max-w-6xl mx-auto animate-fade-up">
+                    <div className="max-w-6xl mx-auto">
                         {children}
                     </div>
                 </main>
