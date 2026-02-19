@@ -1,17 +1,18 @@
-// app/portal/login/LoginForm.tsx — IIMS Stealth Terminal Login (Magic Link)
+// app/portal/login/LoginForm.tsx — IIMS Stealth Terminal Login (Email + Password)
 'use client'
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Shield, ArrowRight, Mail, AlertTriangle, Loader2 } from 'lucide-react'
+import { Shield, ArrowRight, Lock, AlertTriangle, Loader2 } from 'lucide-react'
 
 export default function LoginForm() {
     const searchParams = useSearchParams()
+    const router = useRouter()
     const reason = searchParams.get('reason')
     const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
-    const [sent, setSent] = useState(false)
 
     const reasonMessages: Record<string, string> = {
         rejected: 'Your application has been reviewed and was not approved at this time.',
@@ -23,25 +24,34 @@ export default function LoginForm() {
         e.preventDefault()
         setError(null)
 
-        const trimmed = email.trim().toLowerCase()
-        if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+        const trimmedEmail = email.trim().toLowerCase()
+        if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
             setError('Enter a valid email address.')
+            return
+        }
+        if (!password || password.length < 6) {
+            setError('Password must be at least 6 characters.')
             return
         }
 
         setLoading(true)
         try {
             const supabase = createClient()
-            const { error: authError } = await supabase.auth.signInWithOtp({
-                email: trimmed,
-                options: {
-                    emailRedirectTo: `${window.location.origin}/portal/dashboard`,
-                },
+            const { error: authError } = await supabase.auth.signInWithPassword({
+                email: trimmedEmail,
+                password,
             })
-            if (authError) throw authError
-            setSent(true)
+            if (authError) {
+                if (authError.message.includes('Invalid login credentials')) {
+                    setError('Invalid email or password. Please try again.')
+                } else {
+                    setError(authError.message)
+                }
+                return
+            }
+            router.push('/portal/dashboard')
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Failed to send magic link. Try again.')
+            setError(err instanceof Error ? err.message : 'Login failed. Try again.')
         } finally {
             setLoading(false)
         }
@@ -79,85 +89,72 @@ export default function LoginForm() {
 
                 {/* Main card */}
                 <div className="bg-[#0A0A0F] border border-[#2D2D44] rounded-lg p-8">
-                    {sent ? (
-                        /* ── Success state ── */
-                        <div className="text-center py-4">
-                            <div className="h-14 w-14 rounded-full bg-[#00FF87]/10 border border-[#00FF87]/30 flex items-center justify-center mx-auto mb-6">
-                                <Mail className="h-7 w-7 text-[#00FF87]" />
-                            </div>
-                            <h1 className="font-mono font-bold text-[#F0F0FF] text-lg mb-3">
-                                Check Your Email
-                            </h1>
-                            <p className="text-[#8888AA] text-sm font-sans leading-relaxed mb-2">
-                                A secure login link has been sent to
-                            </p>
-                            <p className="text-[#00D4FF] font-mono text-sm font-bold mb-6">
-                                {email}
-                            </p>
-                            <p className="text-[#8888AA] text-xs font-sans">
-                                Click the link in your email to access the portal. The link expires in 1 hour.
-                            </p>
-                            <button
-                                onClick={() => { setSent(false); setEmail('') }}
-                                className="mt-6 text-[#8888AA] font-mono text-xs hover:text-[#F0F0FF] transition-colors"
-                            >
-                                ← Use a different email
-                            </button>
+                    <h1 className="font-mono font-bold text-[#F0F0FF] text-lg mb-2">
+                        Secure Access
+                    </h1>
+                    <p className="text-[#8888AA] text-sm font-sans mb-8">
+                        Sign in with your email and password.
+                    </p>
+
+                    {error && (
+                        <div className="mb-6 p-3 rounded-md bg-[#FF3333]/10 border border-[#FF3333]/30 text-[#FF3333] text-sm font-mono">
+                            {error}
                         </div>
-                    ) : (
-                        /* ── Login form ── */
-                        <>
-                            <h1 className="font-mono font-bold text-[#F0F0FF] text-lg mb-2">
-                                Secure Access
-                            </h1>
-                            <p className="text-[#8888AA] text-sm font-sans mb-8">
-                                Enter your email to receive a magic login link.
-                            </p>
-
-                            {error && (
-                                <div className="mb-6 p-3 rounded-md bg-[#FF3333]/10 border border-[#FF3333]/30 text-[#FF3333] text-sm font-mono">
-                                    {error}
-                                </div>
-                            )}
-
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div>
-                                    <label htmlFor="email" className="block text-[#8888AA] font-mono text-xs font-bold uppercase tracking-widest mb-2">
-                                        Email Address
-                                    </label>
-                                    <input
-                                        id="email"
-                                        type="email"
-                                        value={email}
-                                        onChange={e => setEmail(e.target.value)}
-                                        placeholder="operator@iimscollege.edu.np"
-                                        required
-                                        autoComplete="email"
-                                        autoFocus
-                                        className="bg-[#0A0A0F] border border-[#2D2D44] text-[#F0F0FF] rounded-md px-3 py-2.5 focus:outline-none focus:border-[#00FF87] focus:ring-1 focus:ring-[#00FF87]/20 placeholder:text-[#8888AA]/50 w-full font-mono text-sm transition-colors"
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full bg-[#00FF87] text-black font-mono font-bold px-5 py-2.5 rounded-md hover:bg-[#00e87a] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 flex items-center justify-center gap-2"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                            SENDING...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Send Magic Link
-                                            <ArrowRight className="h-4 w-4" />
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-                        </>
                     )}
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <div>
+                            <label htmlFor="email" className="block text-[#8888AA] font-mono text-xs font-bold uppercase tracking-widest mb-2">
+                                Email Address
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                placeholder="operator@iimscollege.edu.np"
+                                required
+                                autoComplete="email"
+                                autoFocus
+                                className="bg-[#0A0A0F] border border-[#2D2D44] text-[#F0F0FF] rounded-md px-3 py-2.5 focus:outline-none focus:border-[#00FF87] focus:ring-1 focus:ring-[#00FF87]/20 placeholder:text-[#8888AA]/50 w-full font-mono text-sm transition-colors"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="password" className="block text-[#8888AA] font-mono text-xs font-bold uppercase tracking-widest mb-2">
+                                Password
+                            </label>
+                            <input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                                autoComplete="current-password"
+                                className="bg-[#0A0A0F] border border-[#2D2D44] text-[#F0F0FF] rounded-md px-3 py-2.5 focus:outline-none focus:border-[#00FF87] focus:ring-1 focus:ring-[#00FF87]/20 placeholder:text-[#8888AA]/50 w-full font-mono text-sm transition-colors"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-[#00FF87] text-black font-mono font-bold px-5 py-2.5 rounded-md hover:bg-[#00e87a] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 flex items-center justify-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    AUTHENTICATING...
+                                </>
+                            ) : (
+                                <>
+                                    <Lock className="h-4 w-4" />
+                                    Sign In
+                                    <ArrowRight className="h-4 w-4" />
+                                </>
+                            )}
+                        </button>
+                    </form>
                 </div>
 
                 {/* Footer */}
