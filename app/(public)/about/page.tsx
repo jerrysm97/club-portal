@@ -1,4 +1,4 @@
-// app/(public)/about/page.tsx — Premium minimal about page
+// app/(public)/about/page.tsx
 import { createClient } from '@supabase/supabase-js'
 import type { TeamMember } from '@/types/database'
 
@@ -18,35 +18,41 @@ export default async function AboutPage() {
     return (
         <>
             {/* Hero banner */}
-            <div className="bg-gradient-to-br from-[#111827] to-[#1E1B4B] text-white py-20 px-6">
-                <div className="max-w-6xl mx-auto">
-                    <p className="text-sm text-[#C7D2FE]/60 mb-1">Home / About</p>
-                    <h1 className="text-4xl md:text-5xl font-bold">About Us</h1>
+            <div className="relative bg-gradient-to-br from-[#0F172A] to-[#1E1B4B] text-white py-24 px-6 overflow-hidden">
+                <div className="absolute inset-0 opacity-[0.03]"
+                    style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
+                <div className="relative max-w-6xl mx-auto">
+                    <p className="text-sm text-[#C7D2FE]/50 mb-2 font-medium">Home / About</p>
+                    <h1 className="text-4xl md:text-6xl font-extrabold">About Us</h1>
                 </div>
             </div>
 
-            <section className="py-20 bg-white">
+            <section className="py-24 bg-white">
                 <div className="max-w-4xl mx-auto px-6">
-                    <h2 className="text-2xl font-bold text-[#111827] mb-4">Our Story</h2>
-                    <p className="text-[#6B7280] leading-relaxed text-lg">
+                    <span className="inline-block text-xs font-bold text-[#6366F1] uppercase tracking-[0.2em] mb-3">Our Story</span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-[#0F172A] mb-6">How It All Started</h2>
+                    <p className="text-lg text-[#64748B] leading-relaxed">
                         {aboutText || 'IIMS Cybersecurity Club is the premier technical club at IIMS College, Kathmandu. From ethical hacking to digital forensics, we cover the full spectrum of cybersecurity.'}
                     </p>
                 </div>
             </section>
 
-            <section className="py-20 bg-[#FAFAFA]">
+            <section className="py-24 bg-[#F8FAFC]">
                 <div className="max-w-6xl mx-auto px-6">
-                    <h2 className="text-2xl font-bold text-[#111827] mb-4">Our Values</h2>
-                    <div className="grid md:grid-cols-3 gap-6 mt-8">
+                    <div className="text-center mb-14">
+                        <span className="inline-block text-xs font-bold text-[#6366F1] uppercase tracking-[0.2em] mb-3">Core Principles</span>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#0F172A]">Our Values</h2>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-5">
                         {[
-                            { title: 'Learn by Doing', desc: 'Hands-on labs, CTFs, and real-world projects over pure theory.', icon: '🧪' },
-                            { title: 'Community First', desc: 'Knowledge sharing, mentorship, and lifting each other up.', icon: '🤝' },
-                            { title: 'Responsible Disclosure', desc: 'Ethical practices in all security research and engagements.', icon: '🛡️' },
+                            { title: 'Learn by Doing', desc: 'Hands-on labs, CTFs, and real-world projects over pure theory.', icon: '🧪', gradient: 'from-amber-500/10 to-orange-500/10' },
+                            { title: 'Community First', desc: 'Knowledge sharing, mentorship, and lifting each other up.', icon: '🤝', gradient: 'from-blue-500/10 to-cyan-500/10' },
+                            { title: 'Responsible Disclosure', desc: 'Ethical practices in all security research and engagements.', icon: '🛡️', gradient: 'from-emerald-500/10 to-green-500/10' },
                         ].map((v) => (
-                            <div key={v.title} className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
-                                <div className="text-2xl mb-3">{v.icon}</div>
-                                <h3 className="font-semibold text-[#111827] mb-2">{v.title}</h3>
-                                <p className="text-sm text-[#6B7280]">{v.desc}</p>
+                            <div key={v.title} className={`bg-gradient-to-br ${v.gradient} rounded-2xl p-7 border border-[#E2E8F0] hover:-translate-y-1 hover:shadow-lg transition-all duration-300`}>
+                                <div className="text-3xl mb-4">{v.icon}</div>
+                                <h3 className="font-bold text-[#0F172A] text-lg mb-2">{v.title}</h3>
+                                <p className="text-sm text-[#64748B] leading-relaxed">{v.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -54,21 +60,24 @@ export default async function AboutPage() {
             </section>
 
             {team.length > 0 && (
-                <section className="py-20 bg-white">
+                <section className="py-24 bg-white">
                     <div className="max-w-6xl mx-auto px-6">
-                        <h2 className="text-2xl font-bold text-[#111827] mb-8">Leadership Team</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div className="text-center mb-14">
+                            <span className="inline-block text-xs font-bold text-[#6366F1] uppercase tracking-[0.2em] mb-3">Leadership</span>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-[#0F172A]">Our Team</h2>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                             {team.map((m) => (
-                                <div key={m.id} className="text-center">
-                                    {m.avatar_url ? (
-                                        <img src={m.avatar_url} alt={m.name} className="w-20 h-20 rounded-full mx-auto mb-3 object-cover" />
+                                <div key={m.id} className="group bg-[#F8FAFC] rounded-2xl p-6 text-center border border-[#E2E8F0] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                                    {m.image_url ? (
+                                        <img src={m.image_url} alt={m.name} className="w-20 h-20 rounded-2xl mx-auto mb-4 object-cover ring-2 ring-[#E2E8F0] group-hover:ring-[#6366F1]/30 transition-all" />
                                     ) : (
-                                        <div className="w-20 h-20 rounded-full mx-auto mb-3 bg-[#EEF2FF] flex items-center justify-center text-[#6366F1] text-xl font-bold">
+                                        <div className="w-20 h-20 rounded-2xl mx-auto mb-4 bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] flex items-center justify-center text-[#6366F1] text-2xl font-bold ring-2 ring-[#E2E8F0] group-hover:ring-[#6366F1]/30 transition-all">
                                             {m.name.charAt(0)}
                                         </div>
                                     )}
-                                    <h3 className="font-semibold text-[#111827] text-sm">{m.name}</h3>
-                                    <p className="text-xs text-[#6366F1]">{m.position}</p>
+                                    <h3 className="font-bold text-[#0F172A] text-sm">{m.name}</h3>
+                                    <p className="text-xs text-[#6366F1] font-medium mt-1">{m.role}</p>
                                 </div>
                             ))}
                         </div>

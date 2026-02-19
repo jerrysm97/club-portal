@@ -329,7 +329,7 @@ function GalleryForm({ api, reload }: { api: (path: string, method: string, body
 }
 
 function TeamTab({ team, api, reload }: { team: TeamMember[]; api: (path: string, method: string, body?: Record<string, unknown>) => Promise<boolean>; reload: () => void }) {
-    const [form, setForm] = useState({ name: '', position: '', avatar_url: '', sort_order: 0 })
+    const [form, setForm] = useState({ name: '', role: '', image_url: '', sort_order: 0 })
     const [creating, setCreating] = useState(false)
 
     return (
@@ -341,11 +341,11 @@ function TeamTab({ team, api, reload }: { team: TeamMember[]; api: (path: string
                     <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                             <Input label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                            <Input label="Position" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} />
+                            <Input label="Role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} />
                         </div>
-                        <Input label="Avatar URL" value={form.avatar_url} onChange={(e) => setForm({ ...form, avatar_url: e.target.value })} placeholder="https://..." />
+                        <Input label="Image URL" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
                         <div className="flex gap-2">
-                            <Btn onClick={async () => { if (form.name && await api('team', 'POST', form)) { setCreating(false); setForm({ name: '', position: '', avatar_url: '', sort_order: 0 }); reload() } }}>Add</Btn>
+                            <Btn onClick={async () => { if (form.name && await api('team', 'POST', form)) { setCreating(false); setForm({ name: '', role: '', image_url: '', sort_order: 0 }); reload() } }}>Add</Btn>
                             <Btn variant="ghost" onClick={() => setCreating(false)}>Cancel</Btn>
                         </div>
                     </div>
@@ -354,14 +354,14 @@ function TeamTab({ team, api, reload }: { team: TeamMember[]; api: (path: string
             {team.map((m) => (
                 <Card key={m.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        {m.avatar_url ? (
-                            <img src={m.avatar_url} alt={m.name} className="w-10 h-10 rounded-full object-cover" />
+                        {m.image_url ? (
+                            <img src={m.image_url} alt={m.name} className="w-10 h-10 rounded-full object-cover" />
                         ) : (
                             <div className="w-10 h-10 rounded-full bg-[#EEF2FF] flex items-center justify-center text-[#6366F1] font-bold">{m.name.charAt(0)}</div>
                         )}
                         <div>
                             <p className="font-medium text-[#111827]">{m.name}</p>
-                            <p className="text-sm text-[#6366F1]">{m.position}</p>
+                            <p className="text-sm text-[#6366F1]">{m.role}</p>
                         </div>
                     </div>
                     <Btn variant="danger" onClick={async () => { if (confirm('Delete?') && await api('team', 'DELETE', { id: m.id })) reload() }}>Delete</Btn>
@@ -375,13 +375,13 @@ function SettingsTab({ settings, api, reload }: { settings: SiteSettings; api: (
     const [form, setForm] = useState({
         about_text: settings.about_text || '',
         contact_email: settings.contact_email || '',
-        stat_members: settings.stat_members || 0,
-        stat_events: settings.stat_events || 0,
-        stat_competitions: settings.stat_competitions || 0,
-        stat_partners: settings.stat_partners || 0,
-        social_instagram: settings.social_instagram || '',
-        social_facebook: settings.social_facebook || '',
-        social_github: settings.social_github || '',
+        stat_members: settings.stat_members || '0',
+        stat_events: settings.stat_events || '0',
+        stat_competitions: settings.stat_competitions || '0',
+        stat_partners: settings.stat_partners || '0',
+        instagram_url: settings.instagram_url || '',
+        facebook_url: settings.facebook_url || '',
+        github_url: settings.github_url || '',
     })
 
     return (
@@ -391,15 +391,15 @@ function SettingsTab({ settings, api, reload }: { settings: SiteSettings; api: (
                     <Textarea label="About Text" rows={4} value={form.about_text} onChange={(e) => setForm({ ...form, about_text: e.target.value })} />
                     <Input label="Contact Email" value={form.contact_email} onChange={(e) => setForm({ ...form, contact_email: e.target.value })} />
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <Input label="Members #" type="number" value={form.stat_members} onChange={(e) => setForm({ ...form, stat_members: +e.target.value })} />
-                        <Input label="Events #" type="number" value={form.stat_events} onChange={(e) => setForm({ ...form, stat_events: +e.target.value })} />
-                        <Input label="Competitions #" type="number" value={form.stat_competitions} onChange={(e) => setForm({ ...form, stat_competitions: +e.target.value })} />
-                        <Input label="Partners #" type="number" value={form.stat_partners} onChange={(e) => setForm({ ...form, stat_partners: +e.target.value })} />
+                        <Input label="Members #" type="number" value={form.stat_members} onChange={(e) => setForm({ ...form, stat_members: e.target.value })} />
+                        <Input label="Events #" type="number" value={form.stat_events} onChange={(e) => setForm({ ...form, stat_events: e.target.value })} />
+                        <Input label="Competitions #" type="number" value={form.stat_competitions} onChange={(e) => setForm({ ...form, stat_competitions: e.target.value })} />
+                        <Input label="Partners #" type="number" value={form.stat_partners} onChange={(e) => setForm({ ...form, stat_partners: e.target.value })} />
                     </div>
                     <div className="grid grid-cols-3 gap-3">
-                        <Input label="Instagram" value={form.social_instagram} onChange={(e) => setForm({ ...form, social_instagram: e.target.value })} />
-                        <Input label="Facebook" value={form.social_facebook} onChange={(e) => setForm({ ...form, social_facebook: e.target.value })} />
-                        <Input label="GitHub" value={form.social_github} onChange={(e) => setForm({ ...form, social_github: e.target.value })} />
+                        <Input label="Instagram" value={form.instagram_url} onChange={(e) => setForm({ ...form, instagram_url: e.target.value })} />
+                        <Input label="Facebook" value={form.facebook_url} onChange={(e) => setForm({ ...form, facebook_url: e.target.value })} />
+                        <Input label="GitHub" value={form.github_url} onChange={(e) => setForm({ ...form, github_url: e.target.value })} />
                     </div>
                     <Btn onClick={async () => { if (await api('settings', 'PATCH', form)) reload() }}>Save Settings</Btn>
                 </div>

@@ -4,7 +4,7 @@ import PublicFooter from '@/components/public/PublicFooter'
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="min-h-screen bg-[#FAFAFA]">
+        <div className="min-h-screen bg-[#F8FAFC]">
             <PublicNavbar />
             <main className="pt-16">{children}</main>
             <PublicFooter />

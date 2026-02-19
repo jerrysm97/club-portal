@@ -1,12 +1,20 @@
-// app/portal/login/page.tsx — Email + Password login (premium minimal)
+// app/portal/login/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#EEF2FF] to-[#F8FAFC] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" /></div>}>
+            <LoginContent />
+        </Suspense>
+    )
+}
+
+function LoginContent() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
@@ -36,61 +44,69 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-4">
-            <div className="w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-[#111827]">Welcome back</h1>
-                    <p className="text-sm text-[#6B7280] mt-1">Sign in to your member portal</p>
+        <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#EEF2FF] to-[#F8FAFC] flex items-center justify-center px-4">
+            <div className="w-full max-w-[420px]">
+                {/* Logo */}
+                <div className="text-center mb-10">
+                    <Link href="/" className="inline-block text-2xl font-bold mb-4">
+                        IIMS <span className="text-gradient">Cyber</span>
+                    </Link>
+                    <h1 className="text-2xl font-extrabold text-[#0F172A] mb-1">Welcome back</h1>
+                    <p className="text-sm text-[#64748B]">Sign in to your member portal</p>
                 </div>
 
-                <div className="bg-white rounded-xl p-8 border border-[#E5E7EB] shadow-sm">
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Card */}
+                <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-lg shadow-indigo-500/[0.04]">
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-[#374151] mb-1.5">Email</label>
+                            <label className="block text-sm font-semibold text-[#0F172A] mb-2">Email</label>
                             <input
                                 type="email"
                                 required
                                 placeholder="you@email.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
+                                className="input-premium"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#374151] mb-1.5">Password</label>
+                            <label className="block text-sm font-semibold text-[#0F172A] mb-2">Password</label>
                             <input
                                 type="password"
                                 required
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
+                                className="input-premium"
                             />
                         </div>
 
                         {errorMsg && (
-                            <p className="text-sm text-red-500">{errorMsg}</p>
+                            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-100">
+                                <span className="text-red-500 text-sm">⚠️ {errorMsg}</span>
+                            </div>
                         )}
 
-                        <button
-                            type="submit"
-                            disabled={status === 'loading'}
-                            className="w-full py-3 rounded-lg bg-[#6366F1] text-white font-semibold hover:bg-[#4F46E5] transition-colors disabled:opacity-50"
-                        >
-                            {status === 'loading' ? 'Signing in...' : 'Sign In'}
+                        <button type="submit" disabled={status === 'loading'} className="btn-primary">
+                            {status === 'loading' ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                                    Signing in...
+                                </span>
+                            ) : 'Sign In'}
                         </button>
                     </form>
                 </div>
 
-                <p className="text-center mt-6 text-sm text-[#6B7280]">
-                    Don&apos;t have an account?{' '}
-                    <Link href="/portal/signup" className="text-[#6366F1] font-medium hover:underline">
-                        Sign up
-                    </Link>
-                </p>
-
-                <div className="text-center mt-3">
-                    <Link href="/" className="text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
+                {/* Links */}
+                <div className="mt-8 space-y-3 text-center">
+                    <p className="text-sm text-[#64748B]">
+                        Don&apos;t have an account?{' '}
+                        <Link href="/portal/signup" className="text-[#6366F1] font-semibold hover:text-[#4F46E5] transition-colors">
+                            Sign up
+                        </Link>
+                    </p>
+                    <Link href="/" className="inline-block text-xs text-[#94A3B8] hover:text-[#64748B] transition-colors">
                         ← Back to website
                     </Link>
                 </div>

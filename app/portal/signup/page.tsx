@@ -1,4 +1,4 @@
-// app/portal/signup/page.tsx — Email + Password signup (premium minimal)
+// app/portal/signup/page.tsx
 'use client'
 
 import { useState } from 'react'
@@ -42,22 +42,24 @@ export default function SignupPage() {
 
     if (status === 'success') {
         return (
-            <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-4">
-                <div className="w-full max-w-md text-center">
-                    <div className="bg-white rounded-xl p-10 border border-[#E5E7EB] shadow-sm">
-                        <div className="text-4xl mb-4">✉️</div>
-                        <h2 className="text-xl font-bold text-[#111827] mb-2">Check Your Email</h2>
-                        <p className="text-sm text-[#6B7280] mb-1">
+            <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#EEF2FF] to-[#F8FAFC] flex items-center justify-center px-4">
+                <div className="w-full max-w-[420px] text-center">
+                    <div className="bg-white rounded-2xl p-10 border border-[#E2E8F0] shadow-lg shadow-indigo-500/[0.04]">
+                        <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mx-auto mb-5">
+                            <span className="text-3xl">✉️</span>
+                        </div>
+                        <h2 className="text-xl font-extrabold text-[#0F172A] mb-2">Check Your Email</h2>
+                        <p className="text-sm text-[#64748B] mb-1">
                             We&apos;ve sent a confirmation link to:
                         </p>
-                        <p className="text-sm font-semibold text-[#6366F1] mb-4">{email}</p>
-                        <p className="text-xs text-[#9CA3AF]">
+                        <p className="text-sm font-bold text-[#6366F1] mb-5">{email}</p>
+                        <p className="text-xs text-[#94A3B8] leading-relaxed">
                             After confirming, your account will be reviewed by an admin before you can access the portal.
                         </p>
                     </div>
-                    <div className="mt-6">
-                        <Link href="/portal/login" className="text-sm text-[#6366F1] font-medium hover:underline">
-                            Back to Sign In
+                    <div className="mt-8">
+                        <Link href="/portal/login" className="text-sm text-[#6366F1] font-semibold hover:text-[#4F46E5] transition-colors">
+                            ← Back to Sign In
                         </Link>
                     </div>
                 </div>
@@ -66,72 +68,80 @@ export default function SignupPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-4">
-            <div className="w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-[#111827]">Create an account</h1>
-                    <p className="text-sm text-[#6B7280] mt-1">Sign up to join the cybersecurity club</p>
+        <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#EEF2FF] to-[#F8FAFC] flex items-center justify-center px-4">
+            <div className="w-full max-w-[420px]">
+                {/* Logo */}
+                <div className="text-center mb-10">
+                    <Link href="/" className="inline-block text-2xl font-bold mb-4">
+                        IIMS <span className="text-gradient">Cyber</span>
+                    </Link>
+                    <h1 className="text-2xl font-extrabold text-[#0F172A] mb-1">Create an account</h1>
+                    <p className="text-sm text-[#64748B]">Sign up to join the cybersecurity club</p>
                 </div>
 
-                <div className="bg-white rounded-xl p-8 border border-[#E5E7EB] shadow-sm">
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Card */}
+                <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-lg shadow-indigo-500/[0.04]">
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-[#374151] mb-1.5">Full Name</label>
+                            <label className="block text-sm font-semibold text-[#0F172A] mb-2">Full Name</label>
                             <input
                                 type="text"
                                 required
                                 placeholder="Your full name"
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
+                                className="input-premium"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#374151] mb-1.5">Email</label>
+                            <label className="block text-sm font-semibold text-[#0F172A] mb-2">Email</label>
                             <input
                                 type="email"
                                 required
                                 placeholder="you@email.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
+                                className="input-premium"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#374151] mb-1.5">Password</label>
+                            <label className="block text-sm font-semibold text-[#0F172A] mb-2">Password</label>
                             <input
                                 type="password"
                                 required
                                 placeholder="At least 6 characters"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
+                                className="input-premium"
                             />
                         </div>
 
                         {errorMsg && (
-                            <p className="text-sm text-red-500">{errorMsg}</p>
+                            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-100">
+                                <span className="text-red-500 text-sm">⚠️ {errorMsg}</span>
+                            </div>
                         )}
 
-                        <button
-                            type="submit"
-                            disabled={status === 'loading'}
-                            className="w-full py-3 rounded-lg bg-[#6366F1] text-white font-semibold hover:bg-[#4F46E5] transition-colors disabled:opacity-50"
-                        >
-                            {status === 'loading' ? 'Creating account...' : 'Sign Up'}
+                        <button type="submit" disabled={status === 'loading'} className="btn-primary">
+                            {status === 'loading' ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                                    Creating account...
+                                </span>
+                            ) : 'Sign Up'}
                         </button>
                     </form>
                 </div>
 
-                <p className="text-center mt-6 text-sm text-[#6B7280]">
-                    Already have an account?{' '}
-                    <Link href="/portal/login" className="text-[#6366F1] font-medium hover:underline">
-                        Sign in
-                    </Link>
-                </p>
-
-                <div className="text-center mt-3">
-                    <Link href="/" className="text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
+                {/* Links */}
+                <div className="mt-8 space-y-3 text-center">
+                    <p className="text-sm text-[#64748B]">
+                        Already have an account?{' '}
+                        <Link href="/portal/login" className="text-[#6366F1] font-semibold hover:text-[#4F46E5] transition-colors">
+                            Sign in
+                        </Link>
+                    </p>
+                    <Link href="/" className="inline-block text-xs text-[#94A3B8] hover:text-[#64748B] transition-colors">
                         ← Back to website
                     </Link>
                 </div>

@@ -1,4 +1,4 @@
-// app/(public)/events/EventsClient.tsx — Premium minimal events filter
+// app/(public)/events/EventsClient.tsx
 'use client'
 
 import { useState } from 'react'
@@ -9,11 +9,11 @@ interface Props { events: PublicEvent[] }
 const types = ['All', 'CTF', 'Workshop', 'Competition', 'Seminar']
 const tabs = ['All', 'Upcoming', 'Past'] as const
 
-const typeBadgeColor: Record<string, string> = {
-    ctf: 'bg-red-50 text-red-600',
-    workshop: 'bg-blue-50 text-blue-600',
-    competition: 'bg-amber-50 text-amber-600',
-    seminar: 'bg-purple-50 text-purple-600',
+const typeBadge: Record<string, string> = {
+    ctf: 'bg-red-50 text-red-600 border-red-100',
+    workshop: 'bg-blue-50 text-blue-600 border-blue-100',
+    competition: 'bg-amber-50 text-amber-600 border-amber-100',
+    seminar: 'bg-purple-50 text-purple-600 border-purple-100',
 }
 
 export default function EventsClient({ events }: Props) {
@@ -29,7 +29,7 @@ export default function EventsClient({ events }: Props) {
     })
 
     return (
-        <section className="py-16 bg-[#FAFAFA]">
+        <section className="py-16 bg-[#F8FAFC]">
             <div className="max-w-6xl mx-auto px-6">
                 {/* Type filters */}
                 <div className="flex flex-wrap gap-2 mb-6">
@@ -37,9 +37,9 @@ export default function EventsClient({ events }: Props) {
                         <button
                             key={t}
                             onClick={() => setTypeFilter(t)}
-                            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${typeFilter === t
-                                    ? 'bg-[#6366F1] text-white'
-                                    : 'bg-white text-[#6B7280] border border-[#E5E7EB] hover:border-[#6366F1]/30'
+                            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${typeFilter === t
+                                ? 'bg-gradient-to-r from-[#6366F1] to-[#4F46E5] text-white shadow-md shadow-indigo-500/20'
+                                : 'bg-white text-[#64748B] border border-[#E2E8F0] hover:border-[#6366F1]/30 hover:text-[#6366F1]'
                                 }`}
                         >
                             {t}
@@ -48,14 +48,14 @@ export default function EventsClient({ events }: Props) {
                 </div>
 
                 {/* Time tabs */}
-                <div className="flex gap-6 border-b border-[#E5E7EB] mb-8">
+                <div className="flex gap-6 border-b border-[#E2E8F0] mb-10">
                     {tabs.map((t) => (
                         <button
                             key={t}
                             onClick={() => setTab(t)}
-                            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${tab === t
-                                    ? 'text-[#6366F1] border-[#6366F1]'
-                                    : 'text-[#6B7280] border-transparent hover:text-[#111827]'
+                            className={`pb-3 text-sm font-semibold transition-all border-b-2 ${tab === t
+                                ? 'text-[#6366F1] border-[#6366F1]'
+                                : 'text-[#94A3B8] border-transparent hover:text-[#0F172A]'
                                 }`}
                         >
                             {t}
@@ -64,26 +64,33 @@ export default function EventsClient({ events }: Props) {
                 </div>
 
                 {filtered.length === 0 ? (
-                    <div className="bg-white rounded-xl p-12 text-center border border-[#E5E7EB]">
-                        <p className="text-[#6B7280]">No events found.</p>
+                    <div className="bg-white rounded-2xl p-16 text-center border border-[#E2E8F0] shadow-sm">
+                        <div className="text-4xl mb-4">🔍</div>
+                        <p className="text-[#64748B] font-medium">No events found.</p>
                     </div>
                 ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {filtered.map((e) => {
                             const isPast = new Date(e.event_date) < now
                             return (
-                                <div key={e.id} className={`bg-white rounded-xl p-6 border border-[#E5E7EB] hover:shadow-md transition-shadow ${isPast ? 'opacity-60' : ''}`}>
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${typeBadgeColor[e.type] || 'bg-gray-100 text-gray-600'}`}>
-                                            {e.type}
-                                        </span>
-                                        {isPast && <span className="text-xs text-[#9CA3AF]">Past</span>}
-                                    </div>
-                                    <h3 className="font-semibold text-[#111827] mb-2">{e.title}</h3>
-                                    <p className="text-sm text-[#6B7280] line-clamp-2 mb-4">{e.description}</p>
-                                    <div className="text-xs text-[#9CA3AF]">
-                                        {new Date(e.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                                        {e.location && ` · ${e.location}`}
+                                <div key={e.id} className={`group bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ${isPast ? 'opacity-50' : ''}`}>
+                                    <div className="p-6">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${typeBadge[e.type] || 'bg-gray-50 text-gray-600 border-gray-100'}`}>
+                                                {e.type.charAt(0).toUpperCase() + e.type.slice(1)}
+                                            </span>
+                                            {isPast && <span className="text-xs text-[#94A3B8] font-medium bg-gray-50 px-2 py-0.5 rounded-full">Past</span>}
+                                        </div>
+                                        <h3 className="text-lg font-bold text-[#0F172A] mb-2 group-hover:text-[#6366F1] transition-colors">{e.title}</h3>
+                                        <p className="text-sm text-[#64748B] line-clamp-2 mb-5">{e.description}</p>
+                                        <div className="flex items-center gap-4 text-xs text-[#94A3B8]">
+                                            <span className="flex items-center gap-1.5">
+                                                📅 {new Date(e.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </span>
+                                            {e.location && (
+                                                <span className="flex items-center gap-1.5">📍 {e.location}</span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             )
