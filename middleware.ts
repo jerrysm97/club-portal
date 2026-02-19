@@ -47,9 +47,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         }
     )
 
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!session) {
+    if (authError || !user) {
         return NextResponse.redirect(new URL('/portal/login', request.url))
     }
 
@@ -69,7 +69,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         const { data: member, error } = await adminClient
             .from('members')
             .select('role, status')
-            .eq('user_id', session.user.id)
+            .eq('user_id', user.id)
             .single()
 
         if (error || !member) {
@@ -78,7 +78,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         }
 
         // ── Step 4: Handle member status ──
-        if (member.status === 'pending') {
+        // ── Step 4: Handle member status ──
+        // Allow admins/superadmins to bypass pending status (e.g. first user setup)
+        if (member.status === 'pending' && !['admin', 'superadmin'].includes(member.role)) {
             return NextResponse.redirect(new URL('/portal/pending', request.url))
         }
 

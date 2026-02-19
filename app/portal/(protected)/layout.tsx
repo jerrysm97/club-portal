@@ -15,21 +15,25 @@ export default async function ProtectedPortalLayout({
     const supabase = await createServerSupabaseClient()
 
     // ── Step 1: Verify session ──
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) redirect('/portal/login')
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/portal/login')
 
     // ── Step 2: Fetch member and check status ──
     // ✅ CORRECT: query by user_id (auth.users FK), NOT by id (members PK)
     const { data: memberData } = await supabase
         .from('members')
         .select('id, user_id, full_name, email, student_id, club_post, role, status, bio, avatar_url, skills, points, joined_at, updated_at')
-        .eq('user_id', session.user.id)
+        .eq('user_id', user.id)
         .single()
 
     const member = memberData as unknown as Member | null
 
     // Redirects go OUTSIDE (protected)/ — no infinite loop possible
-    if (!member || member.status === 'pending') redirect('/portal/pending')
+    if (!member) redirect('/portal/pending')
+
+    if (member.status === 'pending' && !['admin', 'superadmin'].includes(member.role)) {
+        redirect('/portal/pending')
+    }
     if (member.status === 'rejected') redirect('/portal/login?reason=rejected')
     if (member.status === 'banned') redirect('/portal/login?reason=banned')
 

@@ -12,12 +12,12 @@ export const revalidate = 60
 
 export default async function DashboardPage() {
     const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) redirect('/portal/login')
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/portal/login')
 
     // Parallel data fetching
     const [memberRes, eventsRes, announcementsRes, rankRes] = await Promise.all([
-        supabase.from('members').select('*').eq('user_id', session.user.id).single(),
+        supabase.from('members').select('*').eq('user_id', user.id).single(),
         supabase
             .from('events')
             .select('id, title, type, starts_at, location')

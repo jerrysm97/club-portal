@@ -6,17 +6,17 @@ import SignOutButton from './SignOutButton'
 
 export default async function PendingPage() {
     const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user } } = await supabase.auth.getUser()
 
     let email: string | null = null
-    if (session) {
+    if (user) {
         const { data: member } = await supabase
             .from('members')
             .select('email')
-            .eq('user_id', session.user.id)
+            .eq('user_id', user.id)
             .single()
         const memberEmail = (member as { email: string } | null)?.email
-        email = memberEmail ?? session.user.email ?? null
+        email = memberEmail ?? user.email ?? null
     }
 
     return (
