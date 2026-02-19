@@ -1,7 +1,6 @@
 // components/Sidebar.tsx
-// The navigation sidebar shown on every dashboard page.
-// Fixed on desktop (left side), hamburger menu on mobile.
-// Shows an "Admin" link only if the current user has admin role.
+// Cyber Blue Matrix themed sidebar — deep navy with electric blue active states.
+// Fixed on desktop, slide-out on mobile.
 
 'use client'
 
@@ -11,15 +10,11 @@ import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function Sidebar() {
-    // Track which page is active to highlight the correct nav link
     const pathname = usePathname()
     const router = useRouter()
-    // Track if mobile menu is open or closed
     const [mobileOpen, setMobileOpen] = useState(false)
-    // Track if the current user is an admin (to show/hide admin link)
     const [isAdmin, setIsAdmin] = useState(false)
 
-    // Check if the user is an admin on load
     useEffect(() => {
         const checkRole = async () => {
             const { data: { session } } = await supabase.auth.getSession()
@@ -35,17 +30,15 @@ export default function Sidebar() {
         checkRole()
     }, [])
 
-    // Sign the user out and redirect to login
     const handleSignOut = async () => {
         await supabase.auth.signOut()
         router.push('/portal/login')
         router.refresh()
     }
 
-    // Navigation links — shown to all approved members
     const navLinks = [
         {
-            name: 'Posts',
+            name: 'Feed',
             href: '/portal/dashboard',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,43 +68,37 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* ===== MOBILE: Hamburger button (top-left corner) ===== */}
+            {/* Mobile hamburger */}
             <button
                 onClick={() => setMobileOpen(true)}
-                className="fixed top-4 left-4 z-50 md:hidden bg-white p-2 rounded-xl shadow-md border border-slate-200"
+                className="fixed top-18 left-4 z-50 md:hidden bg-[#0A1F44] p-2 rounded-lg border border-[#00B4FF]/30"
                 aria-label="Open menu"
             >
-                <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-[#00B4FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
 
-            {/* ===== MOBILE: Dark overlay when menu is open ===== */}
+            {/* Mobile overlay */}
             {mobileOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
-                    onClick={() => setMobileOpen(false)}
-                />
+                <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
             )}
 
-            {/* ===== SIDEBAR ===== */}
-            <aside
-                className={`
-          fixed top-0 left-0 h-full w-64 bg-[#1a1a2e] text-white z-50
-          flex flex-col
-          transition-transform duration-300 ease-in-out
-          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:translate-x-0 md:static md:z-auto
-        `}
-            >
-                {/* Club name / logo area */}
-                <div className="p-6 border-b border-white/10">
-                    <h2 className="text-lg font-bold tracking-tight">Club Portal</h2>
-                    <p className="text-xs text-slate-400 mt-1">Member Dashboard</p>
+            {/* Sidebar */}
+            <aside className={`
+                fixed top-14 left-0 h-[calc(100vh-3.5rem)] w-60 bg-[#0A1F44] border-r border-[#00B4FF]/20 z-50
+                flex flex-col transition-transform duration-300 ease-in-out
+                ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
+                md:translate-x-0 md:static md:z-auto
+            `}>
+                {/* Logo area */}
+                <div className="p-5 border-b border-[#00B4FF]/20">
+                    <h2 className="font-[var(--font-orbitron)] font-bold text-white text-sm">Dashboard</h2>
+                    <p className="font-[var(--font-mono)] text-[#00FF9C] text-xs mt-1">// Member Portal</p>
                 </div>
 
-                {/* Navigation links */}
-                <nav className="flex-1 p-4 space-y-1">
+                {/* Nav links */}
+                <nav className="flex-1 p-3 space-y-1">
                     {navLinks.map((link) => {
                         const isActive = pathname === link.href
                         return (
@@ -120,12 +107,12 @@ export default function Sidebar() {
                                 href={link.href}
                                 onClick={() => setMobileOpen(false)}
                                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
-                  ${isActive
-                                        ? 'bg-indigo-600 text-white'
-                                        : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                                    flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300
+                                    ${isActive
+                                        ? 'bg-[#00B4FF]/15 text-[#00B4FF] border-l-2 border-[#00B4FF]'
+                                        : 'text-[#8892A4] hover:bg-white/5 hover:text-white'
                                     }
-                `}
+                                `}
                             >
                                 {link.icon}
                                 {link.name}
@@ -133,20 +120,20 @@ export default function Sidebar() {
                         )
                     })}
 
-                    {/* Admin link — only visible to admins */}
+                    {/* Admin link */}
                     {isAdmin && (
                         <>
-                            <div className="my-3 border-t border-white/10" />
+                            <div className="my-3 border-t border-[#00B4FF]/20" />
                             <Link
                                 href="/portal/admin"
                                 onClick={() => setMobileOpen(false)}
                                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
-                  ${pathname === '/portal/admin'
-                                        ? 'bg-purple-600 text-white'
-                                        : 'text-purple-300 hover:bg-white/10 hover:text-white'
+                                    flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300
+                                    ${pathname === '/portal/admin'
+                                        ? 'bg-[#00FF9C]/15 text-[#00FF9C] border-l-2 border-[#00FF9C]'
+                                        : 'text-[#00FF9C]/70 hover:bg-white/5 hover:text-[#00FF9C]'
                                     }
-                `}
+                                `}
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -158,11 +145,11 @@ export default function Sidebar() {
                     )}
                 </nav>
 
-                {/* Sign out button at the bottom */}
-                <div className="p-4 border-t border-white/10">
+                {/* Sign out */}
+                <div className="p-3 border-t border-[#00B4FF]/20">
                     <button
                         onClick={handleSignOut}
-                        className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+                        className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-[#8892A4] hover:bg-[#FF3B3B]/10 hover:text-[#FF3B3B] transition-all duration-300 cursor-pointer"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
