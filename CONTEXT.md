@@ -1,90 +1,158 @@
-# 🚀 ANTIGRAVITY MEGA PROMPT — IIMS Cybersecurity Club
-# V5.0 FINAL — All Real Details Filled In | Zero Placeholders
-# Public Website + Member Portal | One Project | One Domain
-#
-# HOW TO USE:
-# 1. Paste your CONTEXT.md first in Antigravity
-# 2. Paste this ENTIRE file right after it
-# 3. Say "Start with Step 1 — build PublicNavbar.tsx and wait for my confirmation"
-# 4. Say "done, next" after each file is tested and working
 
----
 
-## 📍 PROJECT IDENTITY
+## 1. PROJECT IDENTITY
 
 ```
-Club Name:          IIMS Cybersecurity Club
-College Name:       IIMS College
-College Website:    https://iimscollege.edu.np/
-Club Email:         cybersec@iimscollege.edu.np          ← mock, use this for now
-Instagram:          https://instagram.com/iimscyberclub   ← mock, use this for now
-Facebook:           https://facebook.com/iimscyberclub    ← mock, use this for now
-GitHub:             https://github.com/iimscyberclub      ← mock, use this for now
-Domain intent:      One domain, portal lives at /portal
-Stack:              Next.js 14 App Router, Supabase, Tailwind CSS, Resend
+Club Name:            IIMS Cybersecurity Club
+College Name:         IIMS College
+College Website:      https://iimscollege.edu.np/
+Club Email:           cybersec@iimscollege.edu.np        [mock — replace when ready]
+Instagram:            https://instagram.com/iimscyberclub [mock — replace when ready]
+Facebook:             https://facebook.com/iimscyberclub  [mock — replace when ready]
+GitHub:               https://github.com/iimscyberclub   [mock — replace when ready]
+Project folder name:  iims-cyber-club
+Domain structure:     Single domain — portal at /portal/*
 ```
 
 ---
 
-## 📍 FULL PROJECT VISION
+## 2. WHAT I AM BUILDING
 
-I am building ONE Next.js 14 project containing:
-1. **Public Club Website** — anyone on the internet can visit
-2. **Private Member Portal** — only approved members access after email login
+One Next.js 14 project. Two experiences. One domain.
 
-Both live on the same domain. The public website is **entirely data-driven** — all public content (events, gallery, announcements) is pushed from the Admin Portal. There is zero hardcoded content that requires a developer to update.
+PUBLIC WEBSITE — anyone on the internet can visit
+→ Homepage, About, Events, Contact pages
+→ 100% data-driven — every word, image, stat, team member
+   is managed from the Admin Portal
+→ Zero hardcoded content that requires a developer to update
 
-The public site connects to the portal via a prominent CTA button. Inside the portal, members can navigate back to the public website at any time.
+PRIVATE MEMBER PORTAL — approved members only
+→ Login at /portal/login (Supabase Magic Link — no passwords)
+→ Member dashboard: post feed, documents, profile
+→ Admin panel: 8 tabs for full platform control
 
----
-
-## 🎨 DESIGN SYSTEM: CYBER BLUE MATRIX
-
-Apply this design system consistently across EVERY page and component.
-
-### Typography (load via Google Fonts in layout.tsx)
-```
-Headings:      Orbitron      weights: 700, 900
-Body text:     Exo 2         weights: 300, 400, 700
-Mono/labels:   Share Tech Mono  (monospace — use for dates, codes, section labels)
-```
-
-### Color Palette (use Tailwind arbitrary values)
-```
-Primary surface:    #0A1F44   Deep Navy Blue   → bg-[#0A1F44]
-Electric accent:    #00B4FF   Electric Blue    → text-[#00B4FF], border-[#00B4FF]
-Neon accent:        #00FF9C   Neon Green       → text-[#00FF9C] (badges, glows, highlights)
-Background:         #0D0D0D   Near Black       → bg-[#0D0D0D]
-Alert/danger:       #FF3B3B   Red              → text-[#FF3B3B]
-Muted text:         #8892A4   Slate gray       → text-[#8892A4]
-```
-
-### UI Rules
-- **Glassmorphism cards:** `bg-white/5 backdrop-blur-md border border-white/10 rounded-xl`
-- **Neon glow on hover:** `hover:shadow-[0_0_20px_rgba(0,180,255,0.3)]`
-- **Section labels:** monospace prefix style — `// 01 — About Us` in Share Tech Mono, #00FF9C color
-- **Circuit/grid background:** subtle CSS grid pattern on dark backgrounds
-- **Buttons — Primary:** `bg-[#00B4FF] text-[#0D0D0D] font-bold hover:bg-[#00FF9C] transition-all`
-- **Buttons — Outline:** `border border-[#00B4FF] text-[#00B4FF] hover:bg-[#00B4FF] hover:text-[#0D0D0D]`
-- **Buttons — Danger:** `bg-[#FF3B3B] text-white hover:opacity-80`
-- **Smooth transitions:** `transition-all duration-300` on all interactive elements
+The public website has a button to enter the portal.
+Inside the portal, members can navigate back to the public website.
+This is NOT two separate projects — one codebase, one GitHub repo, one Vercel deployment.
 
 ---
 
-## 🗂️ COMPLETE FOLDER STRUCTURE
+## 3. TECH STACK
 
-Build exactly this. Do not add or remove any folders:
+```
+Framework:        Next.js 14 with App Router
+Language:         TypeScript (strict — no plain JS files)
+Styling:          Tailwind CSS (arbitrary values for exact hex colors)
+Database:         Supabase (PostgreSQL)
+Authentication:   Supabase Magic Link (email only — no passwords)
+File Storage:     Supabase Storage (3 buckets — see Section 7)
+Email:            Resend (contact form + magic link delivery)
+Hosting:          Vercel (auto-deploy from GitHub main branch)
+Fonts:            Next.js next/font/google (Inter + JetBrains Mono)
+Package manager:  npm
+```
+
+---
+
+## 4. DESIGN SYSTEM — STEALTH TERMINAL (Minimalist Cyber)
+
+This is the ONLY design language used across every page and component.
+Lightweight, fast, terminal-inspired. NO glassmorphism. NO glowing shadows. NO blurs.
+
+### 4.1 Typography
+
+```
+JetBrains Mono — All headings, section labels, numbers, dates, code
+                 Weights: 400 (regular), 700 (bold)
+                 Load via: next/font/google
+
+Inter           — All body text, descriptions, form fields, paragraphs
+                 Weights: 300 (light), 400 (regular), 600 (semibold)
+                 Load via: next/font/google
+```
+
+### 4.2 Color Palette (Always use Tailwind arbitrary values)
+
+```
+Pure Black:         #000000   → bg-black (main page background)
+Matte Dark:         #09090B   → bg-[#09090B] (cards, containers, surfaces)
+Border Gray:        #27272A   → border-[#27272A] (all borders and dividers)
+Terminal Emerald:   #10B981   → text-[#10B981] bg-[#10B981] (primary accent — CTAs, active, labels)
+Hacker Cyan:        #06B6D4   → text-[#06B6D4] (secondary tags, links, type badges)
+Danger Red:         #EF4444   → text-[#EF4444] bg-[#EF4444] (errors, delete, reject)
+Ghost White:        #F8FAFC   → text-[#F8FAFC] (primary readable text)
+Muted Slate:        #A1A1AA   → text-[#A1A1AA] (subtitles, placeholder, muted info)
+```
+
+### 4.3 Component Patterns (Copy these exactly — do not invent new patterns)
+
+```
+CARD:
+  bg-[#09090B] border border-[#27272A] rounded-md p-6
+  hover: hover:border-[#10B981] transition-colors duration-200
+
+SECTION LABEL (above every section heading):
+  > 01_SECTION_NAME
+  Font: JetBrains Mono, color: #10B981, text-sm, uppercase
+
+SECTION HEADING:
+  Font: JetBrains Mono 700, color: #F8FAFC, text-3xl md:text-4xl
+
+BUTTON PRIMARY:
+  bg-[#10B981] text-black font-bold px-6 py-3 rounded-sm
+  hover:opacity-90 transition-opacity
+
+BUTTON OUTLINE:
+  border border-[#10B981] text-[#10B981] px-6 py-3 rounded-sm
+  hover:bg-[#10B981]/10 transition-colors
+
+BUTTON DANGER:
+  bg-[#EF4444] text-white px-4 py-2 rounded-sm hover:opacity-80
+
+INPUT FIELD:
+  bg-[#09090B] border border-[#27272A] text-[#F8FAFC] rounded-sm px-4 py-3
+  focus:border-[#10B981] focus:outline-none transition-colors
+  placeholder:text-[#A1A1AA]
+
+DIVIDER:
+  border-t border-[#27272A]
+
+BADGE — Emerald:    bg-[#10B981]/10 text-[#10B981] px-2 py-1 rounded-sm text-xs font-mono
+BADGE — Cyan:       bg-[#06B6D4]/10 text-[#06B6D4] px-2 py-1 rounded-sm text-xs font-mono
+BADGE — Red:        bg-[#EF4444]/10 text-[#EF4444] px-2 py-1 rounded-sm text-xs font-mono
+BADGE — Gray:       bg-[#27272A] text-[#A1A1AA] px-2 py-1 rounded-sm text-xs font-mono
+```
+
+### 4.4 Hero Section Special Rules
+
+```
+Background: pure black (#000000) with subtle terminal cursor animation:
+  — Blinking block cursor ( █ ) after the headline, CSS animation only
+  — No JS libraries for animation
+
+Hero grid background pattern (globals.css only, no JS):
+  background-image:
+    linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+```
+
+---
+
+## 5. FOLDER STRUCTURE
+
+Build exactly this. Do not add, rename, or remove any folder or file.
 
 ```
 iims-cyber-club/
 │
 ├── app/
-│   ├── layout.tsx                        ← Root layout: Google Fonts + metadata
-│   ├── globals.css                       ← Smooth scroll + circuit grid CSS pattern
+│   ├── layout.tsx                        ← Root layout: fonts + metadata + globals
+│   ├── globals.css                       ← Smooth scroll + grid bg pattern + cursor blink
 │   │
-│   ├── (public)/                         ← Route group: public website
-│   │   ├── layout.tsx                    ← PublicNavbar + PublicFooter wrapper
-│   │   ├── page.tsx                      ← Homepage / (7 sections)
+│   ├── (public)/                         ← Route group: public website (no auth)
+│   │   ├── layout.tsx                    ← Wraps PublicNavbar + PublicFooter
+│   │   ├── page.tsx                      ← Homepage / (8 sections, all dynamic)
 │   │   ├── about/
 │   │   │   └── page.tsx                  ← /about
 │   │   ├── events/
@@ -92,67 +160,73 @@ iims-cyber-club/
 │   │   └── contact/
 │   │       └── page.tsx                  ← /contact
 │   │
-│   ├── portal/
+│   ├── portal/                           ← Member portal (protected routes)
 │   │   ├── login/
 │   │   │   └── page.tsx                  ← /portal/login
 │   │   ├── pending/
 │   │   │   └── page.tsx                  ← /portal/pending
 │   │   ├── dashboard/
-│   │   │   ├── layout.tsx                ← Sidebar layout
-│   │   │   ├── page.tsx                  ← /portal/dashboard (feed)
+│   │   │   ├── layout.tsx                ← Topbar + Sidebar layout
+│   │   │   ├── page.tsx                  ← /portal/dashboard (post feed)
 │   │   │   ├── documents/
 │   │   │   │   └── page.tsx              ← /portal/dashboard/documents
 │   │   │   └── profile/
 │   │   │       └── page.tsx              ← /portal/dashboard/profile
 │   │   └── admin/
-│   │       └── page.tsx                  ← /portal/admin (5 tabs)
+│   │       └── page.tsx                  ← /portal/admin (8 tabs)
 │   │
 │   └── api/
-│       ├── auth/callback/route.ts        ← Supabase magic link callback
-│       └── contact/route.ts             ← Contact form email via Resend
+│       ├── auth/
+│       │   └── callback/
+│       │       └── route.ts              ← Supabase magic link callback handler
+│       └── contact/
+│           └── route.ts                  ← Contact form: save to DB + send via Resend
 │
 ├── components/
 │   ├── public/
-│   │   ├── PublicNavbar.tsx
-│   │   ├── PublicFooter.tsx
-│   │   ├── HeroSection.tsx
-│   │   ├── AboutSection.tsx
-│   │   ├── DomainsSection.tsx
-│   │   ├── EventsSection.tsx             ← Fetches from Supabase, handles empty state
-│   │   ├── TeamSection.tsx
-│   │   ├── StatsSection.tsx              ← Scroll-triggered count animation
-│   │   ├── GallerySection.tsx            ← Fetches from Supabase
-│   │   └── ContactSection.tsx
+│   │   ├── PublicNavbar.tsx              ← Fixed top nav + mobile hamburger
+│   │   ├── PublicFooter.tsx              ← 3-column footer
+│   │   ├── HeroSection.tsx               ← Hero with grid bg + blinking cursor
+│   │   ├── AboutSection.tsx              ← Fetches about_text from site_settings
+│   │   ├── DomainsSection.tsx            ← 5 static domain cards
+│   │   ├── EventsSection.tsx             ← Fetches public_events — handles empty state
+│   │   ├── TeamSection.tsx               ← Fetches team_members — handles empty state
+│   │   ├── StatsSection.tsx              ← Fetches stats from site_settings + count animation
+│   │   ├── GallerySection.tsx            ← Fetches public_gallery — handles empty state
+│   │   └── ContactSection.tsx            ← Contact form with validation
 │   │
 │   └── portal/
-│       ├── PortalTopbar.tsx              ← "← Public Website" link inside portal
-│       ├── Sidebar.tsx
-│       ├── PostCard.tsx
-│       ├── PostForm.tsx
-│       ├── DocumentCard.tsx
-│       └── UploadForm.tsx
+│       ├── PortalTopbar.tsx              ← "← Public Website" link + member name + logout
+│       ├── Sidebar.tsx                   ← Nav: Feed, Documents, Profile, Admin (if admin)
+│       ├── PostCard.tsx                  ← Post display + edit/delete for own posts
+│       ├── PostForm.tsx                  ← Create + edit post modal
+│       ├── DocumentCard.tsx              ← Document display + view/download
+│       └── UploadForm.tsx                ← File upload (PDF, DOC, DOCX only)
 │
 ├── lib/
-│   ├── supabase.ts                       ← Browser client
-│   └── supabase-server.ts               ← Server client (for server components)
+│   ├── supabase.ts                       ← Browser client (for client components)
+│   └── supabase-server.ts               ← Server client (for server components + API routes)
 │
 ├── types/
 │   └── database.ts                       ← TypeScript types for all Supabase tables
 │
 ├── middleware.ts                         ← Protects /portal/dashboard/* and /portal/admin/*
-├── .env.local                            ← Secret keys
+├── .env.local                            ← Secret keys (never commit — in .gitignore)
 ├── push.sh                               ← GitHub auto-push script
-└── CONTEXT.md
+└── CONTEXT.md                            ← This file
 ```
 
 ---
 
-## 🗄️ DATABASE SCHEMA (Supabase — PostgreSQL)
+## 6. DATABASE SCHEMA (Supabase — PostgreSQL)
 
-Run this complete SQL in Supabase SQL Editor. Build all tables exactly as defined:
+Run this complete SQL block in Supabase SQL Editor. All tables required.
 
-### Table 1: members
 ```sql
+-- =============================================
+-- CORE: Auth and Member Content
+-- =============================================
+
 CREATE TABLE members (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email       text UNIQUE NOT NULL,
@@ -163,23 +237,17 @@ CREATE TABLE members (
   bio         text,
   created_at  timestamptz DEFAULT now()
 );
-```
 
-### Table 2: posts
-```sql
 CREATE TABLE posts (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title       text NOT NULL,
   content     text NOT NULL,
   author_id   uuid REFERENCES members(id) ON DELETE SET NULL,
   pinned      boolean DEFAULT false,
-  is_public   boolean DEFAULT false,  -- true = appears on public website news section
+  is_public   boolean DEFAULT false,
   created_at  timestamptz DEFAULT now()
 );
-```
 
-### Table 3: documents
-```sql
 CREATE TABLE documents (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title        text NOT NULL,
@@ -188,10 +256,11 @@ CREATE TABLE documents (
   uploaded_by  uuid REFERENCES members(id) ON DELETE SET NULL,
   created_at   timestamptz DEFAULT now()
 );
-```
 
-### Table 4: public_events
-```sql
+-- =============================================
+-- PUBLIC WEBSITE: Dynamic Data
+-- =============================================
+
 CREATE TABLE public_events (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title        text NOT NULL,
@@ -200,465 +269,368 @@ CREATE TABLE public_events (
   description  text,
   type         text CHECK (type IN ('Workshop', 'CTF', 'Seminar', 'Competition', 'Other')),
   status       text DEFAULT 'upcoming' CHECK (status IN ('upcoming', 'past')),
-  image_url    text,  -- poster/photo uploaded by admin to Supabase Storage
+  image_url    text,
   created_at   timestamptz DEFAULT now()
 );
-```
 
-### Table 5: public_gallery
-```sql
 CREATE TABLE public_gallery (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  image_url   text NOT NULL,  -- from Supabase Storage bucket: public-gallery
+  image_url   text NOT NULL,
   caption     text,
   sort_order  integer DEFAULT 0,
   created_at  timestamptz DEFAULT now()
 );
-```
 
-### RLS Policies (run after creating tables)
-```sql
--- Enable RLS on all tables
+CREATE TABLE team_members (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        text NOT NULL,
+  role        text NOT NULL,
+  image_url   text,
+  sort_order  integer DEFAULT 0,
+  created_at  timestamptz DEFAULT now()
+);
+
+-- =============================================
+-- SITE SETTINGS: Single row, id = 'global'
+-- Admin edits this from the Settings tab
+-- =============================================
+
+CREATE TABLE site_settings (
+  id                text PRIMARY KEY DEFAULT 'global',
+  about_text        text DEFAULT 'IIMS Cybersecurity Club is the premier technical club at IIMS College, Kathmandu.',
+  stat_members      text DEFAULT '50+',
+  stat_events       text DEFAULT '15+',
+  stat_competitions text DEFAULT '5+',
+  stat_partners     text DEFAULT '3+',
+  contact_email     text DEFAULT 'cybersec@iimscollege.edu.np',
+  instagram_url     text DEFAULT 'https://instagram.com/iimscyberclub',
+  facebook_url      text DEFAULT 'https://facebook.com/iimscyberclub',
+  github_url        text DEFAULT 'https://github.com/iimscyberclub',
+  updated_at        timestamptz DEFAULT now()
+);
+
+-- Insert the single settings row on setup
+INSERT INTO site_settings (id) VALUES ('global');
+
+-- =============================================
+-- CONTACT MESSAGES: Inbox for admin
+-- =============================================
+
+CREATE TABLE contact_messages (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        text NOT NULL,
+  email       text NOT NULL,
+  subject     text NOT NULL,
+  message     text NOT NULL,
+  is_read     boolean DEFAULT false,
+  created_at  timestamptz DEFAULT now()
+);
+
+-- =============================================
+-- ROW LEVEL SECURITY
+-- =============================================
+
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public_gallery ENABLE ROW LEVEL SECURITY;
+ALTER TABLE team_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
--- public_events: anyone can read (public website fetches this)
-CREATE POLICY "Public can read events" ON public_events FOR SELECT USING (true);
+-- Public read (no auth needed — fetched by public website server components)
+CREATE POLICY "Public read events"   ON public_events   FOR SELECT USING (true);
+CREATE POLICY "Public read gallery"  ON public_gallery  FOR SELECT USING (true);
+CREATE POLICY "Public read team"     ON team_members    FOR SELECT USING (true);
+CREATE POLICY "Public read settings" ON site_settings   FOR SELECT USING (true);
 
--- public_gallery: anyone can read (public website fetches this)
-CREATE POLICY "Public can read gallery" ON public_gallery FOR SELECT USING (true);
+-- Contact messages: anyone can insert (public form), only admin reads
+CREATE POLICY "Public insert contact" ON contact_messages FOR INSERT WITH CHECK (true);
 
--- posts: approved members can read, is_public posts readable by all
-CREATE POLICY "Approved members read posts" ON posts FOR SELECT
-  USING (auth.role() = 'authenticated');
+-- Members: authenticated users read all, update only own row
+CREATE POLICY "Auth read members"   ON members FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth update own"     ON members FOR UPDATE USING (auth.uid() = id);
 
--- members: approved members can read all, update only own row
-CREATE POLICY "Members read all" ON members FOR SELECT
-  USING (auth.role() = 'authenticated');
-CREATE POLICY "Members update own" ON members FOR UPDATE
-  USING (auth.uid() = id);
+-- Posts: authenticated users read and create, update/delete own only
+CREATE POLICY "Auth read posts"     ON posts FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth create posts"   ON posts FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Auth update own post" ON posts FOR UPDATE USING (auth.uid() = author_id);
+CREATE POLICY "Auth delete own post" ON posts FOR DELETE USING (auth.uid() = author_id);
 
--- documents: approved members can read and insert
-CREATE POLICY "Members read documents" ON documents FOR SELECT
-  USING (auth.role() = 'authenticated');
-CREATE POLICY "Members upload documents" ON documents FOR INSERT
-  WITH CHECK (auth.role() = 'authenticated');
+-- Documents: authenticated users read and create
+CREATE POLICY "Auth read docs"      ON documents FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth upload docs"    ON documents FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
--- Admin-only deletes (handled server-side with service role key)
-```
-
-### Supabase Storage Buckets (create these manually in Supabase dashboard)
-```
-Bucket 1: club-documents     → private (signed URLs for members only)
-Bucket 2: public-gallery     → public (images served directly to public website)
-Bucket 3: event-images       → public (event posters served to public website)
-```
-
----
-
-## 🔐 MIDDLEWARE (middleware.ts)
-
-Protect ONLY these routes: `/portal/dashboard/:path*` and `/portal/admin/:path*`
-All public routes pass through freely — no auth check.
-
-```
-Request → Is path /portal/dashboard/* or /portal/admin/*?
-
-YES →
-  Get Supabase session
-  No session → redirect to /portal/login
-
-  Has session → query members table (wrap in try/catch)
-    status = pending   → redirect to /portal/pending
-    status = rejected  → redirect to /portal/login?error=access_denied
-    status = approved  → allow ✅
-    catch error        → redirect to /portal/login?error=server_error
-
-  For /portal/admin/* additionally:
-    role ≠ admin → redirect to /portal/dashboard
-
-NO → allow through ✅ (public website — no checks)
+-- Note: Admin-only actions (approve member, delete any post, manage events/gallery/team/settings)
+-- are handled server-side using the SUPABASE_SERVICE_ROLE_KEY which bypasses RLS.
 ```
 
 ---
 
-## 🌐 STEP 1 — Public Layout: Navbar + Footer
+## 7. SUPABASE STORAGE BUCKETS
 
-### PublicNavbar (components/public/PublicNavbar.tsx)
+Create these manually in Supabase Dashboard → Storage → New Bucket:
 
-- Fixed top, `bg-[#0D0D0D]/95 backdrop-blur-md border-b border-[#00B4FF]/20`
-- Left: Club logo placeholder (cyber shield SVG icon inline) + "IIMS Cybersecurity Club" in Orbitron font, white
-- Center (desktop only): nav links with Share Tech Mono font
-  - `Home` → `/`
-  - `About` → `/about`
-  - `Events` → `/events`
-  - `Contact` → `/contact`
-  - Hover: underline in `#00B4FF` with glow effect
-- Right: **"Member Portal →"** button
-  - Style: `border border-[#00B4FF] text-[#00B4FF] hover:bg-[#00B4FF] hover:text-[#0D0D0D] font-bold px-4 py-2 rounded transition-all`
-  - Links to `/portal/login`
-- Mobile: hamburger icon (inline SVG) → slide-down menu with all links + portal button
-- Use `useState` for mobile menu toggle
+```
+Bucket Name:      club-documents
+Access:           Private (signed URLs for members only)
+Allowed types:    PDF, DOC, DOCX
 
-### PublicFooter (components/public/PublicFooter.tsx)
+Bucket Name:      public-gallery
+Access:           Public (direct URL — used by public website gallery)
+Allowed types:    JPG, JPEG, PNG, WEBP
 
-Three columns on desktop, stacked on mobile. Background: `bg-[#0A1F44]` with top border `border-t border-[#00B4FF]/30`
+Bucket Name:      event-images
+Access:           Public (direct URL — used by public events section)
+Allowed types:    JPG, JPEG, PNG, WEBP
 
-**Column 1 — Club Identity:**
-- Club name in Orbitron white
-- Tagline: `// Securing the Digital Future`  in Share Tech Mono, #00FF9C
-- Social icons (inline SVGs — Facebook, Instagram, GitHub):
-  - Facebook: `https://facebook.com/iimscyberclub`
-  - Instagram: `https://instagram.com/iimscyberclub`
-  - GitHub: `https://github.com/iimscyberclub`
-  - Icon hover: scale-110 + neon blue glow
-
-**Column 2 — Quick Links:**
-- "Quick Links" heading in Orbitron
-- Links: Home, About, Events, Contact, Member Portal
-- Each with `→` prefix in #00FF9C, hover:text-[#00B4FF]
-
-**Column 3 — College:**
-- "Our Institution" heading in Orbitron
-- IIMS College
-- Link: `https://iimscollege.edu.np/` → opens new tab
-- Style link: text-[#00B4FF] hover:text-[#00FF9C]
-
-**Bottom bar:**
-- `© 2026 IIMS Cybersecurity Club · IIMS College · All rights reserved`
-- Share Tech Mono font, #8892A4 color, centered
-- Separator: `border-t border-white/10 mt-8 pt-4`
-
----
-
-## 🏠 STEP 2 — Homepage (app/(public)/page.tsx)
-
-This is a **Server Component** that fetches from Supabase and passes data as props to child components. Import all section components. The page itself is the orchestrator.
-
-### Section 1 — Hero (components/public/HeroSection.tsx)
-- Full viewport height `min-h-screen`, background `#0D0D0D`
-- **Animated circuit grid background:** CSS only — use `bg-grid` pattern via globals.css:
-  ```css
-  .bg-grid {
-    background-image:
-      linear-gradient(rgba(0,180,255,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,180,255,0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-  ```
-- Floating neon orb decorations: two `absolute` divs with `rounded-full blur-3xl opacity-20`:
-  - One `bg-[#00B4FF]` top-left
-  - One `bg-[#00FF9C]` bottom-right
-- Content centered:
-  - Label above heading: `// IIMS COLLEGE · EST. 2024` in Share Tech Mono, #00FF9C, letter-spacing wide
-  - Main heading: **"Securing the Digital Future"** in Orbitron 900 weight, white, text-5xl to text-7xl responsive
-  - Sub-heading: **"IIMS Cybersecurity Club"** in Orbitron 700, text-[#00B4FF], text-2xl
-  - Body text: "Nepal's next generation of ethical hackers, defenders, and security researchers." in Exo 2, #8892A4
-  - Two buttons:
-    - Primary: **"Explore Club Life ↓"** → scrolls to `#about` (anchor link)
-    - Outline: **"Member Portal →"** → `/portal/login`
-  - Animated scroll arrow at very bottom of hero: bouncing chevron-down SVG in #00B4FF
-
-### Section 2 — About (components/public/AboutSection.tsx)
-- Section label: `// 01 — About Us` in Share Tech Mono #00FF9C
-- Two columns desktop: text left, image right
-- Text: "IIMS Cybersecurity Club is the premier technical club at IIMS College, Kathmandu. We train the next generation of security professionals through hands-on workshops, CTF competitions, and real-world security research. From ethical hacking to digital forensics, we cover the full spectrum of cybersecurity."
-- Image: `/public/about-mission.jpg` using Next.js Image (add placeholder note: "// TODO: Add about-mission.jpg to /public folder")
-- 2x2 icon grid below text (use inline SVGs for icons):
-  - 🛡️ Ethical Hacking
-  - 🔒 Defense & Blue Team
-  - 🔬 Security Research
-  - 🏆 CTF Competitions
-- Each icon card: glassmorphism style + hover neon glow
-
-### Section 3 — Domains (components/public/DomainsSection.tsx)
-- Section label: `// 02 — Our Domains`
-- Heading: "What We Do"
-- 5 domain cards in a responsive grid (2 cols tablet, 3 cols then 2+3 desktop):
-  - **Red Team** — Offensive security, penetration testing, vulnerability research
-  - **Blue Team** — Threat detection, incident response, SIEM, SOC operations
-  - **Cloud & DevSecOps** — Securing pipelines, AWS/Azure security, container hardening
-  - **Digital Forensics** — Memory analysis, disk forensics, malware reverse engineering
-  - **AI & Security** — Adversarial ML, AI-powered threat detection, LLM security
-- Each card: glassmorphism, relevant inline SVG icon, title in Orbitron, description in Exo 2
-- Hover: border color shifts to #00FF9C + neon glow
-
-### Section 4 — Events (components/public/EventsSection.tsx)
-- **This is a Server Component prop receiver — data is fetched in page.tsx**
-- Section label: `// 03 — Events`
-- Heading: "Upcoming Events"
-- Receives `events` prop (array from `public_events` table where `status = 'upcoming'`)
-- **CRITICAL: Handle empty state gracefully:**
-  ```
-  if (events.length === 0) → show elegant empty state:
-    Icon: calendar with question mark (inline SVG)
-    Text: "The team is cooking up something exciting..."
-    Sub: "Check back soon or follow our socials for announcements."
-    Social links: Instagram + Facebook icons
-    Style: glassmorphism card, centered, #00FF9C accent
-  ```
-- When events exist: responsive grid of event cards
-  - Each card: event image (from `image_url`) with fallback gradient if no image
-  - Event type badge: `Workshop` / `CTF` / `Seminar` in color-coded pills
-    - CTF → #FF3B3B (red), Workshop → #00B4FF (blue), Seminar → #00FF9C (green)
-  - Event date in Share Tech Mono
-  - Title in Orbitron
-  - Location with pin icon
-  - Description excerpt (max 100 chars, truncated with `...`)
-  - Card: glassmorphism + hover glow
-
-### Section 5 — Team (components/public/TeamSection.tsx)
-- Section label: `// 04 — The Team`
-- Heading: "Meet the Team"
-- **HARDCODED team data** (this section is static, not from database):
-
-```typescript
-const team = [
-  { name: "Vision KC",     role: "President",        initials: "VK" },
-  { name: "Hari",          role: "Vice President",    initials: "H"  },
-  { name: "Hari",          role: "Treasurer",         initials: "H"  },
-  { name: "Hari",          role: "Secretary",         initials: "H"  },
-  { name: "Hari",          role: "Joint Secretary",   initials: "H"  },
-  { name: "Hari",          role: "Marketing Lead",    initials: "H"  },
-  { name: "Sujal Mainali", role: "Technical Head",    initials: "SM" },
-  { name: "Hari",          role: "Logistics",         initials: "H"  },
-]
+Bucket Name:      team-avatars
+Access:           Public (direct URL — used by public team section)
+Allowed types:    JPG, JPEG, PNG, WEBP
 ```
 
-- Each member card: glassmorphism
-  - Avatar: circle with initials in Orbitron, gradient background `from-[#00B4FF] to-[#00FF9C]`
-  - Name in Orbitron white
-  - Role in Share Tech Mono #00FF9C
-  - Hover: lift effect + neon glow
-- Grid: 2 cols mobile, 3 cols tablet, 4 cols desktop
+---
 
-### Section 6 — Stats (components/public/StatsSection.tsx)
-- Section label: `// 05 — By the Numbers`
-- Full-width dark section with grid background
-- 4 stats in a row:
-  - **50+** Active Members
-  - **15+** Events Conducted
-  - **5+** Competitions Won
-  - **3+** Partner Organizations
-- **Scroll-triggered counting animation:**
-  - Use `IntersectionObserver` in a `useClient` component
-  - Numbers count up from 0 to target when section enters viewport
-  - Duration: 2 seconds, easeOut timing
-- Numbers in Orbitron 900, text-5xl, text-[#00FF9C]
-- Labels in Exo 2, text-[#8892A4]
+## 8. ENVIRONMENT VARIABLES (.env.local)
 
-### Section 7 — Gallery (components/public/GallerySection.tsx)
-- **Server Component prop receiver — data fetched in page.tsx**
-- Section label: `// 06 — Club Life`
-- Heading: "Gallery"
-- Receives `gallery` prop (array from `public_gallery` table, ordered by `sort_order`)
-- Admin-managed captions will include entries like:
-  - "Winning the 2025 CTF Challenge"
-  - "Guest lecture on Network Forensics"
-  - "Hands-on Kali Linux Lab Session"
-  - "Annual Cybersecurity Summit Team"
-- Responsive masonry-style grid (CSS grid with `grid-auto-rows`)
-- Each image: Next.js `<Image>`, rounded-xl, object-cover
-  - Overlay on hover: dark gradient + caption text slides up from bottom
-- **Empty state:** if no gallery images: "Gallery coming soon. Follow our journey on Instagram." + Instagram link
-- Sort by `sort_order` ascending
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+RESEND_API_KEY=your_resend_api_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
-### Section 8 — Contact/Join (components/public/ContactSection.tsx)
-- Section label: `// 07 — Get In Touch`
-- Two columns desktop:
-  - Left: "Join the Club" — brief text about joining + link to `/portal/login`
-  - Right: Contact form
-- Contact form fields:
-  - Full Name (text input)
-  - Email (email input)
-  - Subject (select: "General Inquiry", "Join the Club", "Event Query", "Partnership", "Other")
-  - Message (textarea, min 4 rows)
-- Submit calls `/api/contact` POST
-- Success state: replace form with green success message with checkmark icon
-- Error state: red error below form
-- Client-side validation: all fields required, valid email format
-- Contact info below form:
-  - Email: `cybersec@iimscollege.edu.np`
-  - College: IIMS College, Kathmandu, Nepal
-  - Website: `https://iimscollege.edu.np/`
+Never commit .env.local. Confirm it is in .gitignore before first push.
+On Vercel: add these same variables under Project Settings → Environment Variables.
 
 ---
 
-## 👥 STEP 3 — About Page (app/(public)/about/page.tsx)
+## 9. MIDDLEWARE LOGIC (middleware.ts)
 
-### Hero Banner
-- Dark banner with circuit grid background
-- Title: "About Us" in Orbitron
-- Breadcrumb: `Home / About` in Share Tech Mono
+Protect ONLY: /portal/dashboard/* and /portal/admin/*
+All other routes pass through with no auth check.
 
-### Club Story
-- Section label: `// 01 — Our Story`
-- Two columns: story text left, image right (`/public/2.jpg`)
-- Story text: "Founded in 2024 at IIMS College, the IIMS Cybersecurity Club was established with a singular mission: to build Nepal's next generation of cybersecurity professionals. What began as a small group of passionate students has grown into a thriving community of ethical hackers, defenders, and researchers."
-
-### Mission & Values
-- Section label: `// 02 — What We Stand For`
-- Three glassmorphism cards:
-  - **Mission:** "To cultivate cybersecurity talent through practical, hands-on education and real-world security challenges."
-  - **Vision:** "A Nepal where every digital system is secured by locally trained, world-class cybersecurity professionals."
-  - **Values:** "Integrity. Curiosity. Collaboration. Ethical practice above all."
-
-### Team Section
-- Same team data as homepage — reuse TeamSection component
-
-### College Association
-- Banner: "Officially Recognized by IIMS College"
-- College logo (placeholder: `/public/college-logo.png`)
-- Link to `https://iimscollege.edu.np/` in new tab
-- Style: glassmorphism, border-[#00B4FF]
-
----
-
-## 📅 STEP 4 — Events Page (app/(public)/events/page.tsx)
-
-**Server Component** — fetches ALL events from `public_events` table (both upcoming and past).
-
-### Page Hero
-- Title: "Events & Activities" banner
-
-### Filter Tabs
-- Three tabs: "All", "Upcoming", "Past"
-- Client component for tab state
-- Filters the events array client-side
-- Active tab: `border-b-2 border-[#00B4FF] text-[#00B4FF]`
-
-### Events Grid
-- 3 columns desktop, 2 tablet, 1 mobile
-- Each card: same style as homepage events section (image, type badge, date, title, location, description)
-- Past events: slightly desaturated + "Past" badge in gray
-- **Empty state per tab:** if no upcoming events → cyber-styled empty state card
-
-### Event Type Legend
-- Small legend at top: color key for CTF (red), Workshop (blue), Seminar (green), Competition (orange)
+```
+Incoming request
+      │
+      ▼
+Is path /portal/dashboard/* or /portal/admin/*?
+      │
+   YES│                              NO → Allow through ✅
+      ▼
+Get Supabase session
+      │
+  No session → redirect /portal/login
+      │
+  Has session → query members table (wrapped in try/catch)
+      │
+      ├── catch error → redirect /portal/login?error=server_error
+      │
+      ├── status = pending   → redirect /portal/pending
+      ├── status = rejected  → redirect /portal/login?error=access_denied
+      │
+      └── status = approved
+              │
+              ├── path is /portal/admin/*
+              │     └── role ≠ admin → redirect /portal/dashboard
+              │
+              └── Allow through ✅
+```
 
 ---
 
-## 📬 STEP 5 — Contact Page (app/(public)/contact/page.tsx)
+## 10. AUTH FLOW (api/auth/callback/route.ts)
 
-### Layout
-Two columns desktop, stacked mobile.
+```
+User submits email on /portal/login
+      ↓
+Supabase sends magic link to their email
+      ↓
+User clicks link → hits /api/auth/callback
+      ↓
+Exchange code for session
+      ↓
+Query members table by email:
+      ├── Email NOT found → INSERT new member (status: pending, role: member)
+      │                  → redirect /portal/pending
+      ├── status = pending   → redirect /portal/pending
+      ├── status = rejected  → redirect /portal/login?error=access_denied
+      └── status = approved  → redirect /portal/dashboard
 
-**Left — Contact Info:**
-- Email: `cybersec@iimscollege.edu.np`
-- Address: IIMS College, Kathmandu, Nepal
-- Website: `https://iimscollege.edu.np/`
-- Social links: Facebook, Instagram, GitHub
-- Map placeholder: gray box with text "IIMS College, Kathmandu" (no Maps API)
-
-**Right — Contact Form:**
-- Same form as ContactSection component — reuse it
-- Full validation + Resend API call
-
-**API Route (app/api/contact/route.ts):**
-- POST receives: name, email, subject, message
-- Sends via Resend to: `cybersec@iimscollege.edu.np`
-- Email subject: `New Contact: [subject] — IIMS Cybersecurity Club`
-- Validate all fields server-side too
-- Return 200 success or 500 with error message
+On any error → redirect /portal/login?error=server_error
+```
 
 ---
 
-## 🔒 STEP 6 — Portal Login (app/portal/login/page.tsx)
+## 11. HOMEPAGE SECTIONS (app/(public)/page.tsx)
 
-- Full screen dark background with grid pattern
-- Centered glassmorphism card
-- Club name + cyber shield SVG icon at top
-- Label: `// MEMBER ACCESS` in Share Tech Mono #00FF9C
-- Heading: "Member Portal" in Orbitron
-- Subtext: "Enter your IIMS email to receive a secure magic login link"
-- Email input: dark themed, border-[#00B4FF] on focus
-- Submit button: "Send Login Link →" (primary style)
-- Loading state: spinner + "Sending..."
-- Success state: "✉️ Check your inbox! Magic link sent to [email]"
-- Error states:
-  - `?error=access_denied` → "Your membership application was not approved. Contact cybersec@iimscollege.edu.np"
-  - `?error=server_error` → "Something went wrong. Please try again in a moment."
-- Bottom: `← Back to Club Website` link → `/`
+This is a Server Component. It fetches all data and passes as props to child components.
+Eight sections in exact order:
 
----
+```
+Section 1 — Hero
+  Component:  HeroSection.tsx (client — for cursor animation)
+  Data:       none (static layout)
+  Content:    Headline: "Securing the Digital Future"
+              Subline:  "IIMS Cybersecurity Club"
+              Body:     "Nepal's next generation of ethical hackers,
+                         defenders, and security researchers."
+              Buttons:  "Explore Club Life ↓" (anchor to #about)
+                        "Member Portal →" (/portal/login)
+  Special:    Blinking terminal cursor after headline (CSS only)
+              Grid background pattern from globals.css
+              Empty state: N/A
 
-## 🔄 STEP 7 — Auth Callback + Middleware
+Section 2 — About Us (id="about")
+  Component:  AboutSection.tsx (server)
+  Data:       about_text from site_settings WHERE id = 'global'
+  Empty state: Show default text if null
 
-**app/api/auth/callback/route.ts:**
-- Handle Supabase magic link exchange
-- After session confirmed, query members table:
-  - Email not in members → create `{ email, status: 'pending', role: 'member' }` → redirect `/portal/pending`
-  - Status pending → redirect `/portal/pending`
-  - Status rejected → redirect `/portal/login?error=access_denied`
-  - Status approved → redirect `/portal/dashboard`
-- Full try/catch → catch → redirect `/portal/login?error=server_error`
+Section 3 — Domains
+  Component:  DomainsSection.tsx (server — static, no DB fetch)
+  Data:       Hardcoded — these 5 domains never change:
+              Red Team | Blue Team | Cloud & DevSecOps | Digital Forensics | AI & Security
+  Empty state: N/A (static)
 
-**middleware.ts:**
-- Protect: `/portal/dashboard/:path*` and `/portal/admin/:path*`
-- All other routes: pass through
-- Full try/catch on db query
-- Catch → `/portal/login?error=server_error`
+Section 4 — Events
+  Component:  EventsSection.tsx (server)
+  Data:       public_events WHERE status = 'upcoming' ORDER BY event_date ASC
+  Empty state: "> NO_UPCOMING_EVENTS_FOUND" in JetBrains Mono #10B981
+               Subtext: "The team is preparing something. Follow our socials."
+               Show Instagram + Facebook links
 
----
+Section 5 — Team
+  Component:  TeamSection.tsx (server)
+  Data:       team_members ORDER BY sort_order ASC
+  Empty state: "> TEAM_DATA_LOADING" — prompt admin to add team from admin panel
 
-## 🏠 STEP 8 — Portal Dashboard
+Section 6 — Stats
+  Component:  StatsSection.tsx (client — for count animation)
+  Data:       stat_members, stat_events, stat_competitions, stat_partners
+              from site_settings WHERE id = 'global'
+  Animation:  IntersectionObserver — count from 0 to value on scroll into view
+  Display:    "> MEMBERS: 50+" terminal output style, JetBrains Mono
 
-**PortalTopbar (components/portal/PortalTopbar.tsx):**
-- `bg-[#0A1F44] border-b border-[#00B4FF]/30`
-- Left: "IIMS Cybersecurity Club" small + "Member Portal" label
-- Right: member name, "← Public Website" link → `/`, Logout button
+Section 7 — Gallery
+  Component:  GallerySection.tsx (server)
+  Data:       public_gallery ORDER BY sort_order ASC
+  Empty state: "> GALLERY_EMPTY — Images coming soon."
 
-**Sidebar (components/portal/Sidebar.tsx):**
-- Dark navy background
-- Links: Feed, Documents, Profile
-- Bottom (admin only): Admin Panel link
-- Active link: #00B4FF left border + text
-
-**Dashboard pages:**
-- `/portal/dashboard` → post feed (pinned first, newest first), create post button
-- `/portal/dashboard/documents` → upload PDF/DOC, list with View (signed URL) + Download
-- `/portal/dashboard/profile` → edit name, bio, view own posts
-
----
-
-## ⚙️ STEP 9 — Admin Panel (app/portal/admin/page.tsx)
-
-5 tabs — full CRUD control over the entire platform:
-
-### Tab 1: Members
-- Table of all members: name, email, role, status, joined date
-- Pending members highlighted, Approve + Reject buttons
-- Approved members: Remove button
-- Real-time update after action (re-fetch)
-
-### Tab 2: Posts (Member Feed)
-- All portal posts: title, author, date, pinned status
-- Delete button, Pin/Unpin toggle
-- `is_public` toggle — "Publish to Website" switch (pushes post to public announcements)
-
-### Tab 3: Public Announcements
-- Shows only posts where `is_public = true`
-- Toggle visibility, delete
-
-### Tab 4: Events Manager
-- Table of all events in `public_events`
-- "Add Event" button → modal form:
-  - Title, Date/Time, Location, Type (dropdown), Description, Status (upcoming/past)
-  - Image upload → uploads to Supabase Storage `event-images` bucket → saves URL
-- Edit and Delete buttons on each row
-- Status toggle: upcoming ↔ past
-
-### Tab 5: Gallery Manager
-- Grid of current gallery images from `public_gallery`
-- "Upload Image" button → file picker → upload to `public-gallery` bucket → save URL + caption + sort_order
-- Each image: caption edit inline, delete button, drag-to-reorder (update sort_order)
+Section 8 — Contact
+  Component:  ContactSection.tsx (client — for form state)
+  Data:       contact_email from site_settings (shown as contact info)
+  Form:       Name, Email, Subject (dropdown), Message
+              On submit: POST /api/contact
+              Saves to contact_messages table AND sends email via Resend
+  Empty state: N/A
+```
 
 ---
 
-## 🤖 STEP 10 — GitHub Auto-Push Script (push.sh)
+## 12. ADMIN PANEL TABS (app/portal/admin/page.tsx)
+
+8 tabs — complete platform control, no developer intervention needed:
+
+```
+Tab 1 — Dashboard
+  Shows: count of unread messages, count of pending members
+  Quick action links to Members tab and Inbox tab
+
+Tab 2 — Members
+  Shows: table of all members (name, email, role, status, joined date)
+  Actions: Approve, Reject (for pending) | Remove (for approved)
+  Pending members row: highlighted with amber left border
+
+Tab 3 — Posts Manager
+  Shows: all portal posts (title, author, date, pinned, is_public)
+  Actions: Create new post | EDIT existing post | Delete | Pin/Unpin | Toggle is_public
+  is_public toggle: instantly publishes to public site news section
+
+Tab 4 — Events Manager
+  Shows: all public_events rows (title, date, type, status)
+  Actions: Add event (modal form with image upload to event-images bucket)
+           Edit event | Delete event | Toggle status upcoming ↔ past
+  Image upload: stores to Supabase Storage event-images → saves URL in image_url field
+
+Tab 5 — Gallery Manager
+  Shows: grid of all public_gallery images with captions
+  Actions: Upload new image (to public-gallery bucket) with caption + sort_order
+           Edit caption inline | Delete image | Update sort_order
+
+Tab 6 — Team Manager
+  Shows: list of all team_members ordered by sort_order
+  Actions: Add member (name, role, avatar upload to team-avatars bucket, sort_order)
+           Edit member details | Delete member | Reorder (change sort_order)
+  This replaces the previously hardcoded team array
+
+Tab 7 — Site Settings
+  Shows: single form for the site_settings row (id = 'global')
+  Fields: About Us text (textarea)
+          Stat: Active Members | Events Conducted | Competitions Won | Partners
+          Contact Email
+          Instagram URL | Facebook URL | GitHub URL
+  On save: UPDATE site_settings WHERE id = 'global'
+           All changes reflect on public website immediately (ISR revalidation)
+
+Tab 8 — Inbox
+  Shows: all contact_messages ordered by created_at DESC
+  Columns: name, email, subject, date, read status
+  Actions: Click to expand full message | Mark as read/unread | Delete
+  Unread messages: bold row, emerald left border
+  Badge on tab label showing count of unread messages
+```
+
+---
+
+## 13. PORTAL PAGES SUMMARY
+
+```
+/portal/login
+  - Full screen dark background with grid pattern
+  - Centered card: club name + "MEMBER ACCESS" label
+  - Email input + "Send Login Link" button
+  - Success: "✉️ Magic link sent to [email]"
+  - Error states from URL params:
+      ?error=access_denied → "Your application was not approved."
+      ?error=server_error  → "Something went wrong. Please try again."
+  - "← Back to Club Website" link → /
+
+/portal/pending
+  - "⏳ Your application is under review."
+  - "We will notify you at [email] once approved."
+  - "← Back to Club Website" link
+  - Logout button
+
+/portal/dashboard
+  - Post feed: pinned first, then newest first
+  - "New Post" button → PostForm modal
+  - Each post: title, content, author, date, pin badge (if pinned)
+  - Own posts: Edit + Delete buttons
+  - Loading: skeleton placeholders while fetching
+
+/portal/dashboard/documents
+  - Upload button (PDF, DOC, DOCX only) → Supabase Storage club-documents bucket
+  - File list: title, uploader, date, View (1hr signed URL), Download
+  - Admin: Delete button on all files
+  - Members: Delete only their own uploads
+
+/portal/dashboard/profile
+  - Edit name, bio
+  - View own posts list
+  - Show member since date and status badge
+
+/portal/admin
+  - Protected: redirect non-admins to /portal/dashboard
+  - 8 tabs as defined in Section 12
+```
+
+---
+
+## 14. GITHUB AUTO-PUSH SCRIPT (push.sh)
+
+Save at project root. Run with: ./push.sh
 
 ```bash
 #!/bin/bash
@@ -673,91 +645,79 @@ if git diff --staged --quiet; then
 fi
 git commit -m "$MSG"
 if git push origin main; then
-  echo "✅ Done! Changes live on GitHub."
+  echo "✅ Done! Changes are live on GitHub."
 else
   echo "❌ Push failed. Check internet or GitHub credentials."
   exit 1
 fi
 ```
 
-Make executable: `chmod +x push.sh`
-Run anytime: `./push.sh`
+Make executable once: chmod +x push.sh
+Run every time:       ./push.sh
 
 ---
 
-## ✅ STEP 11 — Full Testing Checklist
+## 15. CODING RULES (AI must follow every session)
 
-### Public Website
-- [ ] `localhost:3000` loads — all 8 sections visible
-- [ ] Circuit grid background shows in hero
-- [ ] "Explore Club Life" scrolls to About section
-- [ ] "Member Portal →" goes to `/portal/login`
-- [ ] Navbar links work: About, Events, Contact
-- [ ] Mobile: hamburger menu opens/closes with all links
-- [ ] Footer: Facebook, Instagram, GitHub links correct
-- [ ] Footer: IIMS College link opens `https://iimscollege.edu.np/` in new tab
-- [ ] Stats section: numbers animate when scrolled into view
-- [ ] Events section with empty DB: shows elegant empty state (not broken/blank)
-- [ ] Gallery section with empty DB: shows empty state message (not broken/blank)
-- [ ] Contact form: submit with empty fields → validation errors shown
-- [ ] Contact form: submit valid data → success message appears
-
-### Portal Auth
-- [ ] Visit `/portal/dashboard` not logged in → redirects to `/portal/login`
-- [ ] Login page shows "← Back to Club Website" → returns to `/`
-- [ ] Enter email → "Check your inbox" message shows
-- [ ] Click magic link → redirects to `/portal/pending` (first time)
-- [ ] Approve own account in Supabase → login again → goes to `/portal/dashboard`
-- [ ] Break Supabase URL → visit `/portal/dashboard` → redirects to `/portal/login?error=server_error`
-- [ ] Error message shows on login page for `?error=server_error`
-
-### Portal Features
-- [ ] Create a post → appears in feed
-- [ ] Pin a post from admin → appears first in feed
-- [ ] Upload PDF → appears in documents
-- [ ] View document → signed URL opens file
-- [ ] `/portal/admin` as non-admin → redirected to dashboard
-- [ ] Admin panel: all 5 tabs load
-- [ ] Approve pending member → status updates in Supabase
-- [ ] Add an event in Events Manager → appears on public homepage events section
-- [ ] Upload gallery image → appears on public homepage gallery section
-- [ ] Toggle `is_public` on a post → appears in Public Announcements tab
-
-### GitHub Script
-- [ ] Run `./push.sh` → all steps print without errors
-- [ ] Go to GitHub repo → new commit with timestamp visible
+```
+1.  Every code block: file path as comment on line 1 → // app/(public)/page.tsx
+2.  One file at a time — NEVER bundle multiple files in one response
+3.  After every file: state exactly where to paste it + any terminal command to run
+4.  Add inline comments explaining what each block does — developer is a beginner
+5.  TypeScript only — all types defined in types/database.ts and imported
+6.  Public data fetching → Server Components using supabase-server.ts (for SEO)
+7.  Interactive/form components → Client Components with 'use client' at top
+8.  ALL async operations wrapped in try/catch — no unhandled promise rejections
+9.  NEVER break UI if DB returns empty array — always handle empty states gracefully
+10. All forms: client-side validation first, then API call, never skip validation
+11. Never use window.location.href — always router.push() + router.refresh()
+12. Never hardcode Supabase keys — always process.env.NEXT_PUBLIC_SUPABASE_URL etc.
+13. Tailwind arbitrary values for colors — bg-[#000000] not bg-black (except bg-black)
+14. Fonts loaded only in app/layout.tsx via next/font/google — nowhere else
+15. Design system: STEALTH TERMINAL only — no glassmorphism, no glow shadows, no blurs
+16. Admin actions that bypass RLS must use SUPABASE_SERVICE_ROLE_KEY server-side only
+```
 
 ---
 
-## 📋 CODING RULES (AI must follow all of these)
+## 16. CURRENT BUILD STATUS (Update this every session)
 
-1. Every code block starts with file path comment: `// app/(public)/page.tsx`
-2. After every file: tell me exactly where to paste it + any command to run
-3. Comments inside every component explaining what each section does
-4. **One file at a time** — never give multiple files together
-5. All TypeScript — define types in `types/database.ts` and import them
-6. **Public data fetching = Server Components** using `supabase-server.ts` for SEO
-7. **Portal/interactive = Client Components** with `'use client'` directive
-8. Error handling with try/catch on every async operation
-9. **Never break UI if DB returns empty array** — always handle empty states
-10. All forms: client-side validation first, then API call
-11. Never use `window.location.href` — always `router.push()` + `router.refresh()`
-12. Never hardcode Supabase keys — always `process.env.NEXT_PUBLIC_SUPABASE_URL` etc.
-13. Tailwind arbitrary values for exact hex colors: `text-[#00B4FF]`, `bg-[#0D0D0D]`
-14. Google Fonts loaded in `app/layout.tsx` using Next.js `next/font/google`
+```
+✅  Project created (npx create-next-app)
+✅  GitHub repo created and connected
+✅  Vercel connected and auto-deploy active
+✅  CONTEXT.md created
+✅  Supabase project created
+⬜  SQL schema run in Supabase
+⬜  Storage buckets created
+⬜  .env.local configured
+⬜  Step 1  — PublicNavbar + PublicFooter
+⬜  Step 2  — Homepage (all 8 sections)
+⬜  Step 3  — About page
+⬜  Step 4  — Events page
+⬜  Step 5  — Contact page + API route
+⬜  Step 6  — Portal Login page
+⬜  Step 7  — Auth Callback + Middleware
+⬜  Step 8  — Portal Dashboard layout + Topbar + Sidebar
+⬜  Step 9  — Dashboard pages (Feed, Documents, Profile)
+⬜  Step 10 — Admin Panel (all 8 tabs)
+⬜  Step 11 — push.sh script
+⬜  Step 12 — Full testing pass
+```
+
+Tick a box (✅) after each step is confirmed working before moving to the next.
 
 ---
 
-## ▶️ START COMMAND
+## 17. SESSION STARTER COMMAND
 
-After pasting this full prompt say exactly:
+After pasting this CONTEXT.md, say exactly:
 
-> "I have read everything. Let's start with Step 1.
-> Build `components/public/PublicNavbar.tsx` first.
-> Use the exact Cyber Blue Matrix design system and IIMS Cybersecurity Club details.
-> Wait for my confirmation before giving me the next file."
+> "I have read the full context. Current status is shown in Section 16.
+> Let's work on [STEP NAME]. Start with the first file only.
+> Use the Stealth Terminal design system. Wait for my confirmation before the next file."
 
 ---
 
 *IIMS Cybersecurity Club · IIMS College · Kathmandu, Nepal*
-*Prompt V5.0 FINAL — No placeholders. All details filled in. Ready to build.*
+*CONTEXT.md V6.0 FINAL — Zero placeholders. 100% dynamic. Ready to build.*

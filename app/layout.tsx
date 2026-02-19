@@ -1,30 +1,23 @@
 // app/layout.tsx
-// Root layout — sets up Google Fonts (Orbitron, Exo 2, Share Tech Mono) and metadata.
-// These fonts form the "Cyber Blue Matrix" design system.
+// Root layout — loads Inter (body) and JetBrains Mono (headings/labels) fonts.
+// Stealth Terminal design system — pure black background, no blur/glow.
 
 import type { Metadata } from 'next'
-import { Orbitron, Exo_2, Share_Tech_Mono } from 'next/font/google'
+import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
-// Heading font — used for titles and emphasis
-const orbitron = Orbitron({
+// Body font — paragraphs, descriptions, form fields
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-orbitron',
-  weight: ['700', '900'],
+  variable: '--font-inter',
+  weight: ['300', '400', '600'],
 })
 
-// Body font — used for paragraphs and general text
-const exo2 = Exo_2({
-  subsets: ['latin'],
-  variable: '--font-exo2',
-  weight: ['300', '400', '700'],
-})
-
-// Monospace font — used for labels, dates, and section markers
-const shareTechMono = Share_Tech_Mono({
+// Mono font — headings, labels, numbers, dates, code
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
-  weight: '400',
+  weight: ['400', '700'],
 })
 
 export const metadata: Metadata = {
@@ -39,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${orbitron.variable} ${exo2.variable} ${shareTechMono.variable} font-[var(--font-exo2)] antialiased bg-[#0D0D0D] text-white`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-[var(--font-inter)] antialiased bg-black text-[#F8FAFC]`}>
         {children}
       </body>
     </html>

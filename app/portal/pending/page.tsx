@@ -1,11 +1,11 @@
 // app/portal/pending/page.tsx
-// Pending approval page — Cyber Blue Matrix themed.
+// Membership pending page — Stealth Terminal theme.
 
 'use client'
 
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 export default function PendingPage() {
     const router = useRouter()
@@ -17,29 +17,20 @@ export default function PendingPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0D0D0D] bg-grid flex items-center justify-center px-4">
-            <div className="text-center max-w-md">
-                <div className="w-20 h-20 glass rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <span className="text-4xl">⏳</span>
+        <div className="min-h-screen bg-black bg-grid flex items-center justify-center px-4">
+            <div className="w-full max-w-sm text-center">
+                <p className="font-[var(--font-mono)] text-[#10B981] text-xs mb-4">{'>'} APPLICATION_STATUS</p>
+                <div className="bg-[#09090B] border border-[#27272A] rounded-md p-8 mb-6">
+                    <p className="font-[var(--font-mono)] font-bold text-[#F8FAFC] text-lg mb-2">Under Review</p>
+                    <p className="text-[#A1A1AA] text-sm leading-relaxed">
+                        Your membership application is being reviewed by an admin. You&apos;ll be notified once approved.
+                    </p>
                 </div>
-                <p className="font-[var(--font-mono)] text-[#00FF9C] text-xs tracking-wider mb-3">// PENDING REVIEW</p>
-                <h1 className="font-[var(--font-orbitron)] font-bold text-2xl text-white mb-3">
-                    Membership Under Review
-                </h1>
-                <p className="font-[var(--font-exo2)] text-[#8892A4] leading-relaxed mb-8">
-                    Your application has been received. Our admin team will review it and notify you once approved.
-                </p>
                 <div className="flex flex-col gap-3">
-                    <Link
-                        href="/"
-                        className="px-6 py-3 text-sm font-bold border border-[#00B4FF] text-[#00B4FF] rounded-lg hover:bg-[#00B4FF] hover:text-[#0D0D0D] transition-all duration-300"
-                    >
+                    <Link href="/" className="font-[var(--font-mono)] text-[#A1A1AA] text-sm hover:text-[#F8FAFC] transition-colors">
                         ← Back to Club Website
                     </Link>
-                    <button
-                        onClick={handleSignOut}
-                        className="px-6 py-3 text-sm font-[var(--font-mono)] text-[#8892A4] hover:text-[#FF3B3B] transition-colors"
-                    >
+                    <button onClick={handleSignOut} className="font-[var(--font-mono)] text-[#EF4444] text-sm hover:opacity-80 transition-opacity">
                         Sign Out
                     </button>
                 </div>

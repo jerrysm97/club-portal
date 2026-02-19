@@ -1,29 +1,23 @@
 // app/(public)/contact/page.tsx
-// Contact page — reuses ContactSection component.
+// Contact page — Stealth Terminal themed, reuses ContactSection component.
 
+import { supabaseServer } from '@/lib/supabase-server'
+import type { SiteSettings } from '@/types/database'
 import ContactSection from '@/components/public/ContactSection'
-import Link from 'next/link'
 
-export default function ContactPage() {
+export default async function ContactPage() {
+    const { data } = await supabaseServer.from('site_settings').select('*').eq('id', 'global').single()
+    const settings = data as SiteSettings | null
+
     return (
-        <div className="bg-[#0D0D0D]">
-            {/* Hero banner */}
-            <section className="relative py-28 px-4 bg-grid">
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0A1F44]/80 to-[#0D0D0D]" />
-                <div className="relative max-w-4xl mx-auto text-center">
-                    <h1 className="font-[var(--font-orbitron)] font-black text-4xl md:text-5xl text-white mb-4">
-                        Contact Us
-                    </h1>
-                    <p className="font-[var(--font-mono)] text-[#8892A4] text-sm">
-                        <Link href="/" className="hover:text-[#00B4FF] transition-colors">Home</Link>
-                        {' / '}
-                        <span className="text-[#00B4FF]">Contact</span>
-                    </p>
+        <div className="bg-black min-h-screen">
+            <section className="py-20 px-4 bg-black bg-grid border-b border-[#27272A]">
+                <div className="max-w-7xl mx-auto">
+                    <p className="font-[var(--font-mono)] text-[#A1A1AA] text-xs mb-2">Home / Contact</p>
+                    <h1 className="font-[var(--font-mono)] font-bold text-4xl md:text-5xl text-[#F8FAFC]">Contact</h1>
                 </div>
             </section>
-
-            {/* Contact section (reused component) */}
-            <ContactSection />
+            <ContactSection contactEmail={settings?.contact_email || 'cybersec@iimscollege.edu.np'} />
         </div>
     )
 }

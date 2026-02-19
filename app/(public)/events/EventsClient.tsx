@@ -1,54 +1,51 @@
 // app/(public)/events/EventsClient.tsx
-// Client component for event filter tabs and rendering.
+// Client component — filter tabs for All / Upcoming / Past events.
 
 'use client'
 
 import { useState } from 'react'
 import type { PublicEvent } from '@/types/database'
 
-const typeColors: Record<string, string> = {
-    CTF: 'bg-[#FF3B3B]/20 text-[#FF3B3B]',
-    Workshop: 'bg-[#00B4FF]/20 text-[#00B4FF]',
-    Seminar: 'bg-[#00FF9C]/20 text-[#00FF9C]',
-    Competition: 'bg-orange-500/20 text-orange-400',
-    Other: 'bg-white/10 text-[#8892A4]',
+const typeBadge: Record<string, string> = {
+    CTF: 'bg-[#EF4444]/10 text-[#EF4444]',
+    Workshop: 'bg-[#06B6D4]/10 text-[#06B6D4]',
+    Seminar: 'bg-[#10B981]/10 text-[#10B981]',
+    Competition: 'bg-[#06B6D4]/10 text-[#06B6D4]',
+    Other: 'bg-[#27272A] text-[#A1A1AA]',
 }
 
-type FilterTab = 'all' | 'upcoming' | 'past'
+type Filter = 'all' | 'upcoming' | 'past'
 
 export default function EventsClient({ events }: { events: PublicEvent[] }) {
-    const [activeTab, setActiveTab] = useState<FilterTab>('all')
+    const [filter, setFilter] = useState<Filter>('all')
 
-    const filtered = activeTab === 'all' ? events : events.filter((e) => e.status === activeTab)
+    const filtered = filter === 'all' ? events : events.filter(e => e.status === filter)
 
-    const tabs: { key: FilterTab; label: string }[] = [
+    const tabs: { key: Filter; label: string }[] = [
         { key: 'all', label: 'All' },
         { key: 'upcoming', label: 'Upcoming' },
         { key: 'past', label: 'Past' },
     ]
 
     return (
-        <section className="py-16 px-4">
+        <section className="py-12 px-4">
             <div className="max-w-7xl mx-auto">
                 {/* Type legend */}
-                <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
-                    {Object.entries(typeColors).map(([type, classes]) => (
-                        <div key={type} className="flex items-center gap-1.5">
-                            <span className={`w-3 h-3 rounded-full ${classes.split(' ')[0]}`} />
-                            <span className="text-[#8892A4] text-xs font-[var(--font-mono)]">{type}</span>
-                        </div>
-                    ))}
+                <div className="flex flex-wrap gap-3 mb-6">
+                    <span className="bg-[#EF4444]/10 text-[#EF4444] px-2 py-1 rounded-sm text-xs font-[var(--font-mono)]">CTF</span>
+                    <span className="bg-[#06B6D4]/10 text-[#06B6D4] px-2 py-1 rounded-sm text-xs font-[var(--font-mono)]">Workshop/Competition</span>
+                    <span className="bg-[#10B981]/10 text-[#10B981] px-2 py-1 rounded-sm text-xs font-[var(--font-mono)]">Seminar</span>
                 </div>
 
                 {/* Filter tabs */}
-                <div className="flex items-center justify-center gap-2 mb-12">
+                <div className="flex gap-2 mb-8 border-b border-[#27272A]">
                     {tabs.map((tab) => (
                         <button
                             key={tab.key}
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`px-6 py-2.5 text-sm font-[var(--font-mono)] rounded-lg transition-all duration-300 ${activeTab === tab.key
-                                    ? 'bg-[#00B4FF] text-[#0D0D0D] font-bold shadow-[0_0_15px_rgba(0,180,255,0.3)]'
-                                    : 'text-[#8892A4] hover:text-[#00B4FF] hover:bg-white/5'
+                            onClick={() => setFilter(tab.key)}
+                            className={`px-4 py-3 text-sm font-[var(--font-mono)] transition-colors duration-200 border-b-2 -mb-px ${filter === tab.key
+                                    ? 'border-[#10B981] text-[#10B981]'
+                                    : 'border-transparent text-[#A1A1AA] hover:text-[#F8FAFC]'
                                 }`}
                         >
                             {tab.label}
@@ -58,45 +55,43 @@ export default function EventsClient({ events }: { events: PublicEvent[] }) {
 
                 {/* Events grid */}
                 {filtered.length === 0 ? (
-                    <div className="glass rounded-2xl p-12 text-center max-w-lg mx-auto">
-                        <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-[#00FF9C]/10 flex items-center justify-center">
-                            <svg className="w-8 h-8 text-[#00FF9C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <h3 className="font-[var(--font-orbitron)] font-bold text-white text-xl mb-3">No events found</h3>
-                        <p className="font-[var(--font-exo2)] text-[#8892A4]">Check back soon or try a different filter.</p>
+                    <div className="bg-[#09090B] border border-[#27272A] rounded-md p-12 text-center max-w-lg mx-auto">
+                        <p className="font-[var(--font-mono)] text-[#10B981] text-sm mb-3">{'>'} NO_EVENTS_FOUND</p>
+                        <p className="text-[#A1A1AA] text-sm">No {filter !== 'all' ? filter : ''} events to display.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filtered.map((event) => (
-                            <div key={event.id} className={`glass rounded-xl overflow-hidden group hover:shadow-[0_0_20px_rgba(0,180,255,0.2)] transition-all duration-300 ${event.status === 'past' ? 'opacity-70' : ''}`}>
-                                <div className="h-40 bg-gradient-to-br from-[#0A1F44] to-[#00B4FF]/20 relative">
-                                    {event.image_url && <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />}
-                                    <span className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${typeColors[event.type] || typeColors.Other}`}>
-                                        {event.type}
-                                    </span>
-                                    {event.status === 'past' && (
-                                        <span className="absolute top-3 right-3 text-xs font-bold px-3 py-1 rounded-full bg-white/10 text-[#8892A4]">Past</span>
-                                    )}
-                                </div>
-                                <div className="p-5">
-                                    <p className="font-[var(--font-mono)] text-[#00B4FF] text-xs mb-2">
-                                        {new Date(event.event_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                    </p>
-                                    <h3 className="font-[var(--font-orbitron)] font-bold text-white text-base mb-2 group-hover:text-[#00B4FF] transition-colors">{event.title}</h3>
-                                    {event.location && (
-                                        <div className="flex items-center gap-1.5 text-[#8892A4] text-xs mb-2">
-                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            </svg>
-                                            {event.location}
+                            <div
+                                key={event.id}
+                                className={`bg-[#09090B] border border-[#27272A] rounded-md overflow-hidden hover:border-[#10B981] transition-colors duration-200 ${event.status === 'past' ? 'opacity-60' : ''
+                                    }`}
+                            >
+                                <div className="h-40 bg-[#09090B] relative">
+                                    {event.image_url ? (
+                                        <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center border-b border-[#27272A]">
+                                            <p className="font-[var(--font-mono)] text-[#27272A] text-xs">{'>'} EVENT_IMAGE</p>
                                         </div>
                                     )}
+                                    <div className="absolute top-3 left-3 flex gap-2">
+                                        <span className={`text-xs font-bold font-[var(--font-mono)] px-2 py-1 rounded-sm ${typeBadge[event.type] || typeBadge.Other}`}>
+                                            {event.type}
+                                        </span>
+                                        {event.status === 'past' && (
+                                            <span className="bg-[#27272A] text-[#A1A1AA] px-2 py-1 rounded-sm text-xs font-[var(--font-mono)]">Past</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="p-5">
+                                    <p className="font-[var(--font-mono)] text-[#10B981] text-xs mb-2">
+                                        {new Date(event.event_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    </p>
+                                    <h3 className="font-[var(--font-mono)] font-bold text-[#F8FAFC] text-sm mb-2">{event.title}</h3>
+                                    {event.location && <p className="text-[#A1A1AA] text-xs mb-2">{event.location}</p>}
                                     {event.description && (
-                                        <p className="font-[var(--font-exo2)] text-[#8892A4] text-sm">
-                                            {event.description.length > 100 ? event.description.slice(0, 100) + '...' : event.description}
-                                        </p>
+                                        <p className="text-[#A1A1AA] text-sm">{event.description.length > 100 ? event.description.slice(0, 100) + '...' : event.description}</p>
                                     )}
                                 </div>
                             </div>

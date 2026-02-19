@@ -1,5 +1,5 @@
 // types/database.ts
-// TypeScript types for all Supabase tables
+// TypeScript types for all Supabase tables — V6.0
 
 export interface Member {
     id: string
@@ -20,7 +20,6 @@ export interface Post {
     pinned: boolean
     is_public: boolean
     created_at: string
-    // Joined fields
     members?: Pick<Member, 'name' | 'email'> | null
 }
 
@@ -54,11 +53,35 @@ export interface GalleryImage {
     created_at: string
 }
 
-export interface Comment {
+export interface TeamMember {
     id: string
-    post_id: string
-    author_id: string | null
-    content: string
+    name: string
+    role: string
+    image_url: string | null
+    sort_order: number
     created_at: string
-    members?: Pick<Member, 'name' | 'email'> | null
+}
+
+export interface SiteSettings {
+    id: string
+    about_text: string | null
+    stat_members: string | null
+    stat_events: string | null
+    stat_competitions: string | null
+    stat_partners: string | null
+    contact_email: string | null
+    instagram_url: string | null
+    facebook_url: string | null
+    github_url: string | null
+    updated_at: string
+}
+
+export interface ContactMessage {
+    id: string
+    name: string
+    email: string
+    subject: string
+    message: string
+    is_read: boolean
+    created_at: string
 }
