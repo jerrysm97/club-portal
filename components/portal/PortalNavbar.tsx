@@ -7,6 +7,7 @@ import { Menu, X, ShieldCheck, LogOut, LayoutDashboard, MessageSquare, Calendar,
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase'
 import Avatar from '@/components/ui/Avatar'
+import { BRAND } from '@/lib/brand'
 // Import types safely
 type Member = any
 
@@ -43,7 +44,7 @@ export default function PortalNavbar({ member }: { member: Member }) {
                     <div className="h-8 w-8 rounded-lg bg-[#1A237E] flex items-center justify-center">
                         <GraduationCap className="h-4 w-4 text-white" />
                     </div>
-                    <span className="font-bold text-[#212121] text-sm">IT Club</span>
+                    <span className="font-bold text-[#212121] text-sm">{BRAND.clubShort}</span>
                 </Link>
                 <button
                     onClick={() => setIsOpen(!isOpen)}

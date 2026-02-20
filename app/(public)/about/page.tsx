@@ -1,53 +1,42 @@
-// app/(public)/about/page.tsx — IIMS IT Club About Page (v4.0)
+// app/(public)/about/page.tsx — ICEHC About Page
 import Link from 'next/link'
-import { Code2, Shield, Brain, Globe, BookOpen, FileText, GraduationCap, ExternalLink, ArrowRight } from 'lucide-react'
+import { BookOpen, FileText, GraduationCap, ExternalLink, ArrowRight } from 'lucide-react'
 import type { Metadata } from 'next'
+import { BRAND } from '@/lib/brand'
 
 export const metadata: Metadata = {
-    title: 'About — IIMS IT Club',
-    description: 'Learn about the mission, focus areas, and founding team of the IIMS IT Club at IIMS College, Kathmandu.',
+    title: 'About — ICEHC',
+    description: 'Official vision, objectives, committee, and sustainability plan of ICEHC at IIMS College.',
 }
 
-const FOCUS_AREAS = [
+const OBJECTIVES = [
     {
-        title: 'Web & Software Development',
-        desc: 'Hands-on training with industry-standard frameworks — React, Next.js, Node.js, and databases. We build real projects from scratch.',
-        icon: Code2,
-        color: 'text-[#1A237E]',
-        bg: 'bg-[#1A237E]/8',
+        title: 'Practical Skill Development',
+        desc: 'To move beyond theory by providing hands-on training in industry-standard tools (e.g., Kali Linux, Burp Suite, Wireshark) and methodologies (Penetration Testing, Network Defence).',
     },
     {
-        title: 'Cybersecurity & CTF',
-        desc: 'Ethical hacking, penetration testing, and Capture The Flag competitions aligned with the IIMS College CTF program.',
-        icon: Shield,
-        color: 'text-[#E53935]',
-        bg: 'bg-[#E53935]/8',
+        title: 'Ethical Hacking Awareness',
+        desc: 'To promote "White Hat" hacking principles and educate the student body on digital hygiene, phishing defence, and scam prevention (aligning with the "Scan the Scammers" initiative).',
     },
     {
-        title: 'AI & Machine Learning',
-        desc: 'Applied AI/ML: building neural networks, NLP models, and data science projects tailored for business and technical programs.',
-        icon: Brain,
-        color: 'text-[#2E7D32]',
-        bg: 'bg-[#2E7D32]/8',
+        title: 'Career Readiness',
+        desc: 'To prepare members for professional certifications (CEH, CompTIA Security+) and cybersecurity careers through Capture The Flag (CTF) competitions and expert guest sessions.',
     },
     {
-        title: 'Open Source & DevOps',
-        desc: 'Contributing to open source projects, cloud infrastructure, Docker, CI/CD pipelines, and Infrastructure as Code.',
-        icon: Globe,
-        color: 'text-[#0277BD]',
-        bg: 'bg-[#0277BD]/8',
+        title: 'Innovation & Research',
+        desc: 'To encourage students to build and test their own security tools and research papers on emerging vulnerabilities.',
     },
 ]
 
 const ALL_MEMBERS = [
     { name: 'Sujal Mainali', role: 'President', program: 'BCS 2026 Jan Intake', initials: 'SM', highlight: true },
     { name: 'Deepika Kumari Yadav', role: 'Vice President', program: 'BCS 2026 Jan Intake', initials: 'DY', highlight: false },
-    { name: 'Raskin Shrestha', role: 'Secretary', program: 'BSC 2026 Jan Intake', initials: 'RS', highlight: false },
-    { name: 'Barsha Shrestha', role: 'Joint Secretary', program: 'BSC 2026 Jan Intake', initials: 'BS', highlight: false },
+    { name: 'Raskin Shrestha', role: 'Secretary', program: 'BCS 2026 Jan Intake', initials: 'RS', highlight: false },
+    { name: 'Barsha Shrestha', role: 'Joint/Assistant Secretary', program: 'BCS 2026 Jan Intake', initials: 'BS', highlight: false },
     { name: 'Namika Prajapati', role: 'Treasurer', program: 'BCS 2026 Jan Intake', initials: 'NP', highlight: false },
-    { name: 'Sabina Neupane', role: 'Event Coordinator', program: 'BCS 2026 Jan Intake', initials: 'SN', highlight: false },
-    { name: 'Samrachana Lama', role: 'Marketing Lead', program: 'BCS 2026 Jan Intake', initials: 'SL', highlight: false },
-    { name: 'Radha Rawat', role: 'IT Head', program: 'BSC 2026 Jan Intake', initials: 'RR', highlight: false },
+    { name: 'Sabina Neupane', role: 'Event & Activities Coordinator', program: 'BCS 2026 Jan Intake', initials: 'SN', highlight: false },
+    { name: 'Samrachana Lama', role: 'Marketing / Communication Lead', program: 'BCS 2026 Jan Intake', initials: 'SL', highlight: false },
+    { name: 'Radha Rawat', role: 'IT Head', program: 'BCS 2026 Jan Intake', initials: 'RR', highlight: false },
     { name: 'Karuna Bishkarma', role: 'Executive Head', program: 'BCS 2026 Jan Intake', initials: 'KB', highlight: false },
 ]
 
@@ -63,38 +52,34 @@ export default function AboutPage() {
             {/* Page Hero */}
             <section className="max-w-7xl mx-auto px-6 pb-16">
                 <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
-                    IIMS IT Club
+                    {BRAND.clubShort}
                 </span>
                 <h1 className="font-bold text-[#212121] text-3xl md:text-4xl mb-4">
-                    About the Club
+                    {BRAND.clubFullName}
                 </h1>
                 <p className="text-[#757575] text-base mb-6 font-medium">
-                    Established 2025 · IIMS College, Kathmandu, Nepal
+                    Established {BRAND.foundedYear} · IIMS College, Kathmandu, Nepal
                 </p>
                 <p className="text-[#424242] text-lg leading-relaxed max-w-3xl">
-                    The IIMS IT Club is the official technology club of IIMS College, Kathmandu. Our mission is to empower students across all programs — BCS, BBUS, BIHM, and MBA — with practical technology skills, real-world project experience, and a collaborative community that bridges the gap between academia and industry.
+                    "To establish IIMS College as a premier hub for cybersecurity excellence in Nepal. We envision a community where students bridge the gap between theoretical computer science and real-world defense strategies, fostering a culture of ethical responsibility, digital safety, and proactive threat mitigation."
                 </p>
             </section>
 
-            {/* Focus Areas */}
+            {/* Objectives */}
             <section className="bg-white py-16 border-y border-[#E0E0E0]">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-12">
                         <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
-                            What We Focus On
+                            Objectives
                         </span>
                         <h2 className="font-bold text-[#212121] text-2xl md:text-3xl">
-                            Four Core <span className="text-[#1A237E]">Focus Areas</span>
+                            Four Official <span className="text-[#1A237E]">Objectives</span>
                         </h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {FOCUS_AREAS.map((area) => {
-                            const Icon = area.icon
+                        {OBJECTIVES.map((area) => {
                             return (
                                 <div key={area.title} className="bg-white border border-[#E0E0E0] rounded-xl p-6 shadow-sm hover:shadow-md hover:border-[#1A237E]/20 transition-all group">
-                                    <div className={`h-12 w-12 rounded-xl ${area.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                                        <Icon className={`h-6 w-6 ${area.color}`} />
-                                    </div>
                                     <h3 className="font-bold text-[#212121] mb-2 text-sm">{area.title}</h3>
                                     <p className="text-[#757575] text-sm leading-relaxed">{area.desc}</p>
                                 </div>
@@ -109,10 +94,10 @@ export default function AboutPage() {
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="mb-10">
                         <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
-                            Our People
+                            Founding Committee
                         </span>
                         <h2 className="font-bold text-[#212121] text-2xl md:text-3xl">
-                            Founding <span className="text-[#1A237E]">Members</span>
+                            The Nine Who <span className="text-[#1A237E]">Started It</span>
                         </h2>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -121,11 +106,11 @@ export default function AboutPage() {
                                 key={name}
                                 className={`bg-white border rounded-xl p-5 text-center hover:shadow-md transition-all ${highlight ? 'border-[#1A237E]/30 ring-1 ring-[#1A237E]/20' : 'border-[#E0E0E0]'}`}
                             >
-                                <div className={`h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-base ${highlight ? 'bg-[#1A237E] text-white' : 'bg-[#F0F4FF] text-[#1A237E]'}`}>
+                                <div className={`h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-base ${highlight ? 'bg-[#1A237E] text-white ring-2 ring-[#E53935]/30' : 'bg-[#1A237E] text-white'}`}>
                                     {initials}
                                 </div>
                                 <h3 className="font-semibold text-[#212121] text-sm mb-1">{name}</h3>
-                                <span className={`text-xs px-2 py-0.5 rounded-full inline-block mb-1 font-medium ${highlight ? 'bg-[#1A237E]/10 text-[#1A237E]' : 'bg-[#E8EAF6] text-[#1A237E]'}`}>
+                                <span className={`text-xs px-2 py-0.5 rounded-full inline-block mb-1 font-medium ${highlight ? 'bg-[#E53935] text-white' : 'bg-[#E8EAF6] text-[#1A237E]'}`}>
                                     {role}
                                 </span>
                                 <p className="text-[#9E9E9E] text-xs">{program}</p>
@@ -165,7 +150,7 @@ export default function AboutPage() {
                             {[
                                 { href: 'https://iimscollege.edu.np/it-club/', label: 'IIMS IT Club Page' },
                                 { href: 'https://iimscollege.edu.np/capture-the-flag/', label: 'CTF Program' },
-                                { href: 'https://iimscollege.edu.np/iims-hackathon/', label: 'IIMS Hackathon' },
+                                { href: 'https://iimscollege.edu.np/taylor-university/', label: "Taylor's University" },
                                 { href: 'https://iimscollege.edu.np/', label: 'IIMS College' },
                             ].map(({ href, label }) => (
                                 <a

@@ -6,7 +6,7 @@ import { cookies } from 'next/headers'
 import { createServerClient as createSSRClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
-type Role = 'member' | 'admin' | 'superadmin'
+type Role = 'member' | 'bod' | 'admin' | 'superadmin'
 type MemberRow = Database['public']['Tables']['members']['Row']
 
 /** Get the current session from the request cookies */
@@ -47,34 +47,100 @@ export async function getMember(userId: string): Promise<MemberRow | null> {
 /**
  * assertRole — MUST be the first call in every admin API route.
  * Throws on failure — caller handles with try/catch → 403.
- *
- * @example
- * export async function POST(req: NextRequest) {
- *   const member = await assertRole('admin')   // ← First line, always
- *   ...
- * }
  */
-export async function assertRole(minRole: Role): Promise<Pick<MemberRow, 'id' | 'role' | 'status'>> {
+export async function assertRole(minRole: Role): Promise<Pick<MemberRow, 'id' | 'role' | 'status' | 'club_post'>> {
     const session = await getSession()
     if (!session) throw new Error('UNAUTHENTICATED')
 
     const supabase = createServerClient()
     const { data: member, error } = await supabase
         .from('members')
-        .select('id, role, status')
+        .select('id, role, status, club_post')
         .eq('user_id', session.user.id) // ✅ user_id FK — NEVER .eq('id', ...)
         .single()
 
     if (error || !member) throw new Error('MEMBER_NOT_FOUND')
     if (member.status !== 'approved') throw new Error('NOT_APPROVED')
 
-    const hierarchy: Record<Role, number> = { member: 0, admin: 1, superadmin: 2 }
+    const hierarchy: Record<Role, number> = { member: 0, bod: 1, admin: 2, superadmin: 3 }
     const memberRole = member.role as Role
     if (hierarchy[memberRole] < hierarchy[minRole]) {
         throw new Error('INSUFFICIENT_ROLE')
     }
 
-    return member as Pick<MemberRow, 'id' | 'role' | 'status'>
+    return member as Pick<MemberRow, 'id' | 'role' | 'status' | 'club_post'>
+}
+
+/**
+ * assertSuperadminOrPresident - used for role and club_post assignments
+ */
+export async function assertSuperadminOrPresident(): Promise<Pick<MemberRow, 'id' | 'role' | 'status' | 'club_post'>> {
+    const session = await getSession()
+    if (!session) throw new Error('UNAUTHENTICATED')
+
+    const supabase = createServerClient()
+    const { data: member, error } = await supabase
+        .from('members')
+        .select('id, role, status, club_post')
+        .eq('user_id', session.user.id)
+        .single()
+
+    if (error || !member) throw new Error('MEMBER_NOT_FOUND')
+    if (member.status !== 'approved') throw new Error('NOT_APPROVED')
+
+    if (member.role !== 'superadmin' && member.club_post !== 'President') {
+        throw new Error('INSUFFICIENT_ROLE')
+    }
+
+    return member as Pick<MemberRow, 'id' | 'role' | 'status' | 'club_post'>
+}
+
+/**
+ * assertSuperadmin - strictly for superadmin-only actions
+ */
+export async function assertSuperadmin(): Promise<Pick<MemberRow, 'id' | 'role' | 'status' | 'club_post'>> {
+    const session = await getSession()
+    if (!session) throw new Error('UNAUTHENTICATED')
+
+    const supabase = createServerClient()
+    const { data: member, error } = await supabase
+        .from('members')
+        .select('id, role, status, club_post')
+        .eq('user_id', session.user.id)
+        .single()
+
+    if (error || !member) throw new Error('MEMBER_NOT_FOUND')
+    if (member.status !== 'approved') throw new Error('NOT_APPROVED')
+
+    if (member.role !== 'superadmin') {
+        throw new Error('INSUFFICIENT_ROLE')
+    }
+
+    return member as Pick<MemberRow, 'id' | 'role' | 'status' | 'club_post'>
+}
+
+/**
+ * assertSuperadminOrPresidentOrAdmin - strictly for admin actions
+ */
+export async function assertSuperadminOrPresidentOrAdmin(): Promise<Pick<MemberRow, 'id' | 'role' | 'status' | 'club_post'>> {
+    const session = await getSession()
+    if (!session) throw new Error('UNAUTHENTICATED')
+
+    const supabase = createServerClient()
+    const { data: member, error } = await supabase
+        .from('members')
+        .select('id, role, status, club_post')
+        .eq('user_id', session.user.id)
+        .single()
+
+    if (error || !member) throw new Error('MEMBER_NOT_FOUND')
+    if (member.status !== 'approved') throw new Error('NOT_APPROVED')
+
+    if (member.role !== 'superadmin' && member.role !== 'admin' && member.club_post !== 'President') {
+        throw new Error('INSUFFICIENT_ROLE')
+    }
+
+    return member as Pick<MemberRow, 'id' | 'role' | 'status' | 'club_post'>
 }
 
 /** Standard error response handler for assertRole failures */

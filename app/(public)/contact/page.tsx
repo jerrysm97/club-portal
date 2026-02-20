@@ -2,6 +2,7 @@
 'use client'
 import { useState } from 'react'
 import { Mail, Shield, MapPin, ExternalLink, Loader2, CheckCircle2 } from 'lucide-react'
+import { BRAND } from '@/lib/brand'
 
 interface FormData {
     name: string
@@ -96,7 +97,7 @@ export default function ContactPage() {
                     </h1>
                     <p className="text-[#C5CAE9] text-lg max-w-2xl mx-auto leading-relaxed">
                         Have a question, suggestion, or want to collaborate? <br className="hidden md:block" />
-                        Reach out to the IIMS IT Club team.
+                        Reach out to the ICEHC team.
                     </p>
                 </div>
             </div>
@@ -111,8 +112,8 @@ export default function ContactPage() {
                                     <Shield className="h-7 w-7 text-[#1A237E]" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-[#212121] text-lg">IIMS IT Club</p>
-                                    <p className="text-[#757575] text-sm font-medium">Official IT Club of IIMS College</p>
+                                    <p className="font-bold text-[#212121] text-lg">{BRAND.clubShort}</p>
+                                    <p className="text-[#757575] text-sm font-medium">Cybersecurity & Ethical Hacking Club of IIMS College</p>
                                 </div>
                             </div>
 
@@ -123,8 +124,8 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <p className="text-[#9E9E9E] text-[10px] font-bold uppercase tracking-widest mb-1">Email Support</p>
-                                        <a href="mailto:itclub@iimscollege.edu.np" className="text-[#1A237E] font-semibold hover:text-[#E53935] transition-colors">
-                                            itclub@iimscollege.edu.np
+                                        <a href={`mailto:${BRAND.clubEmail}`} className="text-[#1A237E] font-semibold hover:text-[#E53935] transition-colors">
+                                            {BRAND.clubEmail}
                                         </a>
                                     </div>
                                 </div>
@@ -169,7 +170,7 @@ export default function ContactPage() {
                                     </div>
                                     <p className="text-2xl font-bold text-[#212121] mb-2">Message Received.</p>
                                     <p className="text-[#757575] text-base mb-8 max-w-sm mx-auto">
-                                        Your transmission has been securely logged. The IIMS IT Club dispatch will respond shortly.
+                                        Your transmission has been securely logged. The ICEHC dispatch will respond shortly.
                                     </p>
                                     <button
                                         onClick={() => { setSuccess(false); setForm({ name: '', email: '', subject: '', message: '' }) }}

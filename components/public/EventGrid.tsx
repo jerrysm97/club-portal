@@ -1,7 +1,7 @@
 // components/public/EventGrid.tsx — Client island for event filtering
 'use client'
 import { useState } from 'react'
-import { Calendar, MapPin, ArrowRight } from 'lucide-react'
+import { Calendar, MapPin } from 'lucide-react'
 
 interface EventItem {
     id: string
@@ -23,11 +23,11 @@ const FILTERS = [
 ]
 
 const TYPE_BADGES: Record<string, string> = {
-    workshop: 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/30',
-    ctf: 'text-[#00D4FF] bg-[#00D4FF]/10 border-[#00D4FF]/30',
-    seminar: 'text-[#00FF87] bg-[#00FF87]/10 border-[#00FF87]/30',
-    competition: 'text-[#C0392B] bg-[#8B1A1A]/20 border-[#8B1A1A]/40',
-    meetup: 'text-[#D4AF37] bg-[#D4AF37]/10 border-[#D4AF37]/40',
+    workshop: 'text-[#E53935] bg-[#E53935]/10 border-[#E53935]/30',
+    ctf: 'text-[#1A237E] bg-[#1A237E]/10 border-[#1A237E]/30',
+    seminar: 'text-[#2E7D32] bg-[#2E7D32]/10 border-[#2E7D32]/30',
+    competition: 'text-[#E53935] bg-[#E53935]/10 border-[#E53935]/30',
+    meetup: 'text-[#1A237E] bg-[#1A237E]/10 border-[#1A237E]/30',
 }
 
 function formatDate(iso: string): string {
@@ -50,9 +50,9 @@ export default function EventGrid({ events }: { events: EventItem[] }) {
                     <button
                         key={value}
                         onClick={() => setFilter(value)}
-                        className={`font-mono text-xs px-4 py-2 rounded-md border transition-all ${filter === value
-                            ? 'text-[#00FF87] bg-[#00FF87]/10 border-[#00FF87]/30'
-                            : 'text-[#8888AA] bg-transparent border-[#2D2D44] hover:text-[#F0F0FF] hover:bg-[#12121A]'
+                        className={`text-xs px-4 py-2 rounded-md border transition-all font-semibold ${filter === value
+                            ? 'text-[#E53935] bg-[#E53935]/10 border-[#E53935]/30'
+                            : 'text-[#616161] bg-white border-[#E0E0E0] hover:text-[#212121] hover:bg-[#F8F9FA]'
                             }`}
                     >
                         {label}
@@ -62,10 +62,9 @@ export default function EventGrid({ events }: { events: EventItem[] }) {
 
             {/* Event cards */}
             {filtered.length === 0 ? (
-                <div className="bg-[#0A0A0F] border border-[#2D2D44] rounded-lg p-12 text-center">
-                    <p className="font-mono text-[#00FF87] text-sm">
+                <div className="bg-white border border-[#E0E0E0] rounded-lg p-12 text-center">
+                    <p className="text-[#616161] text-sm">
                         No upcoming events. Check back soon.
-                        <span className="animate-blink">|</span>
                     </p>
                 </div>
             ) : (
@@ -75,29 +74,35 @@ export default function EventGrid({ events }: { events: EventItem[] }) {
                         return (
                             <div
                                 key={event.id}
-                                className="bg-[#0A0A0F] border border-[#2D2D44] rounded-lg overflow-hidden hover:bg-[#12121A] hover:border-[#00FF87]/30 transition-all duration-200 group"
+                                className="bg-white border border-[#E0E0E0] rounded-xl overflow-hidden hover:shadow-md hover:border-[#1A237E]/20 transition-all duration-200 group"
                             >
-                                {event.image_url ? (
-                                    <img src={event.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                {event.image_url || event.cover_image_url ? (
+                                    <div className="h-48 relative overflow-hidden">
+                                        <img src={(event.image_url || event.cover_image_url) || ''} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                        <div className="absolute bottom-2 left-2 bg-[#E53935] text-white px-3 py-1 rounded-tr-lg">
+                                            <div className="text-xs font-bold uppercase">{new Date(event.event_date).toLocaleString('default', { month: 'short' })}</div>
+                                            <div className="text-xl font-bold leading-none">{new Date(event.event_date).getDate()}</div>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <div className="h-36 bg-[#0D1B2A] flex items-center justify-center border-b border-[#1E1E2E]">
-                                        <Calendar className="h-10 w-10 text-[#2D2D44]" />
+                                    <div className="h-48 bg-[#F5F5F5] flex items-center justify-center border-b border-[#E0E0E0]">
+                                        <Calendar className="h-10 w-10 text-[#BDBDBD]" />
                                     </div>
                                 )}
 
                                 <div className="p-5">
-                                    <span className={`font-mono text-xs px-2 py-0.5 rounded-full border ${badgeClass} inline-block mb-3`}>
+                                    <span className={`text-xs px-2 py-0.5 rounded-full border ${badgeClass} inline-block mb-3 font-semibold`}>
                                         {event.type}
                                     </span>
-                                    <h3 className="font-mono font-bold text-[#F0F0FF] text-sm mb-2 group-hover:text-[#00FF87] transition-colors">
+                                    <h3 className="font-bold text-[#212121] text-sm mb-2 group-hover:text-[#1A237E] transition-colors">
                                         {event.title}
                                     </h3>
                                     {event.short_desc && (
-                                        <p className="text-[#8888AA] text-xs font-sans leading-relaxed mb-4 line-clamp-2">
+                                        <p className="text-[#757575] text-xs leading-relaxed mb-4 line-clamp-2">
                                             {event.short_desc}
                                         </p>
                                     )}
-                                    <div className="flex items-center gap-4 text-[#8888AA] text-xs font-mono">
+                                    <div className="flex items-center gap-4 text-[#757575] text-xs">
                                         <span className="flex items-center gap-1">
                                             <Calendar className="h-3 w-3" />
                                             {formatDate(event.event_date)}

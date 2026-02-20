@@ -11,7 +11,8 @@ type PublicEvent = any
 export const revalidate = 60
 export const dynamic = 'force-dynamic'
 
-export default async function EventDetailPage({ params }: { params: { slug: string } }) {
+export default async function EventDetailPage(props: { params: Promise<{ slug: string }> }) {
+    const params = await props.params
     const { slug } = params
     const sb = await createServerSupabaseClient()
 

@@ -2,10 +2,11 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import EventGrid from '@/components/public/EventGrid'
+import { BRAND } from '@/lib/brand'
 
 export const metadata: Metadata = {
-    title: 'Events — IIMS IT Club',
-    description: 'Upcoming workshops, CTF competitions, seminars, and hackathons by IIMS IT Club at IIMS College, Kathmandu.',
+    title: 'Events — ICEHC',
+    description: 'Upcoming workshops, CTF competitions, seminars, and hackathons by ICEHC at IIMS College, Kathmandu.',
 }
 
 export const revalidate = 60
@@ -34,7 +35,7 @@ export default async function EventsPage() {
                 {/* Page Header */}
                 <div className="mb-12">
                     <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
-                        IIMS IT Club
+                        {BRAND.clubShort}
                     </span>
                     <h1 className="font-bold text-[#212121] text-3xl md:text-4xl mb-3">
                         Events & Activities

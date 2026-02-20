@@ -4,6 +4,8 @@
 
 'use client'
 
+import { Clock } from 'lucide-react'
+
 export default function PendingPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] px-4">
@@ -11,9 +13,7 @@ export default function PendingPage() {
 
                 {/* Clock icon to indicate waiting */}
                 <div className="mx-auto w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center">
-                    <svg className="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <Clock className="w-8 h-8 text-amber-500" />
                 </div>
 
                 {/* Main message */}

@@ -2,16 +2,60 @@
 'use client'
 
 import { useState } from 'react'
-import { BadgeCheck, Ban, Trash2, MoreHorizontal, UserCheck, Shield, ShieldAlert, MoreVertical } from 'lucide-react'
+import { BadgeCheck, Ban, Trash2, MoreHorizontal, UserCheck, Shield, ShieldAlert, MoreVertical, Settings } from 'lucide-react'
 import { updateMemberStatus, deleteMember } from '@/app/portal/(protected)/admin/actions'
 import Avatar from '@/components/ui/Avatar'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
 type Member = any
+type CurrentUser = { id: string; role: string; club_post: string }
 
-export default function MembersTab({ members, refresh }: { members: Member[], refresh: () => void }) {
+const CLUB_POSTS = [
+    'President', 'Vice President', 'Secretary', 'Joint Secretary',
+    'Treasurer', 'Event & Activities Coordinator', 'Marketing & Communication Lead',
+    'Logistics & Operations Lead', 'Executive Head', 'Technical Lead', 'General Member'
+]
+
+export default function MembersTab({ members, currentUser, refresh }: { members: Member[], currentUser?: CurrentUser, refresh: () => void }) {
     const [isLoading, setIsLoading] = useState<string | null>(null)
+    const [designatingMember, setDesignatingMember] = useState<Member | null>(null)
+
+    const isSuperadminOrPresident = currentUser?.role === 'superadmin' || currentUser?.club_post === 'President'
+
+    async function handleDesignate(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        if (!designatingMember) return
+
+        setIsLoading(designatingMember.id)
+        const form = new FormData(e.currentTarget)
+        const role = form.get('role') as string
+        const club_post = form.get('club_post') as string
+
+        try {
+            const res = await fetch('/api/admin/members', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: designatingMember.id,
+                    role,
+                    club_post,
+                    status: designatingMember.status // preserve status
+                })
+            })
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to update designation')
+
+            toast.success('Member designation updated')
+            setDesignatingMember(null)
+            refresh()
+        } catch (err: any) {
+            toast.error(err.message)
+        } finally {
+            setIsLoading(null)
+        }
+    }
 
     async function handleStatus(id: string, status: string, role?: string) {
         setIsLoading(id)
@@ -93,14 +137,14 @@ export default function MembersTab({ members, refresh }: { members: Member[], re
                                                     <UserCheck className="h-4 w-4" />
                                                 </button>
                                             )}
-                                            {member.role === 'member' && (
+                                            {isSuperadminOrPresident && (
                                                 <button
-                                                    onClick={() => handleStatus(member.id, member.status, 'admin')}
+                                                    onClick={() => setDesignatingMember(member)}
                                                     disabled={!!isLoading}
-                                                    className="p-2.5 bg-[#FFEBEE] hover:bg-[#E53935] text-[#D32F2F] hover:text-white rounded-xl transition-all shadow-sm border border-[#FFCDD2]"
-                                                    title="Promote Clearance"
+                                                    className="p-2.5 bg-[#E3F2FD] hover:bg-[#1976D2] text-[#1976D2] hover:text-white rounded-xl transition-all shadow-sm border border-[#BBDEFB]"
+                                                    title="Manage Designation"
                                                 >
-                                                    <ShieldAlert className="h-4 w-4" />
+                                                    <Settings className="h-4 w-4" />
                                                 </button>
                                             )}
                                             <button
@@ -119,6 +163,62 @@ export default function MembersTab({ members, refresh }: { members: Member[], re
                     </table>
                 </div>
             </div>
+
+            {/* Designation Modal */}
+            {designatingMember && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B0F19]/80 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-[#E0E0E0] animate-scale-up">
+                        <div className="p-6 border-b border-[#EEEEEE]">
+                            <h3 className="text-xl font-bold border-b-2 border-[#E53935] inline-block pb-1">Manage Designation</h3>
+                            <p className="text-sm text-[#757575] mt-2">Adjusting clearances for {designatingMember.full_name}</p>
+                        </div>
+                        <form onSubmit={handleDesignate} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-[#757575] uppercase tracking-widest mb-2">System Role</label>
+                                <select
+                                    name="role"
+                                    defaultValue={designatingMember.role}
+                                    className="w-full bg-[#F5F5F5] border border-[#E0E0E0] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#1A237E] focus:ring-1 focus:ring-[#1A237E] transition-all"
+                                >
+                                    <option value="member">Member</option>
+                                    <option value="bod">Board of Directors (BOD)</option>
+                                    {currentUser?.role === 'superadmin' && <option value="admin">Admin</option>}
+                                    {currentUser?.role === 'superadmin' && <option value="superadmin">Superadmin</option>}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-[#757575] uppercase tracking-widest mb-2">Club Post</label>
+                                <select
+                                    name="club_post"
+                                    defaultValue={designatingMember.club_post}
+                                    className="w-full bg-[#F5F5F5] border border-[#E0E0E0] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#1A237E] focus:ring-1 focus:ring-[#1A237E] transition-all"
+                                >
+                                    {CLUB_POSTS.map(post => {
+                                        if (post === 'President' && currentUser?.role !== 'superadmin') return null;
+                                        return <option key={post} value={post}>{post}</option>
+                                    })}
+                                </select>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setDesignatingMember(null)}
+                                    className="flex-1 px-4 py-3 bg-[#F5F5F5] hover:bg-[#E0E0E0] text-[#757575] rounded-xl font-bold tracking-widest text-xs uppercase transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={!!isLoading}
+                                    className="flex-1 px-4 py-3 bg-[#1A237E] hover:bg-[#283593] text-white rounded-xl font-bold tracking-widest text-xs uppercase shadow-md shadow-[#1A237E]/20 transition-all disabled:opacity-50"
+                                >
+                                    {isLoading === designatingMember.id ? 'Updating...' : 'Confirm'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

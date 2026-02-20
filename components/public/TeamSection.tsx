@@ -16,7 +16,7 @@ export default function TeamSection({ team }: { team: TeamMember[] }) {
                         Meet the <span className="text-[#1A237E]">Team</span>
                     </h2>
                     <p className="text-[#757575] max-w-xl mx-auto text-lg leading-relaxed">
-                        Passionate student leaders and IT professionals driving the IIMS IT Club forward.
+                        Passionate student leaders and cybersecurity enthusiasts driving ICEHC forward.
                     </p>
                 </div>
 

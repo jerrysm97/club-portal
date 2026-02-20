@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, GraduationCap } from 'lucide-react'
+import { Menu, X, GraduationCap, CalendarDays, Newspaper, MapPin, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BRAND } from '@/lib/brand'
 
 const NAV_LINKS = [
-    { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/events', label: 'Events' },
+    { href: BRAND.ctfPageURL, label: 'CTF Program', external: true },
+    { href: '/events', label: 'Hackathon' },
     { href: '/contact', label: 'Contact' },
 ]
 
@@ -25,11 +27,21 @@ export default function Navbar() {
     }, [])
 
     return (
-        <header className={cn(
-            'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-            scrolled ? 'bg-[#1A237E] shadow-lg' : 'bg-[#1A237E]'
-        )}>
-            <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <header className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300', scrolled ? 'shadow-lg' : '')}>
+            <div className="bg-[#0D1757] text-white/70 h-8 hidden md:block">
+                <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between text-[11px]">
+                    <div className="flex items-center gap-4">
+                        <span className="inline-flex items-center gap-1"><CalendarDays className="h-3 w-3" />Upcoming Events</span>
+                        <span className="inline-flex items-center gap-1"><Newspaper className="h-3 w-3" />ICEHC News</span>
+                        <a href={BRAND.collegeURL} target="_blank" rel="noopener noreferrer" className="hover:text-white">About IIMS College</a>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <a href={`mailto:${BRAND.clubEmail}`} className="inline-flex items-center gap-1 hover:text-white"><Mail className="h-3 w-3" />{BRAND.clubEmail}</a>
+                        <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />Kathmandu, Nepal</span>
+                    </div>
+                </div>
+            </div>
+            <nav className="bg-[#1A237E] max-w-none mx-auto px-6 h-16 flex items-center justify-between">
                 {/* Brand */}
                 <div className="flex items-center gap-3">
                     <a
@@ -46,10 +58,10 @@ export default function Navbar() {
                     <div className="border-l border-white/20 pl-3">
                         <Link href="/" className="group">
                             <span className="font-semibold text-white text-base block leading-tight group-hover:text-white/90 transition-colors">
-                                IT Club
+                                {BRAND.clubShort}
                             </span>
                             <span className="text-white/50 text-[11px] block leading-tight">
-                                IIMS College, Kathmandu
+                                Cybersecurity & Ethical Hacking Club
                             </span>
                         </Link>
                     </div>
@@ -57,18 +69,21 @@ export default function Navbar() {
 
                 {/* Desktop Nav */}
                 <div className="hidden md:flex items-center gap-1">
-                    {NAV_LINKS.map(({ href, label }) => {
+                    {NAV_LINKS.map(({ href, label, external }) => {
                         const active = pathname === href
-                        return (
+                        const classes = cn(
+                            'text-sm px-4 py-2 rounded-lg transition-all font-medium',
+                            active
+                                ? 'text-white bg-white/15'
+                                : 'text-white/70 hover:text-white hover:bg-white/10'
+                        )
+                        return external ? (
+                            <a key={href} href={href} target="_blank" rel="noopener noreferrer" className={classes}>{label}</a>
+                        ) : (
                             <Link
                                 key={href}
                                 href={href}
-                                className={cn(
-                                    'text-sm px-4 py-2 rounded-lg transition-all font-medium',
-                                    active
-                                        ? 'text-white bg-white/15'
-                                        : 'text-white/70 hover:text-white hover:bg-white/10'
-                                )}
+                                className={classes}
                             >
                                 {label}
                             </Link>
@@ -78,7 +93,7 @@ export default function Navbar() {
                         href="/portal/login"
                         className="ml-3 bg-[#E53935] text-white font-semibold text-sm px-5 py-2 rounded-lg hover:bg-[#C62828] active:scale-95 transition-all duration-150 shadow-md"
                     >
-                        Member Login
+                        Member Portal
                     </Link>
                 </div>
 
@@ -95,19 +110,22 @@ export default function Navbar() {
             {/* Mobile Menu */}
             {menuOpen && (
                 <div className="md:hidden bg-[#0D1757] border-t border-white/10 px-6 py-4 space-y-1">
-                    {NAV_LINKS.map(({ href, label }) => {
+                    {NAV_LINKS.map(({ href, label, external }) => {
                         const active = pathname === href
-                        return (
+                        const classes = cn(
+                            'block text-sm px-4 py-3 rounded-lg transition-all font-medium',
+                            active
+                                ? 'text-white bg-white/15'
+                                : 'text-white/70 hover:text-white hover:bg-white/10'
+                        )
+                        return external ? (
+                            <a key={href} href={href} target="_blank" rel="noopener noreferrer" className={classes}>{label}</a>
+                        ) : (
                             <Link
                                 key={href}
                                 href={href}
                                 onClick={() => setMenuOpen(false)}
-                                className={cn(
-                                    'block text-sm px-4 py-3 rounded-lg transition-all font-medium',
-                                    active
-                                        ? 'text-white bg-white/15'
-                                        : 'text-white/70 hover:text-white hover:bg-white/10'
-                                )}
+                                className={classes}
                             >
                                 {label}
                             </Link>
@@ -118,7 +136,7 @@ export default function Navbar() {
                         onClick={() => setMenuOpen(false)}
                         className="block text-center bg-[#E53935] text-white font-semibold text-sm px-5 py-3 rounded-lg hover:bg-[#C62828] transition-all mt-3"
                     >
-                        Member Login
+                        Member Portal
                     </Link>
                 </div>
             )}

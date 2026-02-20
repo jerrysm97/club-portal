@@ -2,7 +2,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Flag, ShieldCheck, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react'
+import { Flag, ShieldCheck, CheckCircle, AlertTriangle, Loader2, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import Button from '@/components/ui/Button'
@@ -54,8 +54,8 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
         <div className={cn(
             "relative p-6 md:p-8 rounded-3xl border transition-all animate-fade-up flex flex-col h-full group overflow-hidden",
             solved
-                ? "bg-[#1E1E2E] border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
-                : "bg-[#1E1E2E] border-white/10 hover:border-[#E53935]/50 hover:shadow-[0_0_20px_rgba(229,57,53,0.15)] shadow-xl"
+                ? "bg-[#161B22] border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                : "bg-[#161B22] border-[#30363D] hover:border-[#58A6FF]/40 hover:shadow-[0_0_20px_rgba(88,166,255,0.05)] shadow-xl"
         )}>
             {/* Solved Overlay Decoration */}
             {solved && (
@@ -106,7 +106,7 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
                                 <Flag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 group-focus-within:text-[#E53935] transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="Enter flag sequence..."
+                                    placeholder="Flag format: ICEHC{...}"
                                     value={flagInput}
                                     onChange={(e) => setFlagInput(e.target.value)}
                                     className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm font-mono text-white focus:bg-black/60 focus:ring-1 focus:ring-[#E53935] focus:border-[#E53935] transition-all outline-none placeholder:text-gray-600"
@@ -119,7 +119,7 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
                                 disabled={!flagInput.trim()}
                                 className="rounded-xl h-12 px-6 bg-[#E53935] hover:bg-[#C62828] text-white border-none font-bold shadow-lg shadow-[#E53935]/20"
                             >
-                                Capture <ChevronRightIcon className="inline h-4 w-4 ml-1" />
+                                Capture <ChevronRight className="inline h-4 w-4 ml-1" />
                             </Button>
                         </div>
                         <div className="flex items-center gap-2 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
@@ -135,8 +135,4 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
             </div>
         </div>
     )
-}
-
-function ChevronRightIcon({ className }: { className?: string }) {
-    return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
 }

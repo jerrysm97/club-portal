@@ -1,7 +1,7 @@
 // app/portal/(protected)/dashboard/page.tsx — IIMS IT Club Dashboard (v4.0)
 import { createServerClient } from '@/lib/supabase-server'
 import Link from 'next/link'
-import { ShieldCheck, Calendar, ArrowRight, Megaphone, Terminal, Star, Trophy, MessageSquare, ChevronRight, GraduationCap } from 'lucide-react'
+import { ShieldCheck, Calendar, ArrowRight, Megaphone, Terminal, Trophy, MessageSquare, ChevronRight, GraduationCap, Inbox, Users } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import { getSession, getMember } from '@/lib/auth'
@@ -66,16 +66,13 @@ export default async function DashboardPage() {
                             )}
                         </div>
                         <div>
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 text-white font-bold text-[10px] uppercase tracking-widest mb-3 backdrop-blur-sm border border-white/10">
-                                <ShieldCheck className="h-3.5 w-3.5" />
-                                Secure Session
-                            </div>
+
                             <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-                                Welcome, <span className="text-[#FFEB3B]">{member.full_name.split(' ')[0]}</span>
+                                Welcome, <span className="text-[#FFEB3B]">{(member.full_name || 'Member').split(' ')[0]}</span>
                             </h1>
                             <div className="flex items-center gap-3 mt-2">
                                 <p className="text-[#E8EAF6] font-medium text-sm flex items-center gap-2">
-                                    {member.program && member.intake ? `${member.program} • ${member.intake}` : 'IT Club Member'}
+                                    {member.program && member.intake_year ? `${member.program} • ${member.intake_year}` : 'IT Club Member'}
                                 </p>
                                 <span className="h-1 w-1 rounded-full bg-white/30" />
                                 <span className="text-white text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-white/10">
@@ -144,7 +141,7 @@ export default async function DashboardPage() {
                             ))
                         ) : (
                             <div className="bg-white p-10 rounded-2xl border border-dashed border-[#E0E0E0] text-center flex flex-col items-center justify-center">
-                                <BoxIcon className="h-10 w-10 text-[#E0E0E0] mb-3" />
+                                <Inbox className="h-10 w-10 text-[#E0E0E0] mb-3" />
                                 <p className="text-[#757575] font-medium text-sm">No recent announcements from the board.</p>
                             </div>
                         )}
@@ -218,14 +215,18 @@ export default async function DashboardPage() {
                     </div>
 
                     {/* Modules / Tools */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <Link href="/portal/ctf" className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-[#E0E0E0] hover:border-[#1A237E] hover:bg-[#1A237E]/5 transition-all group shadow-sm">
+                    <div className="grid grid-cols-3 gap-3">
+                        <Link href="/portal/ctf" className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-[#E0E0E0] hover:border-[#1A237E] hover:bg-[#1A237E]/5 transition-all group shadow-sm text-center">
                             <Terminal className="h-6 w-6 text-[#424242] mb-2 group-hover:text-[#1A237E] transition-colors" />
                             <span className="text-[10px] font-bold text-[#757575] uppercase tracking-widest group-hover:text-[#1A237E]">CTF Arena</span>
                         </Link>
-                        <Link href="/portal/messages" className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-[#E0E0E0] hover:border-[#0277BD] hover:bg-[#0277BD]/5 transition-all group shadow-sm">
+                        <Link href="/portal/messages" className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-[#E0E0E0] hover:border-[#0277BD] hover:bg-[#0277BD]/5 transition-all group shadow-sm text-center">
                             <MessageSquare className="h-6 w-6 text-[#424242] mb-2 group-hover:text-[#0277BD] transition-colors" />
                             <span className="text-[10px] font-bold text-[#757575] uppercase tracking-widest group-hover:text-[#0277BD]">Messages</span>
+                        </Link>
+                        <Link href={`/portal/members?intake=${member.intake_year || new Date().getFullYear()}`} className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-[#E0E0E0] hover:border-[#2E7D32] hover:bg-[#2E7D32]/5 transition-all group shadow-sm text-center">
+                            <Users className="h-6 w-6 text-[#424242] mb-2 group-hover:text-[#2E7D32] transition-colors" />
+                            <span className="text-[10px] font-bold text-[#757575] uppercase tracking-widest group-hover:text-[#2E7D32]">My Cohort</span>
                         </Link>
                     </div>
                 </div>
@@ -234,20 +235,3 @@ export default async function DashboardPage() {
     )
 }
 
-function BoxIcon({ className }: { className?: string }) {
-    return (
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={className}
-        >
-            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-            <path d="m3.3 7 8.7 5 8.7-5" />
-            <path d="M12 22V12" />
-        </svg>
-    )
-}

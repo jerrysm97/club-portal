@@ -6,7 +6,10 @@ import { getSession, getMember } from '@/lib/auth'
 
 export const revalidate = 0
 
-export default async function MessageThreadPage({ params }: { params: { id: string } }) {
+export default async function MessageThreadPage(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params
+    const { id } = params
+
     const session = await getSession()
     if (!session) redirect('/portal/login')
 
@@ -19,7 +22,7 @@ export default async function MessageThreadPage({ params }: { params: { id: stri
     const { data: otherUser } = await supabase
         .from('members')
         .select('id, full_name, avatar_url, role, club_post')
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
     if (!otherUser) return notFound()

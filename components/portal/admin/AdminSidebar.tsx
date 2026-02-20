@@ -12,29 +12,34 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export type AdminTab = 'overview' | 'members' | 'posts' | 'events' | 'ctf' | 'documents'
+export type AdminTab = 'overview' | 'members' | 'posts' | 'events' | 'ctf' | 'documents' | 'audit'
 
 interface AdminSidebarProps {
     activeTab: AdminTab
     onTabChange: (tab: AdminTab) => void
+    currentUser?: { id: string; role: string; club_post?: string | null }
 }
 
-export default function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
+export default function AdminSidebar({ activeTab, onTabChange, currentUser }: AdminSidebarProps) {
     const tabs = [
-        { id: 'overview', label: 'Command Center', icon: LayoutDashboard },
-        { id: 'members', label: 'Operatives', icon: Users },
-        { id: 'posts', label: 'Transmissions', icon: MessageSquare },
-        { id: 'events', label: 'Mission Log', icon: Calendar },
-        { id: 'ctf', label: 'Arena Ops', icon: Trophy },
-        { id: 'documents', label: 'Intell Base', icon: FileText },
+        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+        { id: 'members', label: 'Members', icon: Users },
+        { id: 'posts', label: 'Posts', icon: MessageSquare },
+        { id: 'events', label: 'Events', icon: Calendar },
+        { id: 'ctf', label: 'CTF Arena', icon: Trophy },
+        { id: 'documents', label: 'Documents', icon: FileText },
     ]
+
+    if (currentUser?.role === 'superadmin') {
+        tabs.push({ id: 'audit', label: 'Audit Logs', icon: ShieldAlert })
+    }
 
     return (
         <aside className="w-72 bg-[#1A237E] h-[calc(100vh-64px)] overflow-y-auto hidden lg:flex flex-col border-r border-[#283593] shadow-2xl z-40">
             <div className="p-8">
                 <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#E53935]/10 border border-[#E53935]/20 mb-8 backdrop-blur-sm">
                     <ShieldAlert className="h-5 w-5 text-[#E53935]" />
-                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">Elevated Access</span>
+                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">Admin Panel</span>
                 </div>
 
                 <nav className="space-y-1.5">
@@ -64,7 +69,7 @@ export default function AdminSidebar({ activeTab, onTabChange }: AdminSidebarPro
 
             <div className="mt-auto p-8 border-t border-white/5 bg-[#0D1757]/40 backdrop-blur-sm">
                 <p className="text-[8px] font-bold text-[#9FA8DA]/60 uppercase tracking-widest leading-relaxed">
-                    IIMS IT Club Command <br /> Base Protocol v4.0
+                    ICEHC Portal <br /> Administration
                 </p>
             </div>
         </aside>

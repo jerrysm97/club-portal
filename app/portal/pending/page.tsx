@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { Shield, Mail, CheckCircle2, Clock } from 'lucide-react'
 import SignOutButton from './SignOutButton'
 import { redirect } from 'next/navigation'
+import { BRAND } from '@/lib/brand'
 
 export default async function PendingPage() {
     const cookieStore = await cookies()
@@ -40,7 +41,7 @@ export default async function PendingPage() {
                         <Shield className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                        <h2 className="font-bold text-[#1A237E] text-base tracking-tight">IIMS IT Club</h2>
+                        <h2 className="font-bold text-[#1A237E] text-base tracking-tight">{BRAND.clubShort}</h2>
                         <span className="text-[10px] text-[#757575] font-semibold tracking-widest uppercase">Member Portal</span>
                     </div>
                 </div>
@@ -93,7 +94,7 @@ export default async function PendingPage() {
                 {/* Footer */}
                 <p className="mt-8 text-center text-xs text-[#9E9E9E] font-medium">
                     Need Help?{' '}
-                    <a href="mailto:itclub@iimscollege.edu.np" className="text-[#1A237E] hover:underline font-semibold">
+                    <a href={`mailto:${BRAND.clubEmail}`} className="text-[#1A237E] hover:underline font-semibold">
                         Contact Administration
                     </a>
                 </p>

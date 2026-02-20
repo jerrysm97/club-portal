@@ -1,6 +1,7 @@
 // app/portal/leaderboard/page.tsx — IIMS IT Club Global Leaderboard (v4.0)
 import { createServerClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { Trophy, Zap, Crown, Award, Target } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Pagination from '@/components/ui/Pagination'
@@ -42,126 +43,128 @@ export default async function LeaderboardPage({
     const members = (data || []) as any[]
 
     return (
-        <div className="max-w-5xl mx-auto space-y-10 pb-16 animate-fade-up">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#FFF8E1] text-[#F57F17] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#F57F17]/20 shadow-sm">
-                        <Trophy className="h-3.5 w-3.5" /> High Performance Log
-                    </div>
-                    <h1 className="text-3xl md:text-5xl font-bold text-[#212121] leading-tight">
-                        Club <span className="text-[#E53935]">Leaderboard</span>
-                    </h1>
-                    <p className="text-[#757575] font-medium text-sm mt-3 max-w-xl leading-relaxed">
-                        Global proficiency rankings based on mission success, CTF flag captures, and unit contributions.
-                    </p>
-                </div>
-
-                <div className="bg-white rounded-3xl p-6 border border-[#E0E0E0] shadow-sm flex items-center gap-5 group">
-                    <div className="p-3 bg-[#E8EAF6] rounded-xl text-[#1A237E] group-hover:bg-[#1A237E] group-hover:text-white transition-all shadow-inner">
-                        <Zap className="h-5 w-5" />
-                    </div>
+        <div className="min-h-screen -m-6 md:-m-10 p-6 md:p-10 bg-[#0D1117]">
+            <div className="max-w-5xl mx-auto space-y-10 pb-16 animate-fade-up">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <span className="block text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest leading-none mb-1">Total Members</span>
-                        <span className="block text-2xl font-bold text-[#212121]">{count || 0}</span>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#161B22] text-[#D29922] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#30363D] shadow-sm">
+                            <Trophy className="h-3.5 w-3.5" /> High Performance Log
+                        </div>
+                        <h1 className="text-3xl md:text-5xl font-bold text-[#E6EDF3] leading-tight">
+                            Club <span className="text-[#E53935]">Leaderboard</span>
+                        </h1>
+                        <p className="text-[#8B949E] font-medium text-sm mt-3 max-w-xl leading-relaxed">
+                            Global proficiency rankings based on mission success, CTF flag captures, and unit contributions.
+                        </p>
+                    </div>
+
+                    <div className="bg-[#161B22] rounded-3xl p-6 border border-[#30363D] shadow-sm flex items-center gap-5 group">
+                        <div className="p-3 bg-[#0D1117] rounded-xl text-[#58A6FF] transition-all shadow-inner border border-[#30363D]">
+                            <Zap className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <span className="block text-[10px] font-bold text-[#8B949E] uppercase tracking-widest leading-none mb-1">Total Members</span>
+                            <span className="block text-2xl font-bold text-[#E6EDF3]">{count || 0}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Leaderboard Table */}
-            <div className="bg-white rounded-[2rem] border border-[#E0E0E0] shadow-xl shadow-black/5 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-[#F8F9FA] border-b border-[#E0E0E0]">
-                                <th className="px-6 py-5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">Rank</th>
-                                <th className="px-6 py-5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">Member</th>
-                                <th className="px-6 py-5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest hidden md:table-cell">Designation</th>
-                                <th className="px-6 py-5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest text-right">Points</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#F5F5F5]">
-                            {members.map((m: any, idx: number) => {
-                                const rank = from + idx + 1
-                                const isMe = m.id === currentMember?.id
-                                const isTop3 = rank <= 3
+                {/* Leaderboard Table */}
+                <div className="bg-[#161B22] rounded-[2rem] border border-[#30363D] shadow-xl shadow-black/20 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-[#0D1117] border-b border-[#30363D]">
+                                    <th className="px-6 py-5 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">Rank</th>
+                                    <th className="px-6 py-5 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">Member</th>
+                                    <th className="px-6 py-5 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest hidden md:table-cell">Designation</th>
+                                    <th className="px-6 py-5 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest text-right">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[#30363D]">
+                                {members.map((m: any, idx: number) => {
+                                    const rank = from + idx + 1
+                                    const isMe = m.id === currentMember?.id
+                                    const isTop3 = rank <= 3
 
-                                return (
-                                    <tr
-                                        key={m.id}
-                                        className={cn(
-                                            "group transition-all hover:bg-[#F8F9FA]",
-                                            isMe && "bg-[#E3F2FD]/50 hover:bg-[#E3F2FD]"
-                                        )}
-                                    >
-                                        <td className="px-6 py-5">
-                                            <div className={cn(
-                                                "w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all",
-                                                rank === 1 ? "bg-[#FFF9C4] text-[#F57F17] shadow-lg shadow-[#FFF9C4]/50 scale-110 border border-[#FFF59D]" :
-                                                    rank === 2 ? "bg-[#F5F5F5] text-[#757575] border border-[#E0E0E0]" :
-                                                        rank === 3 ? "bg-[#FFECB3] text-[#FF8F00] border border-[#FFE082]" :
-                                                            "text-[#9E9E9E] group-hover:text-[#212121]"
-                                            )}>
-                                                {rank === 1 ? <Crown className="h-5 w-5" /> : rank}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center gap-4">
-                                                <Avatar src={m.avatar_url} name={m.full_name || 'Anonymous'} size="sm" className="shadow-sm border border-[#E0E0E0]" />
-                                                <div className="min-w-0">
-                                                    <p className={cn(
-                                                        "font-bold text-sm truncate",
-                                                        isMe ? "text-[#1A237E]" : "text-[#212121]"
-                                                    )}>
-                                                        {m.full_name || 'Anonymous Member'} {isMe && "(You)"}
-                                                    </p>
-                                                    <p className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest md:hidden mt-0.5">
-                                                        {m.club_post || m.role}
-                                                    </p>
+                                    return (
+                                        <tr
+                                            key={m.id}
+                                            className={cn(
+                                                "group transition-all hover:bg-[#0D1117] cursor-pointer",
+                                                isMe && "bg-[#58A6FF]/10 hover:bg-[#58A6FF]/15"
+                                            )}
+                                        >
+                                            <td className="px-6 py-5">
+                                                <div className={cn(
+                                                    "w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all",
+                                                    rank === 1 ? "bg-[#FFF9C4] text-[#F57F17] shadow-lg shadow-[#FFF9C4]/50 scale-110 border border-[#FFF59D]" :
+                                                        rank === 2 ? "bg-[#F5F5F5] text-[#757575] border border-[#E0E0E0]" :
+                                                            rank === 3 ? "bg-[#FFECB3] text-[#FF8F00] border border-[#FFE082]" :
+                                                                "text-[#8B949E] group-hover:text-[#E6EDF3]"
+                                                )}>
+                                                    {rank === 1 ? <Crown className="h-5 w-5" /> : rank}
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5 hidden md:table-cell">
-                                            <span className="text-[10px] font-bold text-[#757575] uppercase tracking-widest border border-[#E0E0E0] px-3 py-1.5 rounded-lg bg-[#F8F9FA]">
-                                                {m.club_post || m.role}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-5 text-right">
-                                            <span className={cn(
-                                                "text-lg font-bold font-mono",
-                                                isTop3 ? "text-[#1A237E]" : "text-[#757575]"
-                                            )}>
-                                                {m.points}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <Link href={isMe ? '/portal/profile' : `/portal/members/${m.id}`} className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+                                                    <Avatar src={m.avatar_url} name={m.full_name || 'Anonymous'} size="sm" className="shadow-sm border border-[#E0E0E0]" />
+                                                    <div className="min-w-0">
+                                                        <p className={cn(
+                                                            "font-bold text-sm truncate group-hover:text-[#1A237E] transition-colors",
+                                                            isMe ? "text-[#58A6FF]" : "text-[#E6EDF3]"
+                                                        )}>
+                                                            {m.full_name || 'Anonymous Member'} {isMe && "(You)"}
+                                                        </p>
+                                                        <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-widest md:hidden mt-0.5">
+                                                            {m.club_post || m.role}
+                                                        </p>
+                                                    </div>
+                                                </Link>
+                                            </td>
+                                            <td className="px-6 py-5 hidden md:table-cell">
+                                                <span className="text-[10px] font-bold text-[#8B949E] uppercase tracking-widest border border-[#30363D] px-3 py-1.5 rounded-lg bg-[#0D1117]">
+                                                    {m.club_post || m.role}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-5 text-right">
+                                                <span className={cn(
+                                                    "text-lg font-bold font-mono",
+                                                    isTop3 ? "text-[#D29922]" : "text-[#E6EDF3]"
+                                                )}>
+                                                    {m.points}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {members.length === 0 && (
+                        <div className="py-24 text-center">
+                            <div className="h-16 w-16 bg-[#F8F9FA] rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
+                                <Target className="h-8 w-8 text-[#9E9E9E]" />
+                            </div>
+                            <p className="text-[#E6EDF3] font-bold text-lg mb-1">Leaderboard Empty</p>
+                            <p className="text-[#8B949E] font-medium text-sm">No approved members found.</p>
+                        </div>
+                    )}
                 </div>
 
-                {members.length === 0 && (
-                    <div className="py-24 text-center">
-                        <div className="h-16 w-16 bg-[#F8F9FA] rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
-                            <Target className="h-8 w-8 text-[#9E9E9E]" />
-                        </div>
-                        <p className="text-[#424242] font-bold text-lg mb-1">Leaderboard Empty</p>
-                        <p className="text-[#9E9E9E] font-medium text-sm">No approved members found.</p>
+                {/* Pagination */}
+                {count && count > pageSize && (
+                    <div className="py-8">
+                        <Pagination
+                            page={currentPage}
+                            totalPages={Math.ceil(count / pageSize)}
+                            baseUrl="/portal/leaderboard"
+                        />
                     </div>
                 )}
             </div>
-
-            {/* Pagination */}
-            {count && count > pageSize && (
-                <div className="py-8">
-                    <Pagination
-                        page={currentPage}
-                        totalPages={Math.ceil(count / pageSize)}
-                        baseUrl="/portal/leaderboard"
-                    />
-                </div>
-            )}
         </div>
     )
 }
