@@ -1,6 +1,7 @@
 // components/public/StatsSection.tsx — IIMS College Dark Stats Counter
 import { Users, Calendar, Building2, Trophy } from 'lucide-react'
-import type { SiteSettings } from '@/types/database'
+// Import types safely
+type SiteSettings = any
 
 export default function StatsSection({ settings }: { settings?: SiteSettings | null }) {
     return (

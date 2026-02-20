@@ -39,7 +39,7 @@ export default function AdminPage() {
             const { data: member } = await supabase
                 .from('members' as any)
                 .select('role')
-                .eq('user_id', session.user.id)
+                .eq('id', session.user.id)
                 .single()
 
             if (!member || !['admin', 'superadmin'].includes((member as any).role)) {
@@ -49,11 +49,11 @@ export default function AdminPage() {
 
             // Parallel data fetching with updated table names
             const [m, p, e, c, r] = await Promise.all([
-                supabase.from('members').select('*').order('joined_at', { ascending: false }),
-                supabase.from('posts').select('*, author:members(full_name, avatar_url)').order('created_at', { ascending: false }),
-                supabase.from('events').select('*').order('starts_at', { ascending: false }),
-                supabase.from('ctf_challenges').select('*, solved_count:ctf_submissions(count)').order('points', { ascending: true }),
-                supabase.from('documents').select('*, uploader:members(full_name)').order('created_at', { ascending: false })
+                supabase.from('members' as any).select('*').order('created_at', { ascending: false }),
+                supabase.from('posts' as any).select('*, author:members(name, avatar_url)').order('created_at', { ascending: false }),
+                supabase.from('public_events' as any).select('*').order('event_date', { ascending: false }),
+                supabase.from('ctf_challenges' as any).select('*, solved_count:ctf_submissions(count)').order('points', { ascending: true }),
+                supabase.from('documents' as any).select('*, uploader:members(name)').order('created_at', { ascending: false })
             ])
 
             setData({

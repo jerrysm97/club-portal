@@ -60,7 +60,7 @@ export default function ResourcesTab({ resources, refresh }: { resources: any[],
                                             </div>
                                             <div className="min-w-0">
                                                 <div className="text-sm font-bold truncate text-[#111827]">{res.title}</div>
-                                                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">Relayed by {res.uploader?.full_name || 'System'}</div>
+                                                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">Relayed by {res.uploader?.name || 'System'}</div>
                                             </div>
                                         </div>
                                     </td>

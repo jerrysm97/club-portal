@@ -13,7 +13,7 @@ export default async function PendingPage() {
         const { data: member } = await supabase
             .from('members')
             .select('email')
-            .eq('user_id', user.id)
+            .eq('id', user.id)
             .single()
         const memberEmail = (member as { email: string } | null)?.email
         email = memberEmail ?? user.email ?? null

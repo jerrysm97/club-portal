@@ -9,7 +9,7 @@ import { MessageSquare, Search, Filter } from 'lucide-react'
 
 interface ConversationListProps {
     conversations: {
-        otherMember: { id: string, full_name: string, avatar_url: string | null },
+        otherMember: { id: string, name: string, avatar_url: string | null },
         lastMessage: { content: string, created_at: string },
         unreadCount: number
     }[],
@@ -69,7 +69,7 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                                     <div className="relative">
                                         <Avatar
                                             src={otherMember.avatar_url}
-                                            name={otherMember.full_name}
+                                            name={otherMember.name}
                                             className={cn(
                                                 "w-12 h-12 ring-2 transition-all shadow-sm",
                                                 isActive ? "ring-[#58151C]/10" : "ring-white"
@@ -86,7 +86,7 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                                                 "text-sm font-bold truncate transition-colors",
                                                 isActive ? "text-[#58151C]" : "text-[#111827]"
                                             )}>
-                                                {otherMember.full_name}
+                                                {otherMember.name}
                                             </h4>
                                             <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">
                                                 {formatDate(lastMessage.created_at)}

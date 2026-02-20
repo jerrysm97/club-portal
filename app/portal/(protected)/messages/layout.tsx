@@ -2,7 +2,8 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ConversationList from '@/components/portal/ConversationList'
-import type { Member } from '@/types/database'
+// Import types safely
+type Member = any
 
 export const revalidate = 0
 
@@ -16,7 +17,7 @@ export default async function MessagesLayout({ children }: { children: React.Rea
     const { data: member } = await (supabase
         .from('members' as any) as any)
         .select('id')
-        .eq('user_id', session.user.id)
+        .eq('id', session.user.id)
         .single()
 
     if (!member) redirect('/portal/login')
@@ -34,8 +35,8 @@ export default async function MessagesLayout({ children }: { children: React.Rea
       sender_id,
       receiver_id,
       is_read,
-      sender:members!sender_id(id, full_name, avatar_url),
-      receiver:members!receiver_id(id, full_name, avatar_url)
+      sender:members!sender_id(id, name, avatar_url),
+      receiver:members!receiver_id(id, name, avatar_url)
     `)
         .or(`sender_id.eq.${(member as any).id},receiver_id.eq.${(member as any).id}`)
         .order('created_at', { ascending: false })

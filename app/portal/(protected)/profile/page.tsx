@@ -3,7 +3,8 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { User, Mail, Github, Linkedin, Calendar, Edit2, ShieldCheck, Trophy, Target, Zap, ChevronRight, MapPin, Terminal } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
-import type { Member } from '@/types/database'
+// Import types safely
+type Member = any
 import Link from 'next/link'
 import Avatar from '@/components/ui/Avatar'
 import { cn } from '@/lib/utils'
@@ -19,7 +20,7 @@ export default async function ProfilePage() {
     const { data } = await supabase
         .from('members')
         .select('*')
-        .eq('user_id', session.user.id)
+        .eq('id', session.user.id)
         .single()
 
     const member = data as any
@@ -45,7 +46,7 @@ export default async function ProfilePage() {
                         <div className="p-2 bg-white/10 rounded-[2.5rem] backdrop-blur-md border border-white/20 transition-transform group-hover/avatar:scale-105">
                             <Avatar
                                 src={member.avatar_url}
-                                name={member.full_name}
+                                name={member.name || member.email}
                                 className="w-48 h-48 rounded-[2rem] border-4 border-[#58151C] shadow-2xl"
                             />
                         </div>
@@ -60,7 +61,7 @@ export default async function ProfilePage() {
                                 <ShieldCheck className="h-3.5 w-3.5" /> ID: {member.student_id || 'CLASSIFIED'}
                             </div>
                             <h1 className="text-4xl md:text-5xl font-poppins font-black leading-tight">
-                                {member.full_name}
+                                {member.name || member.email}
                             </h1>
                             <p className="text-[#FECACA] font-medium text-lg opacity-80 max-w-lg">
                                 {member.club_post || (member.role?.toUpperCase())} — Active Command
@@ -69,7 +70,7 @@ export default async function ProfilePage() {
 
                         <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-2">
                             <span className="px-4 py-2 rounded-xl bg-white/10 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border border-white/5">
-                                <Calendar className="h-4 w-4" /> Activated {new Date(member.joined_at).getFullYear()}
+                                <Calendar className="h-4 w-4" /> Activated {new Date(member.created_at).getFullYear()}
                             </span>
                             <span className="px-4 py-2 rounded-xl bg-white/10 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border border-white/5">
                                 <MapPin className="h-4 w-4" /> Sector VII

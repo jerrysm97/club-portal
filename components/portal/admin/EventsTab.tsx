@@ -35,8 +35,8 @@ export default function EventsTab({ events, refresh }: { events: any[], refresh:
                     <div key={event.id} className="bg-white p-10 rounded-[4rem] border border-gray-100 shadow-sm hover:shadow-2xl transition-all group flex flex-col xl:flex-row gap-10">
                         {/* Event Preview */}
                         <div className="w-full xl:w-72 h-48 rounded-[3rem] bg-gray-50 overflow-hidden relative border border-gray-100 shrink-0">
-                            {event.cover_image_url ? (
-                                <img src={event.cover_image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                            {event.image_url ? (
+                                <img src={event.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                     <Calendar className="h-12 w-12 text-gray-200" />
@@ -45,9 +45,9 @@ export default function EventsTab({ events, refresh }: { events: any[], refresh:
                             <div className="absolute top-4 left-4">
                                 <span className={cn(
                                     "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border backdrop-blur-md",
-                                    event.is_published ? "bg-emerald-500/80 text-white border-emerald-400" : "bg-gray-900/80 text-gray-400 border-gray-700"
+                                    event.status === 'upcoming' ? "bg-emerald-500/80 text-white border-emerald-400" : "bg-gray-900/80 text-gray-400 border-gray-700"
                                 )}>
-                                    {event.is_published ? 'Operational' : 'Draft Intel'}
+                                    {event.status === 'upcoming' ? 'Operational' : 'Draft Intel'}
                                 </span>
                             </div>
                         </div>
@@ -58,7 +58,7 @@ export default function EventsTab({ events, refresh }: { events: any[], refresh:
                                 <div className="flex items-center gap-3 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">
                                     <span className="text-[#C3161C]">{event.type}</span>
                                     <span className="w-1 h-1 bg-gray-200 rounded-full" />
-                                    <span>{formatDate(event.starts_at)}</span>
+                                    <span>{formatDate(event.event_date)}</span>
                                 </div>
                                 <h3 className="text-2xl font-poppins font-black text-[#111827] group-hover:text-[#C3161C] transition-colors leading-tight">
                                     {event.title}
@@ -80,17 +80,17 @@ export default function EventsTab({ events, refresh }: { events: any[], refresh:
                         {/* Event Actions */}
                         <div className="flex xl:flex-col gap-3 shrink-0">
                             <button
-                                onClick={() => handleToggleStatus(event.id, event.is_published)}
+                                onClick={() => handleToggleStatus(event.id, event.status === 'upcoming')}
                                 disabled={!!isLoading}
                                 className={cn(
                                     "flex-1 xl:w-16 h-16 rounded-[2rem] flex items-center justify-center transition-all border shadow-sm",
-                                    event.is_published
+                                    event.status === 'upcoming'
                                         ? "bg-gray-900 text-white border-gray-800 hover:bg-black"
                                         : "bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white"
                                 )}
-                                title={event.is_published ? "Archive Mission" : "Deploy Mission"}
+                                title={event.status === 'upcoming' ? "Archive Mission" : "Deploy Mission"}
                             >
-                                {event.is_published ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+                                {event.status === 'upcoming' ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
                             </button>
                             <button className="flex-1 xl:w-16 h-16 bg-white border border-gray-100 text-[#58151C] hover:bg-[#58151C] hover:text-white rounded-[2rem] flex items-center justify-center transition-all shadow-sm">
                                 <Edit2 className="h-6 w-6" />

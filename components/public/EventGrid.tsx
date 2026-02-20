@@ -8,9 +8,9 @@ interface EventItem {
     title: string
     short_desc: string | null
     type: string
-    starts_at: string
+    event_date: string
     location: string | null
-    cover_image_url: string | null
+    image_url: string | null
 }
 
 const FILTERS = [
@@ -50,8 +50,8 @@ export default function EventGrid({ events }: { events: EventItem[] }) {
                         key={value}
                         onClick={() => setFilter(value)}
                         className={`font-mono text-xs px-4 py-2 rounded-md border transition-all ${filter === value
-                                ? 'text-[#00FF87] bg-[#00FF87]/10 border-[#00FF87]/30'
-                                : 'text-[#8888AA] bg-transparent border-[#2D2D44] hover:text-[#F0F0FF] hover:bg-[#12121A]'
+                            ? 'text-[#00FF87] bg-[#00FF87]/10 border-[#00FF87]/30'
+                            : 'text-[#8888AA] bg-transparent border-[#2D2D44] hover:text-[#F0F0FF] hover:bg-[#12121A]'
                             }`}
                     >
                         {label}
@@ -76,10 +76,13 @@ export default function EventGrid({ events }: { events: EventItem[] }) {
                                 key={event.id}
                                 className="bg-[#0A0A0F] border border-[#2D2D44] rounded-lg overflow-hidden hover:bg-[#12121A] hover:border-[#00FF87]/30 transition-all duration-200 group"
                             >
-                                {/* Placeholder cover */}
-                                <div className="h-36 bg-[#0D1B2A] flex items-center justify-center border-b border-[#1E1E2E]">
-                                    <Calendar className="h-10 w-10 text-[#2D2D44]" />
-                                </div>
+                                {event.image_url ? (
+                                    <img src={event.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                ) : (
+                                    <div className="h-36 bg-[#0D1B2A] flex items-center justify-center border-b border-[#1E1E2E]">
+                                        <Calendar className="h-10 w-10 text-[#2D2D44]" />
+                                    </div>
+                                )}
 
                                 <div className="p-5">
                                     <span className={`font-mono text-xs px-2 py-0.5 rounded-full border ${badgeClass} inline-block mb-3`}>
@@ -96,7 +99,7 @@ export default function EventGrid({ events }: { events: EventItem[] }) {
                                     <div className="flex items-center gap-4 text-[#8888AA] text-xs font-mono">
                                         <span className="flex items-center gap-1">
                                             <Calendar className="h-3 w-3" />
-                                            {formatDate(event.starts_at)}
+                                            {formatDate(event.event_date)}
                                         </span>
                                         {event.location && (
                                             <span className="flex items-center gap-1">

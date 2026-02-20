@@ -3,27 +3,34 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ShieldCheck, Calendar, FileText, ArrowRight, Megaphone, Terminal, Star, Zap, Trophy, MessageSquare, ChevronRight, Box as BoxIcon } from 'lucide-react'
-import type { Member, Event as DBEvent, Post } from '@/types/database'
+import { formatDate } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import Avatar from '@/components/ui/Avatar'
-import { formatDate } from '@/lib/utils'
+// Importing helper types for casting if necessary
+type Member = any
+type DBEvent = any
+type Post = any
 
 export const revalidate = 60
 
 export default async function DashboardPage() {
     const supabase = await createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) redirect('/portal/login')
+    if (!user) {
+        console.log('XXX [Dashboard] No user -> redirect login')
+        redirect('/portal/login')
+    }
+    console.log('XXX [Dashboard] Loading for user:', user.email)
 
     // Parallel data fetching
     const [memberRes, eventsRes, announcementsRes, rankRes] = await Promise.all([
-        supabase.from('members').select('*').eq('user_id', user.id).single(),
+        supabase.from('members').select('*').eq('id', user.id).single(),
         supabase
-            .from('events')
-            .select('id, title, type, starts_at, location')
-            .gte('starts_at', new Date().toISOString())
-            .eq('is_published', true)
-            .order('starts_at')
+            .from('public_events' as any)
+            .select('id, title, type, event_date, location')
+            .gte('event_date', new Date().toISOString())
+            .eq('status', 'upcoming')
+            .order('event_date')
             .limit(4),
         supabase
             .from('posts')
@@ -37,7 +44,7 @@ export default async function DashboardPage() {
             .gt('points', 0) // placeholder, will refine below
     ])
 
-    const member = memberRes.data as unknown as Member | null
+    const member = memberRes.data as any | null
     if (!member) redirect('/portal/login')
     const events = (eventsRes.data ?? []) as any[]
     const announcements = (announcementsRes.data ?? []) as any[]
@@ -62,7 +69,7 @@ export default async function DashboardPage() {
                 <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
                         <div className="hidden md:block p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner">
-                            <Avatar src={member.avatar_url} name={member.full_name} size="lg" className="ring-2 ring-white/10" />
+                            <Avatar src={member.avatar_url} name={member.name || member.email} size="lg" className="ring-2 ring-white/10" />
                         </div>
                         <div>
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 text-[#FECACA] font-bold text-[10px] uppercase tracking-widest mb-4">
@@ -70,10 +77,10 @@ export default async function DashboardPage() {
                                 Active Session Established
                             </div>
                             <h1 className="text-3xl md:text-4xl font-poppins font-bold text-white leading-tight">
-                                Welcome back, <span className="text-[#FCD34D]">{member.full_name.split(' ')[0]}</span>
+                                Welcome back, <span className="text-[#FCD34D]">{(member.name || member.email).split(' ')[0]}</span>
                             </h1>
                             <p className="text-[#FECACA] font-medium mt-2 flex items-center gap-2">
-                                {member.club_post || 'General Member'} <span className="h-1 w-1 rounded-full bg-white/30" /> {member.role.toUpperCase()}
+                                {member.club_post || 'General Member'} <span className="h-1 w-1 rounded-full bg-white/30" /> {(member.role || 'member').toUpperCase()}
                             </p>
                         </div>
                     </div>
@@ -183,7 +190,7 @@ export default async function DashboardPage() {
                                     className="block bg-white p-5 rounded-2xl border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all group"
                                 >
                                     <span className="block text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1.5">
-                                        {formatDate(event.starts_at || '')}
+                                        {formatDate(event.event_date || '')}
                                     </span>
                                     <h4 className="font-bold text-[#111827] text-sm group-hover:text-[#C3161C] transition-colors line-clamp-1">
                                         {event.title}

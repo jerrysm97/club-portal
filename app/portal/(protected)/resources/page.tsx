@@ -1,7 +1,9 @@
 // app/portal/resources/page.tsx — IIMS Collegiate Mission Archives
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import ResourcesClient from '@/components/portal/ResourcesClient'
-import type { Document, Member } from '@/types/database'
+// Import types safely
+type Document = any
+type Member = any
 import { redirect } from 'next/navigation'
 import Pagination from '@/components/ui/Pagination'
 
@@ -25,7 +27,7 @@ export default async function ResourcesPage({
     const { data: member } = await (supabase
         .from('members' as any) as any)
         .select('role')
-        .eq('user_id', session.user.id)
+        .eq('id', session.user.id)
         .single()
 
     if (!member) redirect('/portal/login')

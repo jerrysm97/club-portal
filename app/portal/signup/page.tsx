@@ -10,12 +10,10 @@ import Input from '@/components/ui/Input'
 export default function SignupPage() {
     const router = useRouter()
     const [formData, setFormData] = useState({
-        full_name: '',
+        name: '',
         email: '',
         password: '',
         confirm_password: '',
-        student_id: '',
-        club_post: '',
     })
     const [showPw, setShowPw] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -103,8 +101,8 @@ export default function SignupPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <Input
                                 label="Full Identity Name"
-                                name="full_name"
-                                value={formData.full_name}
+                                name="name"
+                                value={formData.name}
                                 onChange={handleChange}
                                 placeholder="Ramesh Sharma"
                                 required
@@ -121,22 +119,7 @@ export default function SignupPage() {
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <Input
-                                label="Student ID (Optional)"
-                                name="student_id"
-                                value={formData.student_id}
-                                onChange={handleChange}
-                                placeholder="e.g. 077BCT012"
-                            />
-                            <Input
-                                label="Area of Interest"
-                                name="club_post"
-                                value={formData.club_post}
-                                onChange={handleChange}
-                                placeholder="e.g. Web Security, CTF"
-                            />
-                        </div>
+
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="relative">

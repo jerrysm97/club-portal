@@ -55,9 +55,9 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
                             </div>
 
                             <div className="flex items-center gap-4 pt-4">
-                                <Avatar src={post.author?.avatar_url} name={post.author?.full_name} size="xs" />
+                                <Avatar src={post.author?.avatar_url} name={post.author?.name} size="xs" />
                                 <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Relayed by <span className="text-[#58151C]">{post.author?.full_name || 'System'}</span>
+                                    Relayed by <span className="text-[#58151C]">{post.author?.name || 'System'}</span>
                                 </div>
                             </div>
                         </div>

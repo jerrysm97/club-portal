@@ -69,18 +69,20 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         const { data: member, error } = await adminClient
             .from('members')
             .select('role, status')
-            .eq('user_id', user.id)
+            .eq('id', user.id)
             .single()
 
         if (error || !member) {
-            // No member row — redirect to pending
-            return NextResponse.redirect(new URL('/portal/pending', request.url))
+            // If no member row exists yet, allow access to /portal/pending (Step 2 handles this)
+            // or redirect if they are trying to access protected content
+            if (!pathname.startsWith('/portal/pending') && !pathname.startsWith('/portal/register')) {
+                return NextResponse.redirect(new URL('/portal/pending', request.url))
+            }
+            return response
         }
 
         // ── Step 4: Handle member status ──
-        // ── Step 4: Handle member status ──
-        // Allow admins/superadmins to bypass pending status (e.g. first user setup)
-        if (member.status === 'pending' && !['admin', 'superadmin'].includes(member.role)) {
+        if (member.status === 'pending' && !['admin', 'superadmin'].includes(member.role || '')) {
             return NextResponse.redirect(new URL('/portal/pending', request.url))
         }
 

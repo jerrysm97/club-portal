@@ -9,8 +9,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /** Format a date string to "Jan 15, 2025" */
-export function formatDate(date: string | Date): string {
-    return format(new Date(date), 'MMM d, yyyy')
+export function formatDate(date: string | Date | null | undefined): string {
+    if (!date) return 'TBD'
+    const d = new Date(date)
+    if (isNaN(d.getTime())) return 'TBD'
+    return format(d, 'MMM d, yyyy')
 }
 
 /** Format a date to relative time "2 hours ago" */

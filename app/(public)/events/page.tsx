@@ -13,12 +13,17 @@ export const revalidate = 60
 export default async function EventsPage() {
     const supabase = await createServerSupabaseClient()
     const { data: dbEvents } = await supabase
-        .from('events')
-        .select('id, title, short_desc, type, starts_at, location, cover_image_url')
-        .eq('is_published', true)
-        .order('starts_at', { ascending: true })
+        .from('public_events' as any)
+        .select('id, title, description, type, event_date, location, image_url')
+        .eq('status', 'upcoming')
+        .order('event_date', { ascending: true })
 
-    const events = dbEvents ?? []
+    const events = (dbEvents ?? []).map((e: any) => ({
+        ...e,
+        short_desc: e.description,
+        event_date: e.event_date,
+        image_url: e.image_url
+    }))
 
     return (
         <div className="bg-black min-h-screen pt-24">

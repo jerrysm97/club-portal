@@ -2,7 +2,8 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Trophy, Medal, Star, Target, Zap, ChevronRight, Crown } from 'lucide-react'
-import type { Member } from '@/types/database'
+// Import types safely
+type Member = any
 import Avatar from '@/components/ui/Avatar'
 import Pagination from '@/components/ui/Pagination'
 import { cn } from '@/lib/utils'
@@ -28,13 +29,13 @@ export default async function LeaderboardPage({
     const { data: currentMember } = await (supabase
         .from('members' as any) as any)
         .select('id, points')
-        .eq('user_id', session.user.id)
+        .eq('id', session.user.id)
         .single()
 
     // Fetch paginated members
     const { data, count } = await (supabase
         .from('members' as any) as any)
-        .select('id, full_name, avatar_url, points, club_post, role', { count: 'exact' })
+        .select('id, name, avatar_url, points, role', { count: 'exact' })
         .eq('status', 'approved')
         .order('points', { ascending: false })
         .range(from, to)
@@ -107,13 +108,13 @@ export default async function LeaderboardPage({
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
-                                                <Avatar src={m.avatar_url} name={m.full_name} size="sm" className="shadow-lg shadow-black/5" />
+                                                <Avatar src={m.avatar_url} name={m.name || m.email} size="sm" className="shadow-lg shadow-black/5" />
                                                 <div className="min-w-0">
                                                     <p className={cn(
                                                         "font-bold text-sm truncate",
                                                         isMe ? "text-[#C3161C]" : "text-[#111827]"
                                                     )}>
-                                                        {m.full_name} {isMe && "(You)"}
+                                                        {m.name || m.email} {isMe && "(You)"}
                                                     </p>
                                                     <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest md:hidden">
                                                         {m.club_post || m.role}

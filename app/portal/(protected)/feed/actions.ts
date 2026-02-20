@@ -98,7 +98,7 @@ export async function addComment(postId: string, content: string) {
 
     if (!content.trim()) return { error: 'Empty transmission' }
 
-    await (supabase.from('post_comments' as any) as any).insert({
+    await (supabase.from('comments' as any) as any).insert({
         post_id: postId,
         author_id: (member as any).id,
         content: content.trim()

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             return NextResponse.json({ error: result.error.flatten() }, { status: 400 })
         }
 
-        const { full_name, email, password, student_id, club_post } = result.data
+        const { name, email, password } = result.data
         const adminClient = createAdminClient()
 
         // Step 1: Create the Supabase Auth user
@@ -41,15 +41,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         // Step 2: Insert the member row
         const { error: memberError } = await adminClient.from('members').insert({
-            user_id: authData.user.id,
-            full_name,
+            id: authData.user.id,
+            name,
             email,
-            student_id: student_id ?? null,
-            club_post: club_post ?? 'General Member',
             role: 'member',
             status: 'pending',
-            skills: [],
-            points: 0,
+            avatar_url: null,
+            bio: null,
         })
 
         if (memberError) {
