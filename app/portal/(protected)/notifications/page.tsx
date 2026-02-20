@@ -1,66 +1,58 @@
-// app/portal/notifications/page.tsx — IIMS Collegiate System Alerts
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+// app/portal/notifications/page.tsx — IIMS IT Club System Alerts (v4.0)
+import { createServerClient } from '@/lib/supabase-server'
 import NotificationsList from '@/components/portal/NotificationsList'
-// Import types safely
-type Notification = any
-type Member = any
 import { redirect } from 'next/navigation'
-import { ShieldCheck, Megaphone } from 'lucide-react'
+import { ShieldAlert, BellRing } from 'lucide-react'
+import { getSession, getMember } from '@/lib/auth'
 
 export const revalidate = 0
 
 export default async function NotificationsPage() {
-    const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
-
+    const session = await getSession()
     if (!session) redirect('/portal/login')
 
-    // Get current member
-    const { data: member } = await (supabase
-        .from('members' as any) as any)
-        .select('id')
-        .eq('id', session.user.id)
-        .single()
+    const member = await getMember(session.user.id)
+    if (!member) redirect('/portal/pending')
 
-    if (!member) redirect('/portal/login')
+    const supabase = createServerClient()
 
-    // Fetch notifications using the new member_id field
-    const { data: notifications } = await (supabase
-        .from('notifications' as any) as any)
+    // Fetch notifications using the accurate recipient_id field
+    const { data: notifications } = await supabase
+        .from('notifications')
         .select('*')
-        .eq('member_id', (member as any).id)
+        .eq('recipient_id', member.id)
         .order('created_at', { ascending: false })
         .limit(50)
 
     return (
-        <div className="max-w-4xl mx-auto space-y-12 pb-20">
+        <div className="max-w-4xl mx-auto space-y-10 pb-16 animate-fade-up">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#10B981]/5 text-[#10B981] font-black text-[10px] uppercase tracking-widest mb-4 border border-[#10B981]/10">
-                        <ShieldCheck className="h-3.5 w-3.5" /> High-Clearance Inbox
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#E3F2FD] text-[#1976D2] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#E3F2FD]">
+                        <ShieldAlert className="h-3 w-3" /> Priority Inbox
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-poppins font-black text-[#111827] leading-tight">
-                        System <span className="text-[#C3161C]">Directives</span>
+                    <h1 className="text-3xl md:text-5xl font-bold text-[#212121] leading-tight">
+                        System <span className="text-[#1A237E]">Alerts</span>
                     </h1>
-                    <p className="text-gray-400 font-medium text-base mt-2 max-w-xl">
-                        Automated mission alerts, unit transmissions, and urgent sector updates logged in real-time.
+                    <p className="text-[#757575] font-medium text-sm mt-3 max-w-xl leading-relaxed">
+                        Automated club notifications, event reminders, and important system broadcasts logged in real-time.
                     </p>
                 </div>
 
-                <div className="p-4 bg-gray-50 rounded-2xl flex items-center gap-4 border border-gray-100">
-                    <Megaphone className="h-6 w-6 text-[#58151C] opacity-30" />
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <div className="p-4 bg-white rounded-2xl flex items-center gap-4 border border-[#E0E0E0] shadow-sm">
+                    <BellRing className="h-6 w-6 text-[#1A237E] opacity-50" />
+                    <div className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">
                         Live Feed Active
                     </div>
                 </div>
             </div>
 
-            <NotificationsList initialNotifications={(notifications || []) as unknown as Notification[]} />
+            <NotificationsList initialNotifications={(notifications || []) as any[]} />
 
-            <footer className="text-center pt-10">
-                <p className="text-[10px] text-gray-200 font-black uppercase tracking-[0.4em]">
-                    End of Active Notifications Log
+            <footer className="text-center pt-8">
+                <p className="text-[10px] text-[#BDBDBD] font-bold uppercase tracking-[0.3em]">
+                    End of Notifications Log
                 </p>
             </footer>
         </div>

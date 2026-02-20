@@ -6,7 +6,8 @@ import { revalidatePath } from 'next/cache'
 
 export async function uploadDocument(prevState: any, formData: FormData) {
     const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user } } = await supabase.auth.getUser()
+    const session = user ? { user } : null
 
     if (!session) return { error: 'Unauthorized uplink' }
 
@@ -43,7 +44,8 @@ export async function uploadDocument(prevState: any, formData: FormData) {
 
 export async function deleteDocument(id: string) {
     const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user } } = await supabase.auth.getUser()
+    const session = user ? { user } : null
     if (!session) return { error: 'Unauthorized' }
 
     const { data: member } = await (supabase

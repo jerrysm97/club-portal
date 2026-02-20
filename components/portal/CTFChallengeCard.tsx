@@ -1,14 +1,13 @@
-// components/portal/CTFChallengeCard.tsx — IIMS Collegiate Challenge Card
+// components/portal/CTFChallengeCard.tsx — IIMS IT Club CTF Challenge Card (v4.0)
 'use client'
 
 import { useState } from 'react'
-import { Flag, ShieldCheck, Trophy, CheckCircle, AlertTriangle, Loader2, ChevronRight } from 'lucide-react'
+import { Flag, ShieldCheck, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-// Import types safely
-type CTFChallenge = any
-import { submitFlag } from '@/app/portal/(protected)/ctf/actions'
 import { toast } from 'sonner'
 import Button from '@/components/ui/Button'
+
+type CTFChallenge = any
 
 interface CTFChallengeCardProps {
     challenge: CTFChallenge & { solved: boolean }
@@ -24,62 +23,79 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
         if (!flagInput.trim()) return
 
         setLoading(true)
-        const res = await submitFlag(challenge.id, flagInput)
-        setLoading(false)
 
-        if (res?.error) {
-            toast.error(res.error)
-        } else {
-            toast.success(`Flag captured! +${res.points} points awarded.`)
-            setSolved(true)
-            setFlagInput('')
+        try {
+            const res = await fetch('/api/ctf/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    challenge_id: challenge.id,
+                    flag: flagInput
+                })
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                toast.error(data.error || 'Capture failed')
+            } else {
+                toast.success(`Flag captured! +${challenge.points} points awarded.`)
+                setSolved(true)
+                setFlagInput('')
+            }
+        } catch (err) {
+            toast.error('Network error during transmission')
+        } finally {
+            setLoading(false)
         }
     }
 
     return (
         <div className={cn(
-            "relative p-8 rounded-[2rem] border transition-all animate-fade-up flex flex-col h-full group overflow-hidden",
+            "relative p-6 md:p-8 rounded-3xl border transition-all animate-fade-up flex flex-col h-full group overflow-hidden",
             solved
-                ? "bg-emerald-50/50 border-emerald-100"
-                : "bg-white border-gray-100 hover:shadow-2xl hover:border-[#58151C]/10 shadow-sm"
+                ? "bg-[#1E1E2E] border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                : "bg-[#1E1E2E] border-white/10 hover:border-[#E53935]/50 hover:shadow-[0_0_20px_rgba(229,57,53,0.15)] shadow-xl"
         )}>
             {/* Solved Overlay Decoration */}
             {solved && (
-                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-[4rem] flex items-center justify-center pointer-events-none">
-                    <CheckCircle className="h-6 w-6 text-emerald-600 opacity-20" />
+                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-bl-[4rem] flex items-center justify-center pointer-events-none">
+                    <CheckCircle className="h-6 w-6 text-emerald-500/50" />
                 </div>
             )}
 
             {/* Header */}
-            <div className="flex items-start justify-between mb-6">
+            <div className="flex items-start justify-between mb-5">
                 <div className="space-y-3">
                     <div className="flex items-center gap-2">
                         <span className={cn(
-                            "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
-                            challenge.difficulty === 'easy' ? "bg-blue-50 text-blue-600 border-blue-100" :
-                                challenge.difficulty === 'medium' ? "bg-amber-50 text-amber-600 border-amber-100" :
-                                    challenge.difficulty === 'hard' ? "bg-red-50 text-red-600 border-red-100" :
-                                        "bg-purple-50 text-purple-600 border-purple-100"
+                            "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border",
+                            challenge.difficulty === 'easy' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+                                challenge.difficulty === 'medium' ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
+                                    challenge.difficulty === 'hard' ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                                        "bg-purple-500/10 text-purple-400 border-purple-500/20 font-black shadow-[0_0_10px_rgba(168,85,247,0.3)]"
                         )}>
                             {challenge.difficulty}
                         </span>
-                        <span className="px-3 py-1 rounded-lg bg-gray-50 text-gray-400 border border-gray-100 text-[9px] font-black uppercase tracking-widest">
+                        <span className="px-2.5 py-1 rounded-md bg-white/5 text-gray-300 border border-white/10 text-[10px] font-bold uppercase tracking-widest">
                             {challenge.category}
                         </span>
                     </div>
-                    <h3 className="text-xl font-poppins font-black text-[#111827] group-hover:text-[#C3161C] transition-colors leading-tight">{challenge.title}</h3>
+                    <h3 className="text-xl font-bold text-white group-hover:text-[#E53935] transition-colors leading-tight font-mono">
+                        {challenge.title}
+                    </h3>
                 </div>
 
                 <div className="text-right">
-                    <div className="text-3xl font-poppins font-black text-[#58151C]">{challenge.points}</div>
-                    <div className="text-[9px] font-black text-gray-300 uppercase tracking-widest leading-none">PTS</div>
+                    <div className="text-2xl font-bold text-[#E53935] font-mono">{challenge.points}</div>
+                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none">PTS</div>
                 </div>
             </div>
 
             {/* Content */}
-            <p className="text-gray-500 font-medium text-sm mb-8 flex-1 leading-relaxed">
+            <div className="text-gray-400 font-mono text-sm mb-8 flex-1 leading-relaxed">
                 {challenge.description}
-            </p>
+            </div>
 
             {/* Input Overlay / Footer */}
             <div className="mt-auto">
@@ -87,13 +103,13 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="flex flex-col sm:flex-row gap-3">
                             <div className="relative flex-1">
-                                <Flag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300 group-focus-within:text-[#C3161C] transition-colors" />
+                                <Flag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 group-focus-within:text-[#E53935] transition-colors" />
                                 <input
                                     type="text"
                                     placeholder="Enter flag sequence..."
                                     value={flagInput}
                                     onChange={(e) => setFlagInput(e.target.value)}
-                                    className="w-full bg-gray-50 border-transparent rounded-xl pl-11 pr-4 py-3 text-sm font-bold focus:bg-white focus:ring-4 focus:ring-[#58151C]/5 transition-all outline-none placeholder:text-gray-300"
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm font-mono text-white focus:bg-black/60 focus:ring-1 focus:ring-[#E53935] focus:border-[#E53935] transition-all outline-none placeholder:text-gray-600"
                                     disabled={loading}
                                 />
                             </div>
@@ -101,22 +117,26 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
                                 type="submit"
                                 loading={loading}
                                 disabled={!flagInput.trim()}
-                                className="rounded-xl h-12 shadow-lg shadow-red-100 px-6"
+                                className="rounded-xl h-12 px-6 bg-[#E53935] hover:bg-[#C62828] text-white border-none font-bold shadow-lg shadow-[#E53935]/20"
                             >
-                                Capture
+                                Capture <ChevronRightIcon className="inline h-4 w-4 ml-1" />
                             </Button>
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-gray-300 font-black uppercase tracking-[0.2em]">
-                            <ShieldCheck className="h-3.5 w-3.5" /> Security Protocol Active
+                        <div className="flex items-center gap-2 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                            <ShieldCheck className="h-3.5 w-3.5" /> SECURE TRANSMISSION
                         </div>
                     </form>
                 ) : (
-                    <div className="bg-emerald-600 rounded-xl p-4 flex items-center justify-center gap-3 text-white shadow-lg shadow-emerald-100 border border-emerald-500 animate-fade-up">
+                    <div className="bg-emerald-500/10 rounded-xl p-4 flex items-center justify-center gap-3 text-emerald-400 border border-emerald-500/20 animate-fade-up">
                         <ShieldCheck className="h-5 w-5" />
-                        <span className="text-xs font-black uppercase tracking-[0.2em]">Mission Accomplished</span>
+                        <span className="text-xs font-bold uppercase tracking-widest">Target Fully Compromised</span>
                     </div>
                 )}
             </div>
         </div>
     )
+}
+
+function ChevronRightIcon({ className }: { className?: string }) {
+    return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
 }

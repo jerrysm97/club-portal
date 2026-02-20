@@ -1,4 +1,4 @@
-// components/portal/admin/AdminSidebar.tsx — IIMS Collegiate Maroon Admin Nav
+// components/portal/admin/AdminSidebar.tsx — IIMS IT Club Admin Nav (v4.0)
 'use client'
 
 import {
@@ -30,14 +30,14 @@ export default function AdminSidebar({ activeTab, onTabChange }: AdminSidebarPro
     ]
 
     return (
-        <aside className="w-72 bg-[#58151C] h-[calc(100vh-64px)] overflow-y-auto hidden lg:flex flex-col border-r border-white/5 shadow-2xl z-40">
+        <aside className="w-72 bg-[#1A237E] h-[calc(100vh-64px)] overflow-y-auto hidden lg:flex flex-col border-r border-[#283593] shadow-2xl z-40">
             <div className="p-8">
-                <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/5 border border-white/5 mb-8">
-                    <ShieldAlert className="h-5 w-5 text-[#FCD34D]" />
-                    <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Elevated Access</span>
+                <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#E53935]/10 border border-[#E53935]/20 mb-8 backdrop-blur-sm">
+                    <ShieldAlert className="h-5 w-5 text-[#E53935]" />
+                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">Elevated Access</span>
                 </div>
 
-                <nav className="space-y-1">
+                <nav className="space-y-1.5">
                     {tabs.map((tab) => {
                         const active = activeTab === tab.id
                         return (
@@ -45,16 +45,16 @@ export default function AdminSidebar({ activeTab, onTabChange }: AdminSidebarPro
                                 key={tab.id}
                                 onClick={() => onTabChange(tab.id as AdminTab)}
                                 className={cn(
-                                    "w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-sm transition-all group relative",
+                                    "w-full flex items-center gap-4 px-5 py-4 rounded-xl text-sm transition-all group relative",
                                     active
-                                        ? "bg-white text-[#58151C] font-bold shadow-xl translate-x-1"
-                                        : "text-[#FECACA] hover:bg-white/10 hover:text-white"
+                                        ? "bg-white text-[#1A237E] font-bold shadow-lg shadow-black/10 translate-x-1"
+                                        : "text-[#C5CAE9] font-medium hover:bg-white/10 hover:text-white"
                                 )}
                             >
                                 <tab.icon className={cn("h-5 w-5 transition-transform", active ? "scale-110" : "group-hover:scale-110")} />
                                 <span className="flex-1 text-left">{tab.label}</span>
                                 {active && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#C3161C] rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#E53935] rounded-r-full" />
                                 )}
                             </button>
                         )
@@ -62,9 +62,9 @@ export default function AdminSidebar({ activeTab, onTabChange }: AdminSidebarPro
                 </nav>
             </div>
 
-            <div className="mt-auto p-8 border-t border-white/5 bg-black/10">
-                <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] leading-relaxed">
-                    IIMS Collegiate Command <br /> Protocols v2.0.4
+            <div className="mt-auto p-8 border-t border-white/5 bg-[#0D1757]/40 backdrop-blur-sm">
+                <p className="text-[8px] font-bold text-[#9FA8DA]/60 uppercase tracking-widest leading-relaxed">
+                    IIMS IT Club Command <br /> Base Protocol v4.0
                 </p>
             </div>
         </aside>

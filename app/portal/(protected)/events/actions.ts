@@ -6,7 +6,8 @@ import { revalidatePath } from 'next/cache'
 
 export async function toggleRsvp(eventId: string, status: 'going' | 'maybe' | 'not_going') {
     const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user } } = await supabase.auth.getUser()
+    const session = user ? { user } : null
 
     if (!session) return { error: 'Unauthorized uplink' }
 

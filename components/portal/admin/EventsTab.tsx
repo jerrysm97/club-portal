@@ -1,4 +1,4 @@
-// components/portal/admin/EventsTab.tsx — IIMS Collegiate Mission Management
+// components/portal/admin/EventsTab.tsx — IIMS IT Club Mission Management (v4.0)
 'use client'
 
 import { useState } from 'react'
@@ -25,27 +25,27 @@ export default function EventsTab({ events, refresh }: { events: any[], refresh:
     return (
         <div className="space-y-10 animate-fade-up">
             <div className="flex justify-end">
-                <button className="bg-[#58151C] text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-xl shadow-red-900/10 flex items-center gap-3 hover:translate-y-[-2px] transition-all hover:bg-[#C3161C]">
-                    <Plus className="h-5 w-5" /> Initiate New Mission
+                <button className="bg-[#1A237E] text-white px-8 py-3.5 rounded-xl font-bold uppercase text-xs tracking-widest shadow-md shadow-[#1A237E]/20 flex items-center gap-3 hover:translate-y-[-2px] transition-all hover:bg-[#283593]">
+                    <Plus className="h-5 w-5" /> Initiate New Event
                 </button>
             </div>
 
             <div className="grid grid-cols-1 gap-8">
                 {events.map(event => (
-                    <div key={event.id} className="bg-white p-10 rounded-[4rem] border border-gray-100 shadow-sm hover:shadow-2xl transition-all group flex flex-col xl:flex-row gap-10">
+                    <div key={event.id} className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-[#E0E0E0] shadow-sm hover:shadow-xl transition-all group flex flex-col xl:flex-row gap-8 md:gap-10">
                         {/* Event Preview */}
-                        <div className="w-full xl:w-72 h-48 rounded-[3rem] bg-gray-50 overflow-hidden relative border border-gray-100 shrink-0">
+                        <div className="w-full xl:w-72 h-48 rounded-[2rem] bg-[#F8F9FA] overflow-hidden relative border border-[#E0E0E0] shrink-0">
                             {event.image_url ? (
-                                <img src={event.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                <img src={event.image_url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
-                                    <Calendar className="h-12 w-12 text-gray-200" />
+                                    <Calendar className="h-12 w-12 text-[#E0E0E0]" />
                                 </div>
                             )}
                             <div className="absolute top-4 left-4">
                                 <span className={cn(
-                                    "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border backdrop-blur-md",
-                                    event.status === 'upcoming' ? "bg-emerald-500/80 text-white border-emerald-400" : "bg-gray-900/80 text-gray-400 border-gray-700"
+                                    "px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border backdrop-blur-md shadow-sm",
+                                    event.status === 'upcoming' ? "bg-[#4CAF50]/90 text-white border-[#81C784]" : "bg-[#212121]/80 text-[#EEEEEE] border-[#424242]"
                                 )}>
                                     {event.status === 'upcoming' ? 'Operational' : 'Draft Intel'}
                                 </span>
@@ -53,28 +53,28 @@ export default function EventsTab({ events, refresh }: { events: any[], refresh:
                         </div>
 
                         {/* Event Details */}
-                        <div className="flex-1 space-y-6">
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-3 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">
-                                    <span className="text-[#C3161C]">{event.type}</span>
-                                    <span className="w-1 h-1 bg-gray-200 rounded-full" />
+                        <div className="flex-1 space-y-5">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">
+                                    <span className="text-[#E53935]">{event.type}</span>
+                                    <span className="w-1 h-1 bg-[#E0E0E0] rounded-full" />
                                     <span>{formatDate(event.event_date)}</span>
                                 </div>
-                                <h3 className="text-2xl font-poppins font-black text-[#111827] group-hover:text-[#C3161C] transition-colors leading-tight">
+                                <h3 className="text-2xl md:text-3xl font-bold text-[#212121] group-hover:text-[#1A237E] transition-colors leading-tight">
                                     {event.title}
                                 </h3>
-                                <div className="flex items-center gap-4 text-gray-400 font-medium text-sm">
+                                <div className="flex items-center gap-5 text-[#757575] font-medium text-sm">
                                     <div className="flex items-center gap-2">
-                                        <MapPin className="h-4 w-4 opacity-50" />
+                                        <MapPin className="h-4 w-4 opacity-70" />
                                         {event.location || 'Remote Feed'}
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Users className="h-4 w-4 opacity-50" />
+                                        <Users className="h-4 w-4 opacity-70" />
                                         {event.max_attendees ? `${event.max_attendees} slots` : 'Unrestricted'}
                                     </div>
                                 </div>
                             </div>
-                            <p className="text-gray-500 font-medium text-base line-clamp-2">{event.description}</p>
+                            <p className="text-[#9E9E9E] font-medium text-sm line-clamp-2 leading-relaxed">{event.description}</p>
                         </div>
 
                         {/* Event Actions */}
@@ -83,24 +83,24 @@ export default function EventsTab({ events, refresh }: { events: any[], refresh:
                                 onClick={() => handleToggleStatus(event.id, event.status === 'upcoming')}
                                 disabled={!!isLoading}
                                 className={cn(
-                                    "flex-1 xl:w-16 h-16 rounded-[2rem] flex items-center justify-center transition-all border shadow-sm",
+                                    "flex-1 xl:w-14 h-14 rounded-xl flex items-center justify-center transition-all border shadow-sm",
                                     event.status === 'upcoming'
-                                        ? "bg-gray-900 text-white border-gray-800 hover:bg-black"
-                                        : "bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white"
+                                        ? "bg-[#212121] text-white border-[#424242] hover:bg-black"
+                                        : "bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9] hover:bg-[#4CAF50] hover:text-white"
                                 )}
-                                title={event.status === 'upcoming' ? "Archive Mission" : "Deploy Mission"}
+                                title={event.status === 'upcoming' ? "Archive Event" : "Deploy Event"}
                             >
-                                {event.status === 'upcoming' ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+                                {event.status === 'upcoming' ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </button>
-                            <button className="flex-1 xl:w-16 h-16 bg-white border border-gray-100 text-[#58151C] hover:bg-[#58151C] hover:text-white rounded-[2rem] flex items-center justify-center transition-all shadow-sm">
-                                <Edit2 className="h-6 w-6" />
+                            <button className="flex-1 xl:w-14 h-14 bg-white border border-[#E0E0E0] text-[#1A237E] hover:bg-[#E8EAF6] hover:border-[#C5CAE9] rounded-xl flex items-center justify-center transition-all shadow-sm">
+                                <Edit2 className="h-5 w-5" />
                             </button>
                             <a
                                 href={`/portal/events/${event.id}`}
                                 target="_blank"
-                                className="flex-1 xl:w-16 h-16 bg-white border border-gray-100 text-gray-400 hover:bg-gray-50 rounded-[2rem] flex items-center justify-center transition-all shadow-sm"
+                                className="flex-1 xl:w-14 h-14 bg-white border border-[#E0E0E0] text-[#BDBDBD] hover:text-[#212121] hover:bg-[#F8F9FA] rounded-xl flex items-center justify-center transition-all shadow-sm"
                             >
-                                <ExternalLink className="h-6 w-6" />
+                                <ExternalLink className="h-5 w-5" />
                             </a>
                         </div>
                     </div>

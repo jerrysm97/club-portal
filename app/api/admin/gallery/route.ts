@@ -1,56 +1,85 @@
-// app/api/admin/gallery/route.ts
-// Admin gallery API — POST, PATCH (caption), DELETE (also removes from storage).
-
+// app/api/admin/gallery/route.ts — Admin Gallery API (v4.0 Spec-Compliant)
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { assertRole } from '@/lib/auth'
+import { createServerClient } from '@/lib/supabase-server'
+import { z } from 'zod'
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-async function assertAdmin() {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        { cookies: { get: (name) => cookieStore.get(name)?.value } }
-    )
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return null
-    const { data } = await supabaseAdmin.from('members').select('role').eq('id', session.user.id).single()
-    return data?.role === 'admin' ? session : null
-}
+const createGallerySchema = z.object({
+    url: z.string().url(),
+    caption: z.string().max(300).optional(),
+    event_id: z.string().uuid().optional(),
+})
 
 export async function POST(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const { image_url, caption, sort_order } = await req.json()
-    const { error } = await supabaseAdmin.from('public_gallery').insert({ image_url, caption, sort_order })
+    const admin = await assertRole('admin')
+    const body = await req.json()
+    const parsed = createGallerySchema.safeParse(body)
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    }
+
+    const supabase = createServerClient()
+    const { error } = await supabase.from('gallery_images').insert({
+        ...parsed.data,
+        uploader_id: admin.id,
+    })
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await supabase.from('audit_logs').insert({
+        admin_id: admin.id,
+        action: 'upload_gallery',
+        meta: { caption: parsed.data.caption }
+    })
+
     return NextResponse.json({ success: true })
 }
 
 export async function PATCH(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const { id, caption } = await req.json()
-    const { error } = await supabaseAdmin.from('public_gallery').update({ caption }).eq('id', id)
+    const admin = await assertRole('admin')
+    const body = await req.json()
+    const parsed = z.object({
+        id: z.string().uuid(),
+        caption: z.string().max(300).optional(),
+    }).safeParse(body)
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    }
+
+    const { id, ...fields } = parsed.data
+    const supabase = createServerClient()
+    const { error } = await supabase.from('gallery_images').update(fields).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
     return NextResponse.json({ success: true })
 }
 
 export async function DELETE(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const { id, image_url } = await req.json()
+    const admin = await assertRole('admin')
+    const body = await req.json()
+    const { id } = z.object({ id: z.string().uuid() }).parse(body)
 
-    // Remove from storage bucket if URL is from our Supabase storage
-    if (image_url?.includes('/storage/v1/object/public/gallery/')) {
-        const path = image_url.split('/storage/v1/object/public/gallery/')[1]
-        await supabaseAdmin.storage.from('gallery').remove([path])
+    const supabase = createServerClient()
+
+    // Fetch image URL before deleting to clean up storage
+    const { data: image } = await supabase
+        .from('gallery_images')
+        .select('url')
+        .eq('id', id)
+        .single()
+
+    if (image?.url?.includes('/storage/v1/object/public/public-gallery/')) {
+        const path = image.url.split('/storage/v1/object/public/public-gallery/')[1]
+        if (path) await supabase.storage.from('public-gallery').remove([path])
     }
 
-    const { error } = await supabaseAdmin.from('public_gallery').delete().eq('id', id)
+    const { error } = await supabase.from('gallery_images').delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await supabase.from('audit_logs').insert({
+        admin_id: admin.id,
+        action: 'delete_gallery',
+        target_id: id,
+    })
+
     return NextResponse.json({ success: true })
 }

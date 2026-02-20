@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         const result = magicLinkSchema.safeParse(body)
 
         if (!result.success) {
-            return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 })
+            return NextResponse.json({ error: result.error.issues[0]?.message || 'Invalid email format' }, { status: 400 })
         }
 
         const { email } = result.data

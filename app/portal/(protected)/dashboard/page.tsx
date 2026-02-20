@@ -1,35 +1,29 @@
-// app/portal/dashboard/page.tsx — IIMS Collegiate Member Dashboard
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+// app/portal/(protected)/dashboard/page.tsx — IIMS IT Club Dashboard (v4.0)
+import { createServerClient } from '@/lib/supabase-server'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { ShieldCheck, Calendar, FileText, ArrowRight, Megaphone, Terminal, Star, Zap, Trophy, MessageSquare, ChevronRight, Box as BoxIcon } from 'lucide-react'
+import { ShieldCheck, Calendar, ArrowRight, Megaphone, Terminal, Star, Trophy, MessageSquare, ChevronRight, GraduationCap } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
-import Button from '@/components/ui/Button'
 import Avatar from '@/components/ui/Avatar'
-// Importing helper types for casting if necessary
-type Member = any
-type DBEvent = any
-type Post = any
+import { getSession, getMember } from '@/lib/auth'
 
-export const revalidate = 60
+export const revalidate = 60 // Revalidate dashboard every minute
 
 export default async function DashboardPage() {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        console.log('XXX [Dashboard] No user -> redirect login')
-        redirect('/portal/login')
-    }
-    console.log('XXX [Dashboard] Loading for user:', user.email)
+    const session = await getSession()
+    if (!session) return null // layout handles redirect
 
-    // Parallel data fetching
-    const [memberRes, eventsRes, announcementsRes, rankRes] = await Promise.all([
-        supabase.from('members').select('*').eq('id', user.id).single(),
+    const member = await getMember(session.user.id)
+    if (!member) return null
+
+    const supabase = createServerClient()
+
+    // Parallel data fetch for everything else, using member.points
+    const [eventsRes, announcementsRes, rankRes] = await Promise.all([
         supabase
-            .from('public_events' as any)
-            .select('id, title, type, event_date, location')
+            .from('public_events')
+            .select('id, title, type, event_date, location, is_published')
             .gte('event_date', new Date().toISOString())
-            .eq('status', 'upcoming')
+            .eq('is_published', true)
             .order('event_date')
             .limit(4),
         supabase
@@ -41,179 +35,197 @@ export default async function DashboardPage() {
         supabase
             .from('members')
             .select('id', { count: 'exact', head: true })
-            .gt('points', 0) // placeholder, will refine below
+            .gt('points', member.points || 0)
     ])
 
-    const member = memberRes.data as any | null
-    if (!member) redirect('/portal/login')
-    const events = (eventsRes.data ?? []) as any[]
-    const announcements = (announcementsRes.data ?? []) as any[]
+    const events = eventsRes.data ?? []
+    const announcements = announcementsRes.data ?? []
 
-    // Refined rank query
-    const { count: rankCount } = await supabase
-        .from('members')
-        .select('id', { count: 'exact', head: true })
-        .gt('points', member.points || 0)
-
-    const userRank = (rankCount || 0) + 1
-
-    const isHighPerms = ['bod', 'admin', 'superadmin'].includes(member.role)
+    // User rank is (number of people with MORE points) + 1
+    const userRank = (rankRes.count || 0) + 1
+    const isHighPerms = ['admin', 'superadmin'].includes(member.role)
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-8 animate-fade-up">
             {/* Welcome Banner */}
-            <section className="relative rounded-[2.5rem] bg-[#58151C] overflow-hidden p-10 md:p-12 shadow-2xl shadow-red-100/50">
-                <div className="absolute inset-0 hero-grid opacity-20 pointer-events-none" />
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-white/10 to-transparent blur-3xl rounded-full translate-x-32 -translate-y-32" />
+            <section className="relative rounded-3xl bg-[#1A237E] overflow-hidden p-8 md:p-12 shadow-lg shadow-[#1A237E]/20">
+                {/* Decorative geometry */}
+                <div className="absolute top-[-50%] right-[-10%] w-[120%] h-[200%] bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-32 -translate-y-32" />
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#E53935]/10 rounded-full blur-3xl -translate-x-32 translate-y-32" />
 
                 <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
-                        <div className="hidden md:block p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner">
-                            <Avatar src={member.avatar_url} name={member.name || member.email} size="lg" className="ring-2 ring-white/10" />
+                        <div className="hidden md:flex p-1 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner h-20 w-20 items-center justify-center relative">
+                            {member.avatar_url ? (
+                                <Avatar src={member.avatar_url} name={member.full_name} size="lg" className="h-16 w-16" />
+                            ) : (
+                                <div className="h-16 w-16 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                                    <GraduationCap className="h-8 w-8 text-[#1A237E]" />
+                                </div>
+                            )}
                         </div>
                         <div>
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 text-[#FECACA] font-bold text-[10px] uppercase tracking-widest mb-4">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 text-white font-bold text-[10px] uppercase tracking-widest mb-3 backdrop-blur-sm border border-white/10">
                                 <ShieldCheck className="h-3.5 w-3.5" />
-                                Active Session Established
+                                Secure Session
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-poppins font-bold text-white leading-tight">
-                                Welcome back, <span className="text-[#FCD34D]">{(member.name || member.email).split(' ')[0]}</span>
+                            <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+                                Welcome, <span className="text-[#FFEB3B]">{member.full_name.split(' ')[0]}</span>
                             </h1>
-                            <p className="text-[#FECACA] font-medium mt-2 flex items-center gap-2">
-                                {member.club_post || 'General Member'} <span className="h-1 w-1 rounded-full bg-white/30" /> {(member.role || 'member').toUpperCase()}
-                            </p>
+                            <div className="flex items-center gap-3 mt-2">
+                                <p className="text-[#E8EAF6] font-medium text-sm flex items-center gap-2">
+                                    {member.program && member.intake ? `${member.program} • ${member.intake}` : 'IT Club Member'}
+                                </p>
+                                <span className="h-1 w-1 rounded-full bg-white/30" />
+                                <span className="text-white text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-white/10">
+                                    {member.club_post || 'General Member'}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-8 bg-black/20 backdrop-blur-xl px-10 py-6 rounded-[2rem] border border-white/10 shadow-2xl">
+                    <div className="flex items-center gap-6 md:gap-8 bg-black/20 backdrop-blur-xl px-8 py-5 rounded-2xl border border-white/10 shadow-xl">
                         <div className="text-center">
-                            <span className="block text-[10px] text-[#FECACA] font-black uppercase tracking-[0.2em] mb-1">XP Points</span>
-                            <span className="block text-3xl font-poppins font-bold text-[#FCD34D]">{member.points}</span>
+                            <span className="block text-[10px] text-[#E8EAF6] font-bold uppercase tracking-widest mb-1.5 opacity-80">Club Points</span>
+                            <span className="block text-3xl font-bold text-[#FFEB3B]">{member.points || 0}</span>
                         </div>
                         <div className="w-px h-12 bg-white/10" />
-                        <div className="text-center">
-                            <span className="block text-[10px] text-[#FECACA] font-black uppercase tracking-[0.2em] mb-1">Rank</span>
-                            <span className="block text-xl font-poppins font-bold text-white">
+                        <div className="text-center group">
+                            <span className="block text-[10px] text-[#E8EAF6] font-bold uppercase tracking-widest mb-1.5 opacity-80">Global Rank</span>
+                            <Link href="/portal/leaderboard" className="block text-2xl font-bold text-white hover:text-[#FFEB3B] transition-colors">
                                 #{userRank}
-                            </span>
+                            </Link>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* Main Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* Announcements & Feed News */}
-                <div className="lg:col-span-2 space-y-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                {/* Announcements Feed */}
+                <div className="xl:col-span-2 space-y-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-poppins font-bold text-[#111827] flex items-center gap-3">
-                            <Megaphone className="h-6 w-6 text-[#C3161C]" />
-                            Sector Updates
+                        <h2 className="text-xl font-bold text-[#212121] flex items-center gap-2">
+                            <Megaphone className="h-5 w-5 text-[#E53935]" />
+                            Official Announcements
                         </h2>
-                        <Link href="/portal/feed" className="text-sm font-bold text-[#C3161C] hover:underline flex items-center gap-1 group">
-                            Full Archive <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        <Link href="/portal/feed" className="text-sm font-semibold text-[#1A237E] hover:underline flex items-center gap-1 group">
+                            View All <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 gap-5">
                         {announcements.length > 0 ? (
-                            announcements.map((post, idx) => (
-                                <div
+                            announcements.map((post) => (
+                                <Link
                                     key={post.id}
-                                    className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#58151C]/10 transition-all group"
-                                    style={{ animationDelay: `${idx * 100}ms` }}
+                                    href={`/portal/feed/${post.id}`}
+                                    className="block bg-white p-6 md:p-8 rounded-2xl border border-[#E0E0E0] shadow-sm hover:shadow-md hover:border-[#1A237E]/20 transition-all group"
                                 >
-                                    <div className="flex items-center justify-between mb-6">
-                                        <span className="px-3 py-1 rounded-lg bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-widest border border-amber-100">
-                                            High Priority
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="px-2.5 py-1 rounded-md bg-[#FFF8E1] text-[#F57F17] text-[10px] font-bold uppercase tracking-wider border border-[#F57F17]/20">
+                                            Announcement
                                         </span>
-                                        <span className="text-gray-400 text-xs font-bold font-mono">
+                                        <span className="text-[#9E9E9E] text-xs font-semibold">
                                             {formatDate(post.created_at)}
                                         </span>
                                     </div>
-                                    {post.title && (
-                                        <h3 className="text-xl font-poppins font-bold text-[#111827] mb-3 group-hover:text-[#C3161C] transition-colors">{post.title}</h3>
-                                    )}
-                                    <p className="text-gray-500 text-base leading-relaxed line-clamp-2 mb-6 font-medium">{post.content}</p>
-                                    <Link href={`/portal/feed/${post.id}`} className="inline-flex items-center gap-2 text-sm font-bold text-[#58151C] group-hover:gap-3 transition-all">
-                                        Read Intel Briefing <ChevronRight className="h-4 w-4" />
-                                    </Link>
-                                </div>
+                                    <h3 className="text-lg font-bold text-[#212121] mb-2 group-hover:text-[#1A237E] transition-colors line-clamp-2">
+                                        {post.title}
+                                    </h3>
+                                    <p className="text-[#757575] text-sm leading-relaxed line-clamp-2 mb-4">
+                                        {post.content}
+                                    </p>
+                                    <div className="flex items-center gap-1.5 text-sm font-semibold text-[#1A237E]">
+                                        Read details <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                                    </div>
+                                </Link>
                             ))
                         ) : (
-                            <div className="bg-gray-50 p-12 rounded-[2rem] border-2 border-dashed border-gray-200 text-center">
-                                <Box className="h-10 w-10 text-gray-300 mx-auto mb-4" />
-                                <p className="text-gray-500 font-bold">No active announcements detected.</p>
+                            <div className="bg-white p-10 rounded-2xl border border-dashed border-[#E0E0E0] text-center flex flex-col items-center justify-center">
+                                <BoxIcon className="h-10 w-10 text-[#E0E0E0] mb-3" />
+                                <p className="text-[#757575] font-medium text-sm">No recent announcements from the board.</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Sidebar Intel */}
-                <div className="space-y-10">
-                    {/* Quick Command */}
+                {/* Sidebar Details */}
+                <div className="space-y-8">
+                    {/* Admin Shortcuts */}
                     {isHighPerms && (
-                        <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-[#58151C]/5 rounded-bl-[4rem] group-hover:bg-[#58151C]/10 transition-colors" />
-                            <h2 className="text-lg font-poppins font-bold text-[#111827] mb-6 flex items-center gap-2">
-                                <ShieldCheck className="h-5 w-5 text-[#C3161C]" />
-                                Command Center
+                        <div className="bg-[#F8F9FA] p-6 rounded-2xl border border-[#E0E0E0] shadow-sm">
+                            <h2 className="text-sm font-bold text-[#212121] mb-4 flex items-center gap-2 uppercase tracking-wide">
+                                <ShieldCheck className="h-4 w-4 text-[#E53935]" />
+                                Admin Shortcuts
                             </h2>
                             <div className="grid grid-cols-1 gap-3">
-                                <Button size="sm" className="rounded-xl font-bold justify-start px-5 h-11" leftIcon={<Star className="h-4 w-4" />}>
-                                    Create Announcement
-                                </Button>
-                                <Button variant="outline" size="sm" className="rounded-xl font-bold border-2 justify-start px-5 h-11" leftIcon={<Calendar className="h-4 w-4" />}>
-                                    Schedule Mission
-                                </Button>
+                                <Link href="/portal/admin?tab=broadcast" className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#E0E0E0] hover:border-[#1A237E] hover:shadow-sm transition-all group">
+                                    <span className="text-sm font-semibold text-[#424242] group-hover:text-[#1A237E] flex items-center gap-2">
+                                        <Megaphone className="h-4 w-4" /> Broadcast
+                                    </span>
+                                    <ChevronRight className="h-4 w-4 text-[#E0E0E0] group-hover:text-[#1A237E]" />
+                                </Link>
+                                <Link href="/portal/admin?tab=events" className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#E0E0E0] hover:border-[#1A237E] hover:shadow-sm transition-all group">
+                                    <span className="text-sm font-semibold text-[#424242] group-hover:text-[#1A237E] flex items-center gap-2">
+                                        <Calendar className="h-4 w-4" /> Manage Events
+                                    </span>
+                                    <ChevronRight className="h-4 w-4 text-[#E0E0E0] group-hover:text-[#1A237E]" />
+                                </Link>
                             </div>
                         </div>
                     )}
 
-                    {/* Upcoming Missions */}
-                    <div className="space-y-6">
+                    {/* Upcoming Events */}
+                    <div className="space-y-5">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-poppins font-bold text-[#111827] flex items-center gap-2">
-                                <Calendar className="h-5 w-5 text-blue-600" />
-                                Next Missions
+                            <h2 className="text-base font-bold text-[#212121] flex items-center gap-2">
+                                <Calendar className="h-5 w-5 text-[#1A237E]" />
+                                Upcoming Events
                             </h2>
-                            <Link href="/portal/events" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">
-                                All Registry
+                            <Link href="/portal/events" className="text-xs font-semibold text-[#9E9E9E] hover:text-[#1A237E] transition-colors">
+                                View Calendar
                             </Link>
                         </div>
 
-                        <div className="space-y-4">
-                            {events.map((event) => (
+                        <div className="space-y-3">
+                            {events.length > 0 ? events.map((event: any) => (
                                 <Link
                                     key={event.id}
                                     href={`/portal/events/${event.id}`}
-                                    className="block bg-white p-5 rounded-2xl border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all group"
+                                    className="block bg-white p-4 rounded-xl border border-[#E0E0E0] hover:border-[#1A237E]/30 hover:shadow-md transition-all group"
                                 >
-                                    <span className="block text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1.5">
+                                    <span className="block text-[10px] font-bold text-[#1A237E] uppercase tracking-wider mb-1">
                                         {formatDate(event.event_date || '')}
                                     </span>
-                                    <h4 className="font-bold text-[#111827] text-sm group-hover:text-[#C3161C] transition-colors line-clamp-1">
+                                    <h4 className="font-semibold text-[#212121] text-sm group-hover:text-[#1A237E] transition-colors line-clamp-1">
                                         {event.title}
                                     </h4>
-                                    <div className="flex items-center gap-3 mt-3">
-                                        <span className="px-2 py-0.5 rounded-lg bg-gray-50 text-gray-400 text-[9px] font-black uppercase border border-gray-100">
+                                    <div className="flex items-center justify-between mt-2">
+                                        <span className="px-2 py-0.5 rounded-md bg-[#F5F5F5] text-[#757575] text-[10px] font-bold uppercase border border-[#E0E0E0]">
                                             {event.type}
                                         </span>
+                                        <ChevronRight className="h-3 w-3 text-[#E0E0E0] group-hover:text-[#1A237E]" />
                                     </div>
                                 </Link>
-                            ))}
+                            )) : (
+                                <div className="p-5 text-center bg-[#F8F9FA] rounded-xl border border-dashed border-[#E0E0E0]">
+                                    <p className="text-xs text-[#9E9E9E] font-medium">No upcoming events right now.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Quick Modals / Tools */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <Link href="/portal/ctf" className="flex flex-col items-center justify-center p-6 rounded-[1.5rem] bg-emerald-50 border border-emerald-100 group hover:bg-emerald-600 transition-all shadow-sm">
-                            <Trophy className="h-6 w-6 text-emerald-600 mb-2 group-hover:text-white transition-colors" />
-                            <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest group-hover:text-white">Arena</span>
+                    {/* Modules / Tools */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <Link href="/portal/ctf" className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-[#E0E0E0] hover:border-[#1A237E] hover:bg-[#1A237E]/5 transition-all group shadow-sm">
+                            <Terminal className="h-6 w-6 text-[#424242] mb-2 group-hover:text-[#1A237E] transition-colors" />
+                            <span className="text-[10px] font-bold text-[#757575] uppercase tracking-widest group-hover:text-[#1A237E]">CTF Arena</span>
                         </Link>
-                        <Link href="/portal/messages" className="flex flex-col items-center justify-center p-6 rounded-[1.5rem] bg-indigo-50 border border-indigo-100 group hover:bg-indigo-600 transition-all shadow-sm">
-                            <MessageSquare className="h-6 w-6 text-indigo-600 mb-2 group-hover:text-white transition-colors" />
-                            <span className="text-[10px] font-black text-indigo-800 uppercase tracking-widest group-hover:text-white">Comm</span>
+                        <Link href="/portal/messages" className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-[#E0E0E0] hover:border-[#0277BD] hover:bg-[#0277BD]/5 transition-all group shadow-sm">
+                            <MessageSquare className="h-6 w-6 text-[#424242] mb-2 group-hover:text-[#0277BD] transition-colors" />
+                            <span className="text-[10px] font-bold text-[#757575] uppercase tracking-widest group-hover:text-[#0277BD]">Messages</span>
                         </Link>
                     </div>
                 </div>
@@ -222,7 +234,7 @@ export default async function DashboardPage() {
     )
 }
 
-function Box({ className }: { className?: string }) {
+function BoxIcon({ className }: { className?: string }) {
     return (
         <svg
             viewBox="0 0 24 24"

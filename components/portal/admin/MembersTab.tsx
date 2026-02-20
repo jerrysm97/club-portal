@@ -1,4 +1,4 @@
-// components/portal/admin/MembersTab.tsx — IIMS Collegiate Operative Management
+// components/portal/admin/MembersTab.tsx — IIMS IT Club Operative Management (v4.0)
 'use client'
 
 import { useState } from 'react'
@@ -6,9 +6,9 @@ import { BadgeCheck, Ban, Trash2, MoreHorizontal, UserCheck, Shield, ShieldAlert
 import { updateMemberStatus, deleteMember } from '@/app/portal/(protected)/admin/actions'
 import Avatar from '@/components/ui/Avatar'
 import { toast } from 'sonner'
-// Import types safely
-type Member = any
 import { cn } from '@/lib/utils'
+
+type Member = any
 
 export default function MembersTab({ members, refresh }: { members: Member[], refresh: () => void }) {
     const [isLoading, setIsLoading] = useState<string | null>(null)
@@ -19,75 +19,75 @@ export default function MembersTab({ members, refresh }: { members: Member[], re
         setIsLoading(null)
         if (res?.error) toast.error(res.error)
         else {
-            toast.success(`Operative updated to ${status}`)
+            toast.success(`Member updated to ${status}`)
             refresh()
         }
     }
 
     async function handleDelete(id: string) {
-        if (!confirm('Abort Operative Protocol? This action cannot be reversed.')) return
+        if (!confirm('Abort member profile? This action cannot be reversed.')) return
         setIsLoading(id)
         const res = await deleteMember(id)
         setIsLoading(null)
         if (res?.error) toast.error(res.error)
         else {
-            toast.success('Operative records purged')
+            toast.success('Member record deleted')
             refresh()
         }
     }
 
     return (
         <div className="space-y-8 animate-fade-up">
-            <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-[2rem] border border-[#E0E0E0] shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50 border-b border-gray-100">
-                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Operative</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Clearance</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Directives</th>
+                            <tr className="bg-[#F8F9FA] border-b border-[#E0E0E0]">
+                                <th className="px-8 py-5 text-[10px] font-bold text-[#757575] uppercase tracking-widest">Member</th>
+                                <th className="px-8 py-5 text-[10px] font-bold text-[#757575] uppercase tracking-widest">Role Clearance</th>
+                                <th className="px-8 py-5 text-[10px] font-bold text-[#757575] uppercase tracking-widest">Status</th>
+                                <th className="px-8 py-5 text-[10px] font-bold text-[#757575] uppercase tracking-widest text-right">Directives</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-[#EEEEEE]">
                             {members.map(member => (
-                                <tr key={member.id} className="group hover:bg-gray-50/50 transition-all">
-                                    <td className="px-8 py-6">
+                                <tr key={member.id} className="group hover:bg-[#F8F9FA] transition-all">
+                                    <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">
-                                            <Avatar src={member.avatar_url} name={member.name} size="sm" className="shadow-lg shadow-black/5" />
+                                            <Avatar src={member.avatar_url} name={member.full_name || member.email} size="sm" className="shadow-sm" />
                                             <div className="min-w-0">
-                                                <div className="text-[#111827] text-sm font-bold truncate">{member.name}</div>
-                                                <div className="text-gray-400 text-[10px] font-medium truncate">{member.email}</div>
+                                                <div className="text-[#212121] text-sm font-bold truncate">{member.full_name || member.email}</div>
+                                                <div className="text-[#9E9E9E] text-[10px] font-semibold truncate">{member.email}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
+                                            "px-3.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
                                             member.role === 'admin' || member.role === 'superadmin'
-                                                ? "bg-red-50 text-[#C3161C] border-red-100 shadow-sm"
-                                                : "bg-blue-50 text-blue-700 border-blue-100"
+                                                ? "bg-[#FFEBEE] text-[#D32F2F] border-[#FFCDD2] shadow-sm"
+                                                : "bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB]"
                                         )}>
                                             {member.role}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
-                                            member.status === 'approved' ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
-                                                member.status === 'pending' ? "bg-amber-50 text-amber-700 border-amber-100 animate-pulse" :
-                                                    "bg-gray-50 text-gray-400 border-gray-200"
+                                            "px-3.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
+                                            member.status === 'approved' ? "bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]" :
+                                                member.status === 'pending' ? "bg-[#FFF8E1] text-[#F57F17] border-[#FFECB3] animate-pulse" :
+                                                    "bg-[#F5F5F5] text-[#757575] border-[#E0E0E0]"
                                         )}>
                                             {member.status}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-6 text-right">
-                                        <div className="flex justify-end gap-2">
+                                    <td className="px-8 py-5 text-right">
+                                        <div className="flex justify-end gap-2.5">
                                             {member.status === 'pending' && (
                                                 <button
                                                     onClick={() => handleStatus(member.id, 'approved')}
                                                     disabled={!!isLoading}
-                                                    className="p-3 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white rounded-xl transition-all shadow-sm border border-emerald-100"
+                                                    className="p-2.5 bg-[#E8F5E9] hover:bg-[#4CAF50] text-[#2E7D32] hover:text-white rounded-xl transition-all shadow-sm border border-[#C8E6C9]"
                                                     title="Authorize Protocol"
                                                 >
                                                     <UserCheck className="h-4 w-4" />
@@ -97,7 +97,7 @@ export default function MembersTab({ members, refresh }: { members: Member[], re
                                                 <button
                                                     onClick={() => handleStatus(member.id, member.status, 'admin')}
                                                     disabled={!!isLoading}
-                                                    className="p-3 bg-red-50 hover:bg-[#C3161C] text-[#C3161C] hover:text-white rounded-xl transition-all shadow-sm border border-red-100"
+                                                    className="p-2.5 bg-[#FFEBEE] hover:bg-[#E53935] text-[#D32F2F] hover:text-white rounded-xl transition-all shadow-sm border border-[#FFCDD2]"
                                                     title="Promote Clearance"
                                                 >
                                                     <ShieldAlert className="h-4 w-4" />
@@ -106,7 +106,7 @@ export default function MembersTab({ members, refresh }: { members: Member[], re
                                             <button
                                                 onClick={() => handleDelete(member.id)}
                                                 disabled={!!isLoading}
-                                                className="p-3 bg-gray-50 hover:bg-gray-900 text-gray-400 hover:text-white rounded-xl transition-all shadow-sm border border-gray-100"
+                                                className="p-2.5 bg-white hover:bg-[#212121] text-[#9E9E9E] hover:text-white rounded-xl transition-all shadow-sm border border-[#E0E0E0]"
                                                 title="Purge Record"
                                             >
                                                 <Trash2 className="h-4 w-4" />

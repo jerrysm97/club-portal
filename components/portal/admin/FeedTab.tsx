@@ -1,4 +1,4 @@
-// components/portal/admin/FeedTab.tsx — IIMS Collegiate Transmission Ops
+// components/portal/admin/FeedTab.tsx — IIMS IT Club Transmissions Ops (v4.0)
 'use client'
 
 import { useState } from 'react'
@@ -28,45 +28,45 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
         <div className="space-y-8 animate-fade-up">
             <div className="grid grid-cols-1 gap-6">
                 {posts.map(post => (
-                    <div key={post.id} className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#58151C]/10 transition-all group flex flex-col md:flex-row gap-8 items-start">
+                    <div key={post.id} className="bg-white p-8 rounded-[2rem] border border-[#E0E0E0] shadow-sm hover:shadow-xl hover:border-[#1A237E]/20 transition-all group flex flex-col md:flex-row gap-8 items-start">
                         <div className="flex-1 space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <span className={cn(
-                                        "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
-                                        post.type === 'announcement' ? "bg-amber-50 text-amber-700 border-amber-100" : "bg-gray-50 text-gray-500 border-gray-200"
+                                        "px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
+                                        post.type === 'announcement' ? "bg-[#FFF8E1] text-[#F57F17] border-[#FFECB3]" : "bg-[#F8F9FA] text-[#757575] border-[#E0E0E0]"
                                     )}>
                                         {post.type || 'Standard'} Directive
                                     </span>
-                                    {post.is_pinned && <Pin className="h-3.5 w-3.5 text-[#C3161C]" />}
+                                    {post.is_pinned && <Pin className="h-4 w-4 text-[#E53935]" />}
                                 </div>
-                                <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                                <span className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">
                                     {formatDate(post.created_at)}
                                 </span>
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="text-xl font-poppins font-black text-[#111827] group-hover:text-[#C3161C] transition-colors">
+                                <h3 className="text-xl font-bold text-[#212121] group-hover:text-[#1A237E] transition-colors leading-tight">
                                     {post.title || 'Untitled Transmission'}
                                 </h3>
-                                <p className="text-gray-500 font-medium text-sm line-clamp-2 leading-relaxed">
+                                <p className="text-[#757575] font-medium text-sm line-clamp-2 leading-relaxed">
                                     {post.content}
                                 </p>
                             </div>
 
                             <div className="flex items-center gap-4 pt-4">
-                                <Avatar src={post.author?.avatar_url} name={post.author?.name} size="xs" />
-                                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Relayed by <span className="text-[#58151C]">{post.author?.name || 'System'}</span>
+                                <Avatar src={post.author?.avatar_url} name={post.author?.full_name || post.author?.name} size="xs" />
+                                <div className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">
+                                    Relayed by <span className="text-[#1A237E]">{post.author?.full_name || post.author?.name || 'System'}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex md:flex-col gap-2 w-full md:w-auto mt-4 md:mt-0">
+                        <div className="flex md:flex-col gap-3 w-full md:w-auto mt-4 md:mt-0">
                             <button
                                 onClick={() => handleDelete(post.id)}
                                 disabled={!!isLoading}
-                                className="flex-1 md:w-12 h-12 bg-gray-50 hover:bg-gray-900 text-gray-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-gray-100 shadow-sm"
+                                className="flex-1 md:w-14 h-14 bg-white hover:bg-[#FFEBEE] text-[#BDBDBD] hover:text-[#D32F2F] rounded-xl flex items-center justify-center transition-all border border-[#E0E0E0] hover:border-[#FFCDD2] shadow-sm"
                                 title="Abort Transmission"
                             >
                                 <Trash className="h-5 w-5" />
@@ -74,7 +74,7 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
                             <a
                                 href={`/portal/feed/${post.id}`}
                                 target="_blank"
-                                className="flex-1 md:w-12 h-12 bg-gray-50 hover:bg-[#58151C] text-gray-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-gray-100 shadow-sm"
+                                className="flex-1 md:w-14 h-14 bg-white hover:bg-[#E8EAF6] text-[#BDBDBD] hover:text-[#1A237E] rounded-xl flex items-center justify-center transition-all border border-[#E0E0E0] hover:border-[#C5CAE9] shadow-sm"
                                 title="View Frequency"
                             >
                                 <ExternalLink className="h-5 w-5" />
@@ -84,9 +84,9 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
                 ))}
 
                 {posts.length === 0 && (
-                    <div className="py-24 text-center bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
-                        <Megaphone className="h-12 w-12 text-gray-200 mx-auto mb-4" />
-                        <p className="text-gray-400 font-black text-lg uppercase tracking-widest">Uplink Silent</p>
+                    <div className="py-24 text-center bg-[#F8F9FA] rounded-[3rem] border-2 border-dashed border-[#E0E0E0]">
+                        <Megaphone className="h-12 w-12 text-[#BDBDBD] mx-auto mb-4" />
+                        <p className="text-[#9E9E9E] font-bold text-lg uppercase tracking-widest">Uplink Silent</p>
                     </div>
                 )}
             </div>

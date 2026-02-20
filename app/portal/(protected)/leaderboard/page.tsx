@@ -1,12 +1,11 @@
-// app/portal/leaderboard/page.tsx — IIMS Collegiate Global Leaderboard
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+// app/portal/leaderboard/page.tsx — IIMS IT Club Global Leaderboard (v4.0)
+import { createServerClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
-import { Trophy, Medal, Star, Target, Zap, ChevronRight, Crown } from 'lucide-react'
-// Import types safely
-type Member = any
+import { Trophy, Zap, Crown, Award, Target } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Pagination from '@/components/ui/Pagination'
 import { cn } from '@/lib/utils'
+import { getSession } from '@/lib/auth'
 
 export const revalidate = 60
 
@@ -15,9 +14,7 @@ export default async function LeaderboardPage({
 }: {
     searchParams: { page?: string }
 }) {
-    const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
-
+    const session = await getSession()
     if (!session) redirect('/portal/login')
 
     const currentPage = parseInt(searchParams.page || '1')
@@ -25,17 +22,19 @@ export default async function LeaderboardPage({
     const from = (currentPage - 1) * pageSize
     const to = from + pageSize - 1
 
+    const supabase = createServerClient()
+
     // Get current member for highlighting
-    const { data: currentMember } = await (supabase
-        .from('members' as any) as any)
+    const { data: currentMember } = await supabase
+        .from('members')
         .select('id, points')
-        .eq('id', session.user.id)
+        .eq('user_id', session.user.id)
         .single()
 
     // Fetch paginated members
-    const { data, count } = await (supabase
-        .from('members' as any) as any)
-        .select('id, name, avatar_url, points, role', { count: 'exact' })
+    const { data, count } = await supabase
+        .from('members')
+        .select('id, full_name, avatar_url, points, role, club_post', { count: 'exact' })
         .eq('status', 'approved')
         .order('points', { ascending: false })
         .range(from, to)
@@ -43,94 +42,94 @@ export default async function LeaderboardPage({
     const members = (data || []) as any[]
 
     return (
-        <div className="max-w-5xl mx-auto space-y-12 pb-20 animate-fade-up">
+        <div className="max-w-5xl mx-auto space-y-10 pb-16 animate-fade-up">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#FCD34D]/10 text-[#58151C] font-black text-[10px] uppercase tracking-widest mb-4 border border-[#FCD34D]/20 shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#FFF8E1] text-[#F57F17] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#F57F17]/20 shadow-sm">
                         <Trophy className="h-3.5 w-3.5" /> High Performance Log
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-poppins font-black text-[#111827] leading-tight text-balance">
-                        Operative <span className="text-[#C3161C]">Leaderboard</span>
+                    <h1 className="text-3xl md:text-5xl font-bold text-[#212121] leading-tight">
+                        Club <span className="text-[#E53935]">Leaderboard</span>
                     </h1>
-                    <p className="text-gray-400 font-medium text-base mt-2 max-w-xl">
-                        Global proficiency rankings based on mission success, flag captures, and unit contributions.
+                    <p className="text-[#757575] font-medium text-sm mt-3 max-w-xl leading-relaxed">
+                        Global proficiency rankings based on mission success, CTF flag captures, and unit contributions.
                     </p>
                 </div>
 
-                <div className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-xl flex items-center gap-6 group">
-                    <div className="p-4 bg-gray-50 rounded-2xl text-gray-300 group-hover:bg-[#58151C] group-hover:text-white transition-all shadow-inner">
-                        <Zap className="h-6 w-6" />
+                <div className="bg-white rounded-3xl p-6 border border-[#E0E0E0] shadow-sm flex items-center gap-5 group">
+                    <div className="p-3 bg-[#E8EAF6] rounded-xl text-[#1A237E] group-hover:bg-[#1A237E] group-hover:text-white transition-all shadow-inner">
+                        <Zap className="h-5 w-5" />
                     </div>
                     <div>
-                        <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total Assets</span>
-                        <span className="block text-2xl font-poppins font-black text-[#111827]">{count || 0}</span>
+                        <span className="block text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest leading-none mb-1">Total Members</span>
+                        <span className="block text-2xl font-bold text-[#212121]">{count || 0}</span>
                     </div>
                 </div>
             </div>
 
             {/* Leaderboard Table */}
-            <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-[2rem] border border-[#E0E0E0] shadow-xl shadow-black/5 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50 border-b border-gray-100">
-                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Rank</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Operative</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest hidden md:table-cell">Designation</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">XP Points</th>
+                            <tr className="bg-[#F8F9FA] border-b border-[#E0E0E0]">
+                                <th className="px-6 py-5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">Rank</th>
+                                <th className="px-6 py-5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">Member</th>
+                                <th className="px-6 py-5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest hidden md:table-cell">Designation</th>
+                                <th className="px-6 py-5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest text-right">Points</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-[#F5F5F5]">
                             {members.map((m: any, idx: number) => {
                                 const rank = from + idx + 1
-                                const isMe = m.id === (currentMember as any)?.id
+                                const isMe = m.id === currentMember?.id
                                 const isTop3 = rank <= 3
 
                                 return (
                                     <tr
                                         key={m.id}
                                         className={cn(
-                                            "group transition-all hover:bg-gray-50/50",
-                                            isMe && "bg-amber-50/30"
+                                            "group transition-all hover:bg-[#F8F9FA]",
+                                            isMe && "bg-[#E3F2FD]/50 hover:bg-[#E3F2FD]"
                                         )}
                                     >
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 py-5">
                                             <div className={cn(
-                                                "w-10 h-10 rounded-xl flex items-center justify-center font-poppins font-black text-sm transition-all",
-                                                rank === 1 ? "bg-[#FCD34D] text-[#58151C] shadow-lg shadow-amber-200 scale-110" :
-                                                    rank === 2 ? "bg-gray-100 text-gray-400" :
-                                                        rank === 3 ? "bg-amber-50 text-amber-700" :
-                                                            "text-gray-300 group-hover:text-[#111827]"
+                                                "w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all",
+                                                rank === 1 ? "bg-[#FFF9C4] text-[#F57F17] shadow-lg shadow-[#FFF9C4]/50 scale-110 border border-[#FFF59D]" :
+                                                    rank === 2 ? "bg-[#F5F5F5] text-[#757575] border border-[#E0E0E0]" :
+                                                        rank === 3 ? "bg-[#FFECB3] text-[#FF8F00] border border-[#FFE082]" :
+                                                            "text-[#9E9E9E] group-hover:text-[#212121]"
                                             )}>
                                                 {rank === 1 ? <Crown className="h-5 w-5" /> : rank}
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
-                                                <Avatar src={m.avatar_url} name={m.name || m.email} size="sm" className="shadow-lg shadow-black/5" />
+                                                <Avatar src={m.avatar_url} name={m.full_name || 'Anonymous'} size="sm" className="shadow-sm border border-[#E0E0E0]" />
                                                 <div className="min-w-0">
                                                     <p className={cn(
                                                         "font-bold text-sm truncate",
-                                                        isMe ? "text-[#C3161C]" : "text-[#111827]"
+                                                        isMe ? "text-[#1A237E]" : "text-[#212121]"
                                                     )}>
-                                                        {m.name || m.email} {isMe && "(You)"}
+                                                        {m.full_name || 'Anonymous Member'} {isMe && "(You)"}
                                                     </p>
-                                                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest md:hidden">
+                                                    <p className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest md:hidden mt-0.5">
                                                         {m.club_post || m.role}
                                                     </p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6 hidden md:table-cell">
-                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest border border-gray-100 px-3 py-1 rounded-lg bg-gray-50">
+                                        <td className="px-6 py-5 hidden md:table-cell">
+                                            <span className="text-[10px] font-bold text-[#757575] uppercase tracking-widest border border-[#E0E0E0] px-3 py-1.5 rounded-lg bg-[#F8F9FA]">
                                                 {m.club_post || m.role}
                                             </span>
                                         </td>
-                                        <td className="px-8 py-6 text-right">
+                                        <td className="px-6 py-5 text-right">
                                             <span className={cn(
-                                                "text-lg font-poppins font-black",
-                                                isTop3 ? "text-[#58151C]" : "text-gray-400"
+                                                "text-lg font-bold font-mono",
+                                                isTop3 ? "text-[#1A237E]" : "text-[#757575]"
                                             )}>
                                                 {m.points}
                                             </span>
@@ -143,19 +142,19 @@ export default async function LeaderboardPage({
                 </div>
 
                 {members.length === 0 && (
-                    <div className="py-32 text-center">
-                        <div className="h-16 w-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Target className="h-8 w-8 text-gray-200" />
+                    <div className="py-24 text-center">
+                        <div className="h-16 w-16 bg-[#F8F9FA] rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
+                            <Target className="h-8 w-8 text-[#9E9E9E]" />
                         </div>
-                        <p className="text-gray-400 font-black text-lg uppercase tracking-widest">Log Silent</p>
-                        <p className="text-gray-300 mt-2 font-medium">No approved operatives found in current sector.</p>
+                        <p className="text-[#424242] font-bold text-lg mb-1">Leaderboard Empty</p>
+                        <p className="text-[#9E9E9E] font-medium text-sm">No approved members found.</p>
                     </div>
                 )}
             </div>
 
             {/* Pagination */}
             {count && count > pageSize && (
-                <div className="py-12 border-t border-gray-50">
+                <div className="py-8">
                     <Pagination
                         page={currentPage}
                         totalPages={Math.ceil(count / pageSize)}
@@ -163,12 +162,6 @@ export default async function LeaderboardPage({
                     />
                 </div>
             )}
-
-            <footer className="text-center pt-10">
-                <p className="text-[10px] text-gray-200 font-black uppercase tracking-[0.4em]">
-                    Frequency Terminated
-                </p>
-            </footer>
         </div>
     )
 }

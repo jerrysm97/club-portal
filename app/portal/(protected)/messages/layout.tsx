@@ -1,74 +1,81 @@
-// app/portal/messages/layout.tsx — IIMS Collegiate Messaging Shell
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+// app/portal/messages/layout.tsx — IIMS IT Club Messaging Shell (v4.0)
+import { createServerClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import ConversationList from '@/components/portal/ConversationList'
-// Import types safely
-type Member = any
+import { getSession, getMember } from '@/lib/auth'
 
 export const revalidate = 0
 
 export default async function MessagesLayout({ children }: { children: React.ReactNode }) {
-    const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
-
+    const session = await getSession()
     if (!session) redirect('/portal/login')
 
-    // Get current member
-    const { data: member } = await (supabase
-        .from('members' as any) as any)
-        .select('id')
-        .eq('id', session.user.id)
-        .single()
+    const member = await getMember(session.user.id)
+    if (!member) redirect('/portal/pending')
 
-    if (!member) redirect('/portal/login')
+    const supabase = createServerClient()
 
-    // To build a conversation list in a simplified model:
-    // 1. Fetch all messages where user is sender or receiver
-    // 2. Extract unique 'other' members
-    // 3. Fetch these members' details and their latest message
-    const { data: rawMessages } = await (supabase
-        .from('messages' as any) as any)
-        .select(`
-      id,
-      content,
-      created_at,
-      sender_id,
-      receiver_id,
-      is_read,
-      sender:members!sender_id(id, name, avatar_url),
-      receiver:members!receiver_id(id, name, avatar_url)
-    `)
-        .or(`sender_id.eq.${(member as any).id},receiver_id.eq.${(member as any).id}`)
-        .order('created_at', { ascending: false })
+    // 1. Get all conversations the member is part of
+    const { data: participations } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id, last_read_at')
+        .eq('member_id', member.id)
 
-    // Aggregate into threads
-    const threadsMap = new Map()
+    const conversationIds = participations?.map((p: any) => p.conversation_id) || []
 
-        ; (rawMessages || []).forEach((msg: any) => {
-            const otherMember = msg.sender_id === (member as any).id ? msg.receiver : msg.sender
-            if (!otherMember) return
+    let formattedConversations: any[] = []
 
-            if (!threadsMap.has(otherMember.id)) {
-                threadsMap.set(otherMember.id, {
-                    otherMember,
-                    lastMessage: msg,
-                    unreadCount: (msg.receiver_id === (member as any).id && !msg.is_read) ? 1 : 0
-                })
-            } else {
-                if (msg.receiver_id === (member as any).id && !msg.is_read) {
-                    threadsMap.get(otherMember.id).unreadCount++
-                }
+    if (conversationIds.length > 0) {
+        // 2. Fetch those conversations with nested latest messages and other participants
+        const { data: convs } = await supabase
+            .from('conversations')
+            .select(`
+                id,
+                updated_at,
+                messages ( id, content, created_at, sender_id ),
+                conversation_participants ( member_id, members ( id, full_name, avatar_url ) )
+            `)
+            .in('id', conversationIds)
+            .order('updated_at', { ascending: false })
+            // Limit messages to the most recent 1 per conversation
+            .order('created_at', { ascending: false, referencedTable: 'messages' })
+            .limit(1, { referencedTable: 'messages' })
+
+        formattedConversations = (convs || []).map((conv: any) => {
+            const otherParticipant = conv.conversation_participants?.find((p: any) => p.member_id !== member.id)
+            const otherMember = otherParticipant?.members
+
+            const latestMsg = conv.messages?.[0] || { content: 'Secure channel established.', created_at: conv.updated_at, sender_id: null }
+
+            const myParticipation = participations?.find((p: any) => p.conversation_id === conv.id)
+            const unread = latestMsg.sender_id !== member.id && latestMsg.created_at > (myParticipation?.last_read_at || '1970-01-01')
+
+            return {
+                conversation_id: conv.id,
+                otherMember: {
+                    id: otherMember?.id,
+                    name: otherMember?.full_name || 'Unknown',
+                    avatar_url: otherMember?.avatar_url
+                },
+                lastMessage: {
+                    content: latestMsg.content,
+                    created_at: latestMsg.created_at,
+                    isMine: latestMsg.sender_id === member.id
+                },
+                unreadCount: unread ? 1 : 0
             }
-        })
-
-    const conversations = Array.from(threadsMap.values())
+        }).filter(c => c.otherMember?.id)
+    }
 
     return (
-        <div className="flex bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl overflow-hidden h-[calc(100vh-160px)] animate-fade-up">
-            <div className="w-80 hidden lg:block border-r border-gray-100 bg-gray-50/50">
-                <ConversationList conversations={conversations} currentMemberId={(member as any).id} />
+        <div className="flex bg-white rounded-[2rem] border border-[#E0E0E0] shadow-xl overflow-hidden h-[calc(100vh-140px)] animate-fade-up">
+            <div className="w-80 hidden lg:flex flex-col border-r border-[#E0E0E0] bg-[#F8F9FA] shrink-0">
+                <ConversationList
+                    conversations={formattedConversations as any}
+                    currentMemberId={member.id}
+                />
             </div>
-            <div className="flex-1 bg-white relative">
+            <div className="flex-1 bg-white relative flex flex-col min-w-0">
                 {children}
             </div>
         </div>

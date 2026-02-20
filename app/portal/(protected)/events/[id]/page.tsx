@@ -1,24 +1,25 @@
-// app/portal/events/[id]/page.tsx — Detailed Mission Intel
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+// app/portal/events/[id]/page.tsx — Detailed Mission Intel (v4.0)
+import { createServerClient } from '@/lib/supabase-server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer'
 import { Calendar, MapPin, Clock, Users, ArrowLeft, ExternalLink, ShieldCheck, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
-// Import types safely
+import { getSession } from '@/lib/auth'
+
 type Event = any
 
 export const revalidate = 60
 
 export default async function PortalEventDetailPage({ params }: { params: { id: string } }) {
-    const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
-
+    const session = await getSession()
     if (!session) redirect('/portal/login')
+
+    const supabase = createServerClient()
 
     // Fetch event details from the verified 'public_events' table
     const { data: eventData } = await supabase
-        .from('public_events' as any)
+        .from('public_events')
         .select('*')
         .eq('id', params.id)
         .maybeSingle()
@@ -27,8 +28,8 @@ export default async function PortalEventDetailPage({ params }: { params: { id: 
     const event = eventData as any
 
     // Fetch attendees count
-    const { count: attendeeCount } = await (supabase
-        .from('event_rsvps' as any) as any)
+    const { count: attendeeCount } = await supabase
+        .from('event_rsvps')
         .select('id', { count: 'exact' })
         .eq('event_id', params.id)
         .eq('status', 'going')
@@ -36,27 +37,27 @@ export default async function PortalEventDetailPage({ params }: { params: { id: 
     const eventDate = event.event_date
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10 animate-fade-up">
+        <div className="max-w-6xl mx-auto space-y-8 animate-fade-up pb-12">
             {/* Navigation */}
-            <Link href="/portal/events" className="inline-flex items-center gap-2 text-gray-400 hover:text-[#58151C] font-bold text-xs uppercase tracking-widest transition-all group">
+            <Link href="/portal/events" className="inline-flex items-center gap-2 text-[#757575] hover:text-[#1A237E] font-bold text-xs uppercase tracking-widest transition-all group">
                 <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                Return to Log
+                Return to Registry
             </Link>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
                 {/* Main Content Area */}
-                <div className="lg:col-span-2 space-y-10">
+                <div className="lg:col-span-2 space-y-8">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-red-50 text-red-600 font-black text-[10px] uppercase tracking-widest mb-4 border border-red-100">
-                            Operation Order: {event.type}
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#E3F2FD] text-[#1976D2] font-bold text-[10px] uppercase tracking-widest mb-4 border border-[#BBDEFB]">
+                            Event Category: {event.type}
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-poppins font-black text-[#111827] leading-tight">
+                        <h1 className="text-4xl md:text-5xl font-bold text-[#212121] leading-tight">
                             {event.title}
                         </h1>
                     </div>
 
                     {event.image_url && (
-                        <div className="relative rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-2xl shadow-red-100/30 aspect-video group">
+                        <div className="relative rounded-3xl overflow-hidden border border-[#E0E0E0] shadow-xl aspect-video group">
                             <img
                                 src={event.image_url}
                                 alt={event.title}
@@ -66,57 +67,57 @@ export default async function PortalEventDetailPage({ params }: { params: { id: 
                         </div>
                     )}
 
-                    <div className="bg-white rounded-[2rem] p-10 border border-gray-100 shadow-sm prose prose-slate prose-lg max-w-none prose-headings:font-poppins prose-headings:font-black prose-headings:text-[#111827] prose-p:text-gray-500 prose-p:font-medium prose-strong:text-[#111827] prose-a:text-[#C3161C]">
+                    <div className="bg-white rounded-3xl p-8 md:p-10 border border-[#E0E0E0] shadow-sm prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-[#212121] prose-p:text-[#757575] prose-p:font-medium prose-strong:text-[#212121] prose-a:text-[#1A237E]">
                         <MarkdownRenderer content={event.description || ''} />
                     </div>
                 </div>
 
                 {/* Intelligence Sidebar */}
-                <div className="space-y-8">
-                    <div className="bg-[#58151C] rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+                <div className="space-y-6">
+                    <div className="bg-[#1A237E] rounded-3xl p-8 text-white shadow-xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[4rem] group-hover:scale-110 transition-transform" />
 
-                        <h3 className="font-poppins font-black text-xl mb-10 flex items-center gap-3">
-                            <ShieldCheck className="h-6 w-6 text-[#FCD34D]" />
-                            Mission Intel
+                        <h3 className="font-bold text-xl mb-8 flex items-center gap-3">
+                            <ShieldCheck className="h-6 w-6 text-[#E53935]" />
+                            Event Details
                         </h3>
 
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             <IntelRow icon={<Calendar className="h-5 w-5" />} label="Execution Date" value={formatDate(eventDate)} />
                             <IntelRow
                                 icon={<Clock className="h-5 w-5" />}
-                                label="Clearance Window"
+                                label="Time"
                                 value={`${new Date(eventDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`}
                             />
-                            <IntelRow icon={<MapPin className="h-5 w-5" />} label="Deployment Area" value={event.location || 'College Campus'} />
-                            <IntelRow icon={<Users className="h-5 w-5" />} label="Team Composition" value={`${attendeeCount || 0} Ready Operatives`} />
+                            <IntelRow icon={<MapPin className="h-5 w-5" />} label="Location" value={event.location || 'IIMS College Campus'} />
+                            <IntelRow icon={<Users className="h-5 w-5" />} label="Attendees" value={`${attendeeCount || 0} Registered`} />
                         </div>
 
-                        <div className="mt-12 pt-8 border-t border-white/10">
+                        <div className="mt-10 pt-8 border-t border-white/10">
                             {event.meeting_link && (
                                 <a
                                     href={event.meeting_link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-3 w-full py-4 bg-[#C3161C] text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-[#A31217] transition-all hover:scale-[1.02] shadow-xl shadow-black/20"
+                                    className="flex items-center justify-center gap-3 w-full py-4 bg-[#E53935] text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-[#D32F2F] transition-all hover:scale-[1.02] shadow-lg shadow-black/20"
                                 >
-                                    Establish Uplink <ExternalLink className="h-4 w-4" />
+                                    Meeting Link <ExternalLink className="h-4 w-4" />
                                 </a>
                             )}
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 rounded-[2rem] p-8 border border-gray-100 flex items-center justify-between group cursor-pointer hover:bg-white transition-all">
+                    <div className="bg-[#F8F9FA] rounded-[2rem] p-6 border border-[#E0E0E0] flex items-center justify-between group cursor-pointer hover:bg-white transition-all shadow-sm">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 rounded-xl bg-white text-[#58151C] shadow-sm group-hover:bg-[#58151C] group-hover:text-white transition-all">
+                            <div className="p-3 rounded-xl bg-white text-[#1A237E] shadow-sm group-hover:bg-[#1A237E] group-hover:text-white transition-all border border-[#E0E0E0] group-hover:border-[#1A237E]">
                                 <Users className="h-5 w-5" />
                             </div>
                             <div>
-                                <span className="block text-gray-400 text-[10px] font-black uppercase tracking-widest">Roster</span>
-                                <span className="block text-sm font-bold text-[#111827]">Browse Attendees</span>
+                                <span className="block text-[#9E9E9E] text-[10px] font-bold uppercase tracking-widest">Roster</span>
+                                <span className="block text-sm font-bold text-[#212121]">Browse Attendees</span>
                             </div>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-gray-300 group-hover:translate-x-1 transition-transform" />
+                        <ChevronRight className="h-5 w-5 text-[#BDBDBD] group-hover:translate-x-1 transition-transform" />
                     </div>
                 </div>
             </div>
@@ -127,11 +128,11 @@ export default async function PortalEventDetailPage({ params }: { params: { id: 
 function IntelRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
     return (
         <div className="flex items-start gap-4">
-            <div className="mt-1 text-[#FECACA]">
+            <div className="mt-1 text-[#C5CAE9]">
                 {icon}
             </div>
             <div>
-                <span className="block text-[8px] font-black text-[#FECACA]/60 uppercase tracking-[0.2em] mb-1">{label}</span>
+                <span className="block text-[9px] font-bold text-[#C5CAE9]/80 uppercase tracking-widest mb-1">{label}</span>
                 <span className="block text-sm font-bold text-white tracking-wide">{value}</span>
             </div>
         </div>

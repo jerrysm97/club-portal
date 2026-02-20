@@ -10,7 +10,8 @@ interface EventItem {
     type: string
     event_date: string
     location: string | null
-    image_url: string | null
+    image_url?: string | null
+    cover_image_url?: string | null
 }
 
 const FILTERS = [

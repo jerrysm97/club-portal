@@ -1,16 +1,19 @@
-// app/portal/login/LoginForm.tsx — IIMS IT Club Magic Link Login
+// app/portal/login/LoginForm.tsx — IIMS IT Club Email/Password Login
 'use client'
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { Shield, ArrowRight, Mail, AlertTriangle, Loader2, CheckCircle2 } from 'lucide-react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { Shield, ArrowRight, Mail, Lock, AlertTriangle, Loader2, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 
 export default function LoginForm() {
     const searchParams = useSearchParams()
+    const router = useRouter()
     const reason = searchParams.get('reason')
     const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
-    const [success, setSuccess] = useState(false)
 
     const reasonMessages: Record<string, string> = {
         rejected: 'Your membership application was not approved at this time.',
@@ -27,21 +30,27 @@ export default function LoginForm() {
             setError('Enter a valid email address.')
             return
         }
+        if (!password || password.length < 6) {
+            setError('Password must be at least 6 characters.')
+            return
+        }
 
         setLoading(true)
         try {
-            const res = await fetch('/api/auth/magic-link', {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: trimmedEmail }),
+                body: JSON.stringify({ email: trimmedEmail, password }),
             })
 
             const data = await res.json()
             if (!res.ok) {
-                throw new Error(data.error || 'Failed to send login link.')
+                throw new Error(data.error || 'Login failed.')
             }
 
-            setSuccess(true)
+            // Redirect to dashboard on success
+            router.push('/portal/dashboard')
+            router.refresh()
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Login failed. Try again.')
         } finally {
@@ -59,7 +68,7 @@ export default function LoginForm() {
                     </div>
                     <div className="text-center">
                         <h2 className="font-bold text-[#1A237E] text-xl tracking-tight">IIMS IT Club</h2>
-                        <span className="text-xs text-[#757575] font-medium tracking-wide uppercase">Member Portal Gateway</span>
+                        <span className="text-xs text-[#757575] font-medium tracking-wide uppercase">Member Portal</span>
                     </div>
                 </div>
 
@@ -73,82 +82,104 @@ export default function LoginForm() {
 
                 {/* Main card */}
                 <div className="bg-white rounded-2xl shadow-xl shadow-black/5 p-8 border border-[#E0E0E0]">
-                    {success ? (
-                        <div className="text-center py-6 animate-fade-up">
-                            <div className="mx-auto w-12 h-12 bg-[#E8F5E9] rounded-full flex items-center justify-center mb-4">
-                                <CheckCircle2 className="h-6 w-6 text-[#2E7D32]" />
-                            </div>
-                            <h3 className="text-lg font-bold text-[#212121] mb-2">Check your email</h3>
-                            <p className="text-[#757575] text-sm mb-6">
-                                We sent a magic link to <span className="font-semibold text-[#212121]">{email}</span>. Click the link to securely sign in.
-                            </p>
-                            <button
-                                onClick={() => setSuccess(false)}
-                                className="text-sm font-semibold text-[#1A237E] hover:underline"
-                            >
-                                Use a different email
-                            </button>
+                    <div className="mb-8">
+                        <h1 className="font-bold text-[#212121] text-2xl mb-2">
+                            Sign In
+                        </h1>
+                        <p className="text-[#757575] text-sm">
+                            Enter your email and password to access the portal.
+                        </p>
+                    </div>
+
+                    {error && (
+                        <div className="mb-6 p-3 rounded-xl bg-[#FFEBEE] border border-[#E53935]/20 text-[#C62828] text-sm font-medium animate-slide-in">
+                            {error}
                         </div>
-                    ) : (
-                        <>
-                            <div className="mb-8">
-                                <h1 className="font-bold text-[#212121] text-2xl mb-2">
-                                    Secure Sign In
-                                </h1>
-                                <p className="text-[#757575] text-sm">
-                                    Enter your IIMS email address to receive a magic login link. No password required.
-                                </p>
-                            </div>
-
-                            {error && (
-                                <div className="mb-6 p-3 rounded-xl bg-[#FFEBEE] border border-[#E53935]/20 text-[#C62828] text-sm font-medium animate-slide-in">
-                                    {error}
-                                </div>
-                            )}
-
-                            <form onSubmit={handleSubmit} className="space-y-5">
-                                <div>
-                                    <label htmlFor="email" className="block text-[#424242] text-sm font-semibold mb-2">
-                                        Email Address
-                                    </label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <Mail className="h-5 w-5 text-[#9E9E9E]" />
-                                        </div>
-                                        <input
-                                            id="email"
-                                            type="email"
-                                            value={email}
-                                            onChange={e => setEmail(e.target.value)}
-                                            placeholder="operator@iimscollege.edu.np"
-                                            required
-                                            autoComplete="email"
-                                            autoFocus
-                                            className="block w-full pl-10 pr-3 py-3 border border-[#E0E0E0] rounded-xl focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] placeholder-[#9E9E9E] text-sm transition-all"
-                                        />
-                                    </div>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full bg-[#1A237E] text-white font-semibold flex items-center justify-center gap-2 py-3 rounded-xl hover:bg-[#283593] active:bg-[#1A237E] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-[#1A237E]/20"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <Loader2 className="h-5 w-5 animate-spin" />
-                                            Requesting Link...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Send Magic Link
-                                            <ArrowRight className="h-5 w-5" />
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-                        </>
                     )}
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Email field */}
+                        <div>
+                            <label htmlFor="email" className="block text-[#424242] text-sm font-semibold mb-2">
+                                Email Address
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Mail className="h-5 w-5 text-[#9E9E9E]" />
+                                </div>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                    placeholder="you@iimscollege.edu.np"
+                                    required
+                                    autoComplete="email"
+                                    autoFocus
+                                    className="block w-full pl-10 pr-3 py-3 border border-[#E0E0E0] rounded-xl focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] placeholder-[#9E9E9E] text-sm transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password field */}
+                        <div>
+                            <label htmlFor="password" className="block text-[#424242] text-sm font-semibold mb-2">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Lock className="h-5 w-5 text-[#9E9E9E]" />
+                                </div>
+                                <input
+                                    id="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    autoComplete="current-password"
+                                    minLength={6}
+                                    className="block w-full pl-10 pr-10 py-3 border border-[#E0E0E0] rounded-xl focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] placeholder-[#9E9E9E] text-sm transition-all"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#9E9E9E] hover:text-[#616161] transition-colors"
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-[#1A237E] text-white font-semibold flex items-center justify-center gap-2 py-3 rounded-xl hover:bg-[#283593] active:bg-[#1A237E] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-[#1A237E]/20"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    Signing In...
+                                </>
+                            ) : (
+                                <>
+                                    Sign In
+                                    <ArrowRight className="h-5 w-5" />
+                                </>
+                            )}
+                        </button>
+                    </form>
+
+                    {/* Register link */}
+                    <div className="mt-6 pt-6 border-t border-[#E0E0E0] text-center">
+                        <p className="text-[#757575] text-sm">
+                            Don&apos;t have an account?{' '}
+                            <Link href="/portal/register" className="text-[#1A237E] font-semibold hover:underline">
+                                Register here
+                            </Link>
+                        </p>
+                    </div>
                 </div>
 
                 {/* Footer */}

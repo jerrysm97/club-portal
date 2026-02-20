@@ -1,50 +1,83 @@
-// app/api/admin/posts/route.ts
-// Admin posts API — POST, PATCH, DELETE.
-
+// app/api/admin/posts/route.ts — Admin Posts API (v4.0 Spec-Compliant)
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { assertRole } from '@/lib/auth'
+import { createServerClient } from '@/lib/supabase-server'
+import { z } from 'zod'
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const createPostSchema = z.object({
+    title: z.string().max(200).optional(),
+    content: z.string().min(1).max(10000),
+    type: z.enum(['post', 'announcement', 'resource', 'project']).default('announcement'),
+    is_pinned: z.boolean().default(false),
+})
 
-async function assertAdmin() {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        { cookies: { get: (name) => cookieStore.get(name)?.value } }
-    )
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return null
-    const { data } = await supabaseAdmin.from('members').select('role').eq('id', session.user.id).single()
-    return data?.role === 'admin' ? session : null
-}
+const updatePostSchema = z.object({
+    id: z.string().uuid(),
+    is_pinned: z.boolean().optional(),
+    title: z.string().max(200).optional(),
+})
 
 export async function POST(req: NextRequest) {
-    const session = await assertAdmin()
-    if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const { title, content, is_public, pinned } = await req.json()
-    const { error } = await supabaseAdmin.from('posts').insert({ title, content, is_public, pinned, author_id: session.user.id })
+    const admin = await assertRole('admin')
+    const body = await req.json()
+    const parsed = createPostSchema.safeParse(body)
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    }
+
+    const supabase = createServerClient()
+    const { error } = await supabase.from('posts').insert({
+        ...parsed.data,
+        author_id: admin.id,
+    })
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await supabase.from('audit_logs').insert({
+        admin_id: admin.id,
+        action: 'create_post',
+        meta: { title: parsed.data.title, type: parsed.data.type }
+    })
+
     return NextResponse.json({ success: true })
 }
 
 export async function PATCH(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const { id, ...fields } = await req.json()
-    const { error } = await supabaseAdmin.from('posts').update(fields).eq('id', id)
+    const admin = await assertRole('admin')
+    const body = await req.json()
+    const parsed = updatePostSchema.safeParse(body)
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    }
+
+    const { id, ...fields } = parsed.data
+    const supabase = createServerClient()
+    const { error } = await supabase.from('posts').update(fields).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await supabase.from('audit_logs').insert({
+        admin_id: admin.id,
+        action: 'update_post',
+        target_id: id,
+        meta: fields
+    })
+
     return NextResponse.json({ success: true })
 }
 
 export async function DELETE(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const { id } = await req.json()
-    const { error } = await supabaseAdmin.from('posts').delete().eq('id', id)
+    const admin = await assertRole('admin')
+    const body = await req.json()
+    const { id } = z.object({ id: z.string().uuid() }).parse(body)
+
+    const supabase = createServerClient()
+    const { error } = await supabase.from('posts').delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await supabase.from('audit_logs').insert({
+        admin_id: admin.id,
+        action: 'delete_post',
+        target_id: id,
+    })
+
     return NextResponse.json({ success: true })
 }

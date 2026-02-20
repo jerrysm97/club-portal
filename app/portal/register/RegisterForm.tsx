@@ -1,50 +1,79 @@
-// app/portal/register/RegisterForm.tsx — Form for profile completion
+// app/portal/register/RegisterForm.tsx — Self-contained email/password registration
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, BookOpen, GraduationCap, Calendar, FileText, Code2, ArrowRight, Loader2 } from 'lucide-react'
+import {
+    User, BookOpen, GraduationCap, Calendar, FileText, Code2,
+    ArrowRight, Loader2, Mail, Lock, Eye, EyeOff
+} from 'lucide-react'
+import Link from 'next/link'
 
-export default function RegisterForm({ initialName }: { initialName: string }) {
+export default function RegisterForm() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [showPassword, setShowPassword] = useState(false)
     const [skillsInput, setSkillsInput] = useState('')
 
     const [form, setForm] = useState({
-        full_name: initialName,
+        email: '',
+        password: '',
+        confirmPassword: '',
+        full_name: '',
         student_id: '',
-        program: 'BSc (Hons) Computing',
+        program: 'BCS',
         intake: '',
         bio: '',
-        skills: [] as string[],
     })
 
-    const programs = ['BSc (Hons) Computing', 'BBA', 'BHM', 'Other']
+    const programs = [
+        { value: 'BCS', label: 'BSc (Hons) Computing' },
+        { value: 'BBUS', label: 'BBA' },
+        { value: 'BIHM', label: 'BHM' },
+        { value: 'MBA', label: 'MBA' },
+        { value: 'Other', label: 'Other' },
+    ]
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         setError(null)
+
+        if (form.password !== form.confirmPassword) {
+            setError('Passwords do not match.')
+            return
+        }
+
+        if (form.password.length < 6) {
+            setError('Password must be at least 6 characters.')
+            return
+        }
+
         setLoading(true)
 
         try {
-            // Process comma-separated skills
             const processedSkills = skillsInput
                 .split(',')
                 .map(s => s.trim())
                 .filter(s => s.length > 0)
 
-            const submission = { ...form, skills: processedSkills }
-
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(submission),
+                body: JSON.stringify({
+                    email: form.email.trim().toLowerCase(),
+                    password: form.password,
+                    full_name: form.full_name,
+                    student_id: form.student_id,
+                    program: form.program,
+                    intake: form.intake,
+                    bio: form.bio,
+                    skills: processedSkills,
+                }),
             })
 
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to update profile')
+            if (!res.ok) throw new Error(data.error || 'Registration failed')
 
-            // Success, redirect to pending (or dashboard if approved)
             router.push('/portal/pending')
             router.refresh()
         } catch (err: unknown) {
@@ -61,7 +90,88 @@ export default function RegisterForm({ initialName }: { initialName: string }) {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Account credentials */}
+            <div className="space-y-1 mb-2">
+                <h3 className="text-[#1A237E] font-bold text-sm uppercase tracking-wider">Account Credentials</h3>
+                <p className="text-[#9E9E9E] text-xs">Create your login credentials</p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5">
+                <div>
+                    <label htmlFor="email" className="block text-sm font-semibold text-[#424242] mb-1.5">Email Address</label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Mail className="h-4 w-4 text-[#9E9E9E]" />
+                        </div>
+                        <input
+                            id="email"
+                            type="email"
+                            required
+                            value={form.email}
+                            onChange={(e) => setForm({ ...form, email: e.target.value })}
+                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                            placeholder="you@iimscollege.edu.np"
+                        />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-semibold text-[#424242] mb-1.5">Password</label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Lock className="h-4 w-4 text-[#9E9E9E]" />
+                            </div>
+                            <input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                required
+                                minLength={6}
+                                value={form.password}
+                                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                className="block w-full pl-10 pr-10 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                                placeholder="••••••••"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#9E9E9E] hover:text-[#616161] transition-colors"
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="confirmPassword" className="block text-sm font-semibold text-[#424242] mb-1.5">Confirm Password</label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Lock className="h-4 w-4 text-[#9E9E9E]" />
+                            </div>
+                            <input
+                                id="confirmPassword"
+                                type={showPassword ? 'text' : 'password'}
+                                required
+                                minLength={6}
+                                value={form.confirmPassword}
+                                onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                                className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                                placeholder="••••••••"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-[#E0E0E0] pt-6">
+                <div className="space-y-1 mb-4">
+                    <h3 className="text-[#1A237E] font-bold text-sm uppercase tracking-wider">Academic Information</h3>
+                    <p className="text-[#9E9E9E] text-xs">Used for membership verification</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label htmlFor="full_name" className="block text-sm font-semibold text-[#424242] mb-1.5">Full Name</label>
                     <div className="relative">
@@ -97,7 +207,7 @@ export default function RegisterForm({ initialName }: { initialName: string }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label htmlFor="program" className="block text-sm font-semibold text-[#424242] mb-1.5">Program</label>
                     <div className="relative">
@@ -111,7 +221,7 @@ export default function RegisterForm({ initialName }: { initialName: string }) {
                             onChange={(e) => setForm({ ...form, program: e.target.value })}
                             className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all appearance-none"
                         >
-                            {programs.map(p => <option key={p} value={p}>{p}</option>)}
+                            {programs.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                         </select>
                     </div>
                 </div>
@@ -175,15 +285,24 @@ export default function RegisterForm({ initialName }: { initialName: string }) {
                 {loading ? (
                     <>
                         <Loader2 className="h-5 w-5 animate-spin" />
-                        Saving Profile...
+                        Creating Account...
                     </>
                 ) : (
                     <>
-                        Complete Registration
+                        Create Account
                         <ArrowRight className="h-5 w-5" />
                     </>
                 )}
             </button>
+
+            <div className="text-center pt-2">
+                <p className="text-[#757575] text-sm">
+                    Already have an account?{' '}
+                    <Link href="/portal/login" className="text-[#1A237E] font-semibold hover:underline">
+                        Sign in
+                    </Link>
+                </p>
+            </div>
         </form>
     )
 }

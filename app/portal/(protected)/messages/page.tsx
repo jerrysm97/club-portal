@@ -1,30 +1,30 @@
-// app/portal/messages/page.tsx — IIMS Collegiate Messaging Placeholder
+// app/portal/messages/page.tsx — IIMS IT Club Messaging Placeholder (v4.0)
 import { MessageSquare, ShieldCheck } from 'lucide-react'
 
 export default function MessagesPage() {
     return (
-        <div className="flex flex-col items-center justify-center h-full text-center p-12 bg-white/50 backdrop-blur-sm animate-fade-up">
+        <div className="flex flex-col items-center justify-center h-full text-center p-8 md:p-12 animate-fade-up">
             <div className="relative mb-8 group">
-                <div className="absolute inset-0 bg-[#58151C]/10 rounded-full blur-2xl scale-150 group-hover:scale-[2] transition-transform duration-700 pointer-events-none" />
-                <div className="relative p-6 rounded-3xl bg-white shadow-2xl border border-gray-100 group-hover:rotate-12 transition-transform h-24 w-24 flex items-center justify-center">
-                    <MessageSquare className="h-10 w-10 text-[#C3161C]" />
+                <div className="absolute inset-0 bg-[#1A237E]/5 rounded-full blur-2xl scale-150 group-hover:scale-[2] transition-transform duration-700 pointer-events-none" />
+                <div className="relative p-6 rounded-3xl bg-white shadow-xl shadow-black/5 border border-[#E0E0E0] group-hover:rotate-6 transition-transform h-24 w-24 flex items-center justify-center">
+                    <MessageSquare className="h-10 w-10 text-[#1A237E]" />
                 </div>
             </div>
 
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#10B981]/5 text-[#10B981] font-black text-[10px] uppercase tracking-[0.2em] mb-4 border border-[#10B981]/10">
-                <ShieldCheck className="h-3 w-3" /> Secure Gateway Ready
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#4CAF50]/10 text-[#2E7D32] font-bold text-[10px] uppercase tracking-widest mb-5 border border-[#4CAF50]/20">
+                <ShieldCheck className="h-3.5 w-3.5" /> Secure Channel Active
             </div>
 
-            <h2 className="text-3xl font-poppins font-black text-[#111827] mb-4">
-                Sector Communications
+            <h2 className="text-2xl md:text-3xl font-bold text-[#212121] mb-3">
+                Peer-to-Peer Transmission
             </h2>
-            <p className="text-gray-400 font-medium text-base max-w-sm leading-relaxed">
-                Select an operative from the mission roster to establish a point-to-point encrypted session.
+            <p className="text-[#757575] font-medium text-sm max-w-sm leading-relaxed">
+                Select a member from the roster to establish an end-to-end encrypted direct messaging session.
             </p>
 
-            <div className="mt-12 grid grid-cols-3 gap-6 opacity-20 filter grayscale">
+            <div className="mt-12 flex items-center justify-center gap-2 opacity-30">
                 {[1, 2, 3].map(i => (
-                    <div key={i} className="h-1 w-12 bg-[#58151C] rounded-full animate-pulse" style={{ animationDelay: `${i * 200}ms` }} />
+                    <div key={i} className="h-1.5 w-1.5 bg-[#1A237E] rounded-full animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
                 ))}
             </div>
         </div>

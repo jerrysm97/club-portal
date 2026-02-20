@@ -59,9 +59,9 @@ export default async function HomePage() {
         (async () => {
             try {
                 const { data } = await supabase
-                    .from('public_events' as any)
-                    .select('id, title, type, event_date, location, image_url, status')
-                    .eq('status', 'upcoming')
+                    .from('public_events')
+                    .select('id, title, type, event_date, location, cover_image_url, is_published')
+                    .eq('is_published', true)
                     .order('event_date', { ascending: true })
                     .limit(4)
                 return data ?? []
@@ -72,11 +72,11 @@ export default async function HomePage() {
         (async () => {
             try {
                 const { data } = await supabase
-                    .from('members' as any)
-                    .select('id, name, club_post, avatar_url, role')
+                    .from('members')
+                    .select('id, full_name, club_post, avatar_url, role')
                     .eq('status', 'approved')
                     .in('role', ['admin', 'superadmin'])
-                    .order('created_at', { ascending: true })
+                    .order('joined_at', { ascending: true })
                     .limit(8)
                 return (data ?? []).map((m: any) => ({ ...m, image_url: m.avatar_url }))
             } catch {

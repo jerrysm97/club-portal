@@ -1,67 +1,72 @@
-// app/portal/messages/[id]/page.tsx — Direct Member Chat
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+// app/portal/messages/[id]/page.tsx — Direct Member Chat (v4.0)
+import { createServerClient } from '@/lib/supabase-server'
 import ChatWindow from '@/components/portal/ChatWindow'
-// Import types safely
-type Message = any
-type Member = any
 import { redirect, notFound } from 'next/navigation'
+import { getSession, getMember } from '@/lib/auth'
 
 export const revalidate = 0
 
 export default async function MessageThreadPage({ params }: { params: { id: string } }) {
-    const supabase = await createServerSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
-
+    const session = await getSession()
     if (!session) redirect('/portal/login')
 
-    // Identify current member
-    const { data: member } = await (supabase
-        .from('members' as any) as any)
-        .select('id, name, avatar_url')
-        .eq('id', session.user.id)
-        .single()
+    const member = await getMember(session.user.id)
+    if (!member) redirect('/portal/pending')
 
-    if (!member) redirect('/portal/login')
+    const supabase = createServerClient()
 
     // Identify 'other' member
-    const { data: otherUser } = await (supabase
-        .from('members' as any) as any)
-        .select('id, name, avatar_url, role')
+    const { data: otherUser } = await supabase
+        .from('members')
+        .select('id, full_name, avatar_url, role, club_post')
         .eq('id', params.id)
         .single()
 
     if (!otherUser) return notFound()
 
-    // Fetch direct messages between these two
-    const { data: messages } = await (async () => {
-        try {
-            return await (supabase
-                .from('messages' as any) as any)
-                .select('*')
-                .or(`and(sender_id.eq.${(member as any).id},receiver_id.eq.${(otherUser as any).id}),and(sender_id.eq.${(otherUser as any).id},receiver_id.eq.${(member as any).id})`)
-                .order('created_at', { ascending: true })
-        } catch (e) {
-            return { data: [] }
-        }
-    })()
+    // Find the conversation ID between these two members
+    const { data: participations } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .in('member_id', [member.id, otherUser.id])
 
-    // Update as read (simplified: mark all from 'other' to 'me' as read)
-    try {
-        await (supabase
-            .from('messages' as any) as any)
-            .update({ is_read: true })
-            .eq('sender_id', (otherUser as any).id)
-            .eq('receiver_id', (member as any).id)
-            .eq('is_read', false)
-    } catch (e) {
-        // Table might be missing
+    const counts: Record<string, number> = {}
+    let activeConvId: string | null = null
+
+    participations?.forEach((p: any) => {
+        counts[p.conversation_id] = (counts[p.conversation_id] || 0) + 1
+        if (counts[p.conversation_id] === 2) activeConvId = p.conversation_id
+    })
+
+    // Fetch direct messages between these two using the conversation ID
+    let messages: any[] = []
+
+    if (activeConvId) {
+        const { data: msgs } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', activeConvId)
+            .order('created_at', { ascending: true })
+
+        messages = msgs || []
+
+        // Update my participant record as read since I just opened the thread
+        await supabase
+            .from('conversation_participants')
+            .update({ last_read_at: new Date().toISOString() })
+            .eq('conversation_id', activeConvId)
+            .eq('member_id', member.id)
     }
 
     return (
         <ChatWindow
-            initialMessages={(messages || []) as unknown as Message[]}
+            initialMessages={messages}
             currentUser={member as any}
-            otherUser={otherUser as any}
+            otherUser={{
+                ...otherUser,
+                name: otherUser.full_name // Map to generic name property for UI
+            } as any}
+            conversationId={activeConvId}
         />
     )
 }

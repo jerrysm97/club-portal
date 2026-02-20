@@ -21,7 +21,8 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user } } = await supabase.auth.getUser()
+    const session = user ? { user } : null
     const path = request.nextUrl.pathname
 
     // Only protect /portal/* (except login, register, pending)

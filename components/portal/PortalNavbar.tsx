@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X, ShieldCheck, LogOut, LayoutDashboard, MessageSquare, Calendar, FileText, Terminal, User, Bell, Rss, GraduationCap, Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase'
 import Avatar from '@/components/ui/Avatar'
 // Import types safely
 type Member = any

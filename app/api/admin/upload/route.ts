@@ -1,37 +1,22 @@
-// app/api/admin/upload/route.ts
-// General file upload to Supabase Storage — returns public URL
-
+// app/api/admin/upload/route.ts — Admin Upload API (v4.0 Spec-Compliant)
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { assertRole } from '@/lib/auth'
+import { createServerClient } from '@/lib/supabase-server'
+import { z } from 'zod'
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-async function assertAdmin() {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        { cookies: { get: (name) => cookieStore.get(name)?.value } }
-    )
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return null
-    const { data } = await supabaseAdmin.from('members').select('role').eq('id', session.user.id).single()
-    return data?.role === 'admin' ? session : null
-}
+const ALLOWED_BUCKETS = ['event-images', 'public-gallery', 'team-avatars', 'club-documents', 'ctf-files']
 
 export async function POST(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const admin = await assertRole('admin')
 
     const formData = await req.formData()
     const file = formData.get('file') as File | null
-    const bucket = (formData.get('bucket') as string) || 'events'
+    const bucket = (formData.get('bucket') as string) || 'event-images'
 
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    if (!ALLOWED_BUCKETS.includes(bucket)) {
+        return NextResponse.json({ error: 'Invalid storage bucket' }, { status: 400 })
+    }
 
     // Generate unique filename
     const ext = file.name.split('.').pop() || 'jpg'
@@ -39,7 +24,8 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer())
 
-    const { error } = await supabaseAdmin.storage
+    const supabase = createServerClient()
+    const { error } = await supabase.storage
         .from(bucket)
         .upload(filename, buffer, {
             contentType: file.type,
@@ -48,7 +34,13 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    const { data: urlData } = supabaseAdmin.storage.from(bucket).getPublicUrl(filename)
+    const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filename)
+
+    await supabase.from('audit_logs').insert({
+        admin_id: admin.id,
+        action: 'upload_file',
+        meta: { bucket, filename }
+    })
 
     return NextResponse.json({ url: urlData.publicUrl })
 }

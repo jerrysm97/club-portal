@@ -1,59 +1,44 @@
 // app/portal/(protected)/layout.tsx — Auth gate for approved members only
-// This layout ONLY wraps pages inside (protected)/ — login, pending, register
-// are OUTSIDE this route group, preventing infinite redirect loops.
-import { createServerSupabaseClient, createAdminSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Sidebar from '@/components/portal/Sidebar'
 import PortalNavbar from '@/components/portal/PortalNavbar'
-
-// Import types safely
-type Member = any
+import { getSession, getMember } from '@/lib/auth'
+import { createServerClient } from '@/lib/supabase-server'
 
 export default async function ProtectedPortalLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
-    const supabase = await createServerSupabaseClient()
+    // ── Step 1: Verify authenticated ──
+    const session = await getSession()
+    if (!session) redirect('/portal/login')
 
-    // ── Step 1: Verify session ──
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) redirect('/portal/login')
-
-    // ── Step 2: Fetch member and check status ──
-    // Use admin client to bypass RLS and guarantee we get the member profile
-    const adminSupabase = createAdminSupabaseClient()
-    const { data: memberData } = await adminSupabase
-        .from('members')
-        .select('id, user_id, name, role, status, avatar_url, points, club_post')
-        .eq('user_id', user.id)
-        .single()
-
-    const member = memberData as any | null
-
-    // Redirects go OUTSIDE (protected)/ — no infinite loop possible
+    // ── Step 2: Fetch and verify member ──
+    const member = await getMember(session.user.id)
     if (!member) redirect('/portal/pending')
 
-    if (member.status === 'pending' && !['admin', 'superadmin'].includes(member.role)) {
-        redirect('/portal/pending')
+    // middleware.ts handles actual routing lockouts, but this acts as an
+    // extra layout-level guard guaranteeing that if status !== 'approved',
+    // they shouldn't see the portal shell (except admins evaluating others).
+    if (member.status === 'pending') {
+        if (!['admin', 'superadmin'].includes(member.role)) {
+            // Profile complete checking is done in pending/page.tsx
+            redirect('/portal/pending')
+        }
     }
     if (member.status === 'rejected') redirect('/portal/login?reason=rejected')
     if (member.status === 'banned') redirect('/portal/login?reason=banned')
 
-    // ── Step 3: Fetch unread notification count ──
-    const { count: unreadNotifications } = await (async () => {
-        try {
-            return await supabase
-                .from('notifications' as any)
-                .select('id', { count: 'exact', head: true })
-                .eq('member_id', member.id)
-                .eq('is_read', false)
-        } catch (e) {
-            return { count: 0 }
-        }
-    })()
+    // ── Step 3: Fetch unread count efficiently ──
+    const supabase = createServerClient()
+    const { count: unreadNotifications } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', session.user.id) // using user_id per DB schema
+        .eq('is_read', false)
 
-    // ── Step 4: Render portal shell ──
+    // ── Step 4: Render Shell ──
     return (
         <div className="flex min-h-screen bg-[#F8F9FA]">
             {/* Desktop Sidebar */}
@@ -67,12 +52,16 @@ export default async function ProtectedPortalLayout({
                 <PortalNavbar member={member} />
 
                 {/* Main Content Area */}
-                <main className="flex-1 p-6 md:p-10 relative z-10">
-                    <div className="max-w-6xl mx-auto">
+                <main className="flex-1 p-6 md:p-10 relative z-10 transition-all duration-300">
+                    <div className="max-w-6xl mx-auto mt-2 md:mt-0">
                         {children}
                     </div>
                 </main>
             </div>
+
+            {/* Background design elements across portal */}
+            <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#1A237E]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none -z-10" />
+            <div className="fixed bottom-0 left-64 w-[500px] h-[500px] bg-[#E53935]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none -z-10" />
         </div>
     )
 }

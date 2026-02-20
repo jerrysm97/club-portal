@@ -1,4 +1,4 @@
-// app/(public)/contact/page.tsx — ICEHC Contact Page: info card + dark form
+// app/(public)/contact/page.tsx — IIMS IT Club Contact Page (v4.0)
 'use client'
 import { useState } from 'react'
 import { Mail, Shield, MapPin, ExternalLink, Loader2, CheckCircle2 } from 'lucide-react'
@@ -86,59 +86,70 @@ export default function ContactPage() {
     }
 
     return (
-        <div className="bg-black min-h-screen pt-24">
-            <div className="max-w-7xl mx-auto px-6 pb-20">
-                <p className="font-mono text-[#00FF87] text-sm mb-2">// contact.sh</p>
-                <h1 className="font-mono font-bold text-[#F0F0FF] text-3xl md:text-4xl mb-4">
-                    Contact Us
-                    <span className="block h-1 w-16 bg-[#00FF87] mt-3 rounded-full" />
-                </h1>
-                <p className="text-[#8888AA] text-sm font-sans mb-12">
-                    Have a question or want to collaborate? Reach out to ICEHC.
-                </p>
+        <div className="bg-[#F8F9FA] min-h-screen pt-24 pb-20">
+            {/* Header Section */}
+            <div className="bg-[#1A237E] text-white py-16 mb-12 shadow-inner relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px]" />
+                <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+                        Contact <span className="text-[#E53935]">Us</span>
+                    </h1>
+                    <p className="text-[#C5CAE9] text-lg max-w-2xl mx-auto leading-relaxed">
+                        Have a question, suggestion, or want to collaborate? <br className="hidden md:block" />
+                        Reach out to the IIMS IT Club team.
+                    </p>
+                </div>
+            </div>
 
+            <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
                     {/* Left — Contact Info */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-[#0A0A0F] border border-[#2D2D44] rounded-lg p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="h-10 w-10 rounded-md bg-[#00FF87]/10 flex items-center justify-center">
-                                    <Shield className="h-5 w-5 text-[#00FF87]" />
+                        <div className="bg-white border border-[#E0E0E0] rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:border-[#1A237E]/20 transition-all">
+                            <div className="flex items-center gap-4 mb-8">
+                                <div className="h-14 w-14 rounded-2xl bg-[#E8EAF6] flex items-center justify-center border border-[#C5CAE9]">
+                                    <Shield className="h-7 w-7 text-[#1A237E]" />
                                 </div>
                                 <div>
-                                    <p className="font-mono font-bold text-[#F0F0FF] text-sm">ICEHC</p>
-                                    <p className="text-[#8888AA] text-xs font-sans">IIMS Cybersecurity & Ethical Hacking Club</p>
+                                    <p className="font-bold text-[#212121] text-lg">IIMS IT Club</p>
+                                    <p className="text-[#757575] text-sm font-medium">Official IT Club of IIMS College</p>
                                 </div>
                             </div>
 
-                            <div className="space-y-4 mt-6">
-                                <div className="flex items-start gap-3">
-                                    <Mail className="h-4 w-4 text-[#00D4FF] mt-0.5 flex-shrink-0" />
+                            <div className="space-y-6">
+                                <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-[#F8F9FA] transition-colors border border-transparent hover:border-[#E0E0E0]">
+                                    <div className="h-10 w-10 shrink-0 bg-[#FFEBEE] rounded-full flex items-center justify-center">
+                                        <Mail className="h-5 w-5 text-[#E53935]" />
+                                    </div>
                                     <div>
-                                        <p className="text-[#8888AA] font-mono text-xs uppercase tracking-widest mb-1">Email</p>
-                                        <a href="mailto:cybersec@iimscollege.edu.np" className="text-[#F0F0FF] text-sm font-sans hover:text-[#00D4FF] transition-colors">
-                                            cybersec@iimscollege.edu.np
+                                        <p className="text-[#9E9E9E] text-[10px] font-bold uppercase tracking-widest mb-1">Email Support</p>
+                                        <a href="mailto:itclub@iimscollege.edu.np" className="text-[#1A237E] font-semibold hover:text-[#E53935] transition-colors">
+                                            itclub@iimscollege.edu.np
                                         </a>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-3">
-                                    <MapPin className="h-4 w-4 text-[#00D4FF] mt-0.5 flex-shrink-0" />
+                                <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-[#F8F9FA] transition-colors border border-transparent hover:border-[#E0E0E0]">
+                                    <div className="h-10 w-10 shrink-0 bg-[#E8EAF6] rounded-full flex items-center justify-center">
+                                        <MapPin className="h-5 w-5 text-[#1A237E]" />
+                                    </div>
                                     <div>
-                                        <p className="text-[#8888AA] font-mono text-xs uppercase tracking-widest mb-1">Location</p>
-                                        <p className="text-[#F0F0FF] text-sm font-sans">IIMS College, Kathmandu, Nepal</p>
+                                        <p className="text-[#9E9E9E] text-[10px] font-bold uppercase tracking-widest mb-1">Campus Location</p>
+                                        <p className="text-[#424242] font-semibold">IIMS College, Kathmandu, Nepal</p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-3">
-                                    <ExternalLink className="h-4 w-4 text-[#00D4FF] mt-0.5 flex-shrink-0" />
+                                <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-[#F8F9FA] transition-colors border border-transparent hover:border-[#E0E0E0]">
+                                    <div className="h-10 w-10 shrink-0 bg-[#E8F5E9] rounded-full flex items-center justify-center">
+                                        <ExternalLink className="h-5 w-5 text-[#2E7D32]" />
+                                    </div>
                                     <div>
-                                        <p className="text-[#8888AA] font-mono text-xs uppercase tracking-widest mb-1">College</p>
+                                        <p className="text-[#9E9E9E] text-[10px] font-bold uppercase tracking-widest mb-1">Institution</p>
                                         <a
                                             href="https://iimscollege.edu.np/"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-[#00D4FF] text-sm font-sans hover:underline"
+                                            className="text-[#2E7D32] font-semibold hover:underline"
                                         >
                                             iimscollege.edu.np →
                                         </a>
@@ -150,51 +161,60 @@ export default function ContactPage() {
 
                     {/* Right — Contact Form */}
                     <div className="lg:col-span-3">
-                        <div className="bg-[#0A0A0F] border border-[#2D2D44] rounded-lg p-6 md:p-8">
+                        <div className="bg-white border border-[#E0E0E0] rounded-[2rem] p-8 md:p-10 shadow-lg shadow-[#1A237E]/5">
                             {success ? (
-                                <div className="text-center py-8">
-                                    <div className="h-14 w-14 rounded-full bg-[#00FF87]/10 border border-[#00FF87]/30 flex items-center justify-center mx-auto mb-6">
-                                        <CheckCircle2 className="h-7 w-7 text-[#00FF87]" />
+                                <div className="text-center py-12">
+                                    <div className="h-20 w-20 rounded-full bg-[#E8F5E9] border border-[#A5D6A7] flex items-center justify-center mx-auto mb-6">
+                                        <CheckCircle2 className="h-10 w-10 text-[#2E7D32]" />
                                     </div>
-                                    <p className="font-mono text-[#00FF87] text-sm mb-2">Transmission successful.</p>
-                                    <p className="text-[#8888AA] text-sm font-sans">
-                                        Your message has been sent to the ICEHC team. We will get back to you shortly.
+                                    <p className="text-2xl font-bold text-[#212121] mb-2">Message Received.</p>
+                                    <p className="text-[#757575] text-base mb-8 max-w-sm mx-auto">
+                                        Your transmission has been securely logged. The IIMS IT Club dispatch will respond shortly.
                                     </p>
                                     <button
                                         onClick={() => { setSuccess(false); setForm({ name: '', email: '', subject: '', message: '' }) }}
-                                        className="mt-6 text-[#8888AA] font-mono text-xs hover:text-[#F0F0FF] transition-colors"
+                                        className="text-[#1A237E] font-bold text-sm tracking-wide hover:text-[#E53935] transition-colors px-6 py-3 rounded-full hover:bg-[#F8F9FA]"
                                     >
-                                        ← Send another message
+                                        Send another message <span aria-hidden="true">&rarr;</span>
                                     </button>
                                 </div>
                             ) : (
-                                <form onSubmit={handleSubmit} className="space-y-5">
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="mb-4">
+                                        <h2 className="text-2xl font-bold text-[#212121] mb-2">Send us a Message</h2>
+                                        <p className="text-[#9E9E9E] text-sm">Fill out the fields below and we'll get back to you as soon as possible.</p>
+                                    </div>
+
                                     {serverError && (
-                                        <div className="p-3 rounded-md bg-[#FF3333]/10 border border-[#FF3333]/30 text-[#FF3333] text-sm font-mono">
+                                        <div className="p-4 rounded-xl bg-[#FFEBEE] border border-[#FFCDD2] text-[#D32F2F] text-sm font-semibold flex items-center gap-3">
+                                            <Shield className="h-5 w-5 shrink-0" />
                                             {serverError}
                                         </div>
                                     )}
 
-                                    <FormField
-                                        label="Name"
-                                        id="name"
-                                        type="text"
-                                        value={form.name}
-                                        onChange={v => updateField('name', v)}
-                                        error={errors.name?.[0]}
-                                        placeholder="Your name"
-                                        required
-                                    />
-                                    <FormField
-                                        label="Email"
-                                        id="email"
-                                        type="email"
-                                        value={form.email}
-                                        onChange={v => updateField('email', v)}
-                                        error={errors.email?.[0]}
-                                        placeholder="you@example.com"
-                                        required
-                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <FormField
+                                            label="Full Name"
+                                            id="name"
+                                            type="text"
+                                            value={form.name}
+                                            onChange={v => updateField('name', v)}
+                                            error={errors.name?.[0]}
+                                            placeholder="Jane Doe"
+                                            required
+                                        />
+                                        <FormField
+                                            label="Email Address"
+                                            id="email"
+                                            type="email"
+                                            value={form.email}
+                                            onChange={v => updateField('email', v)}
+                                            error={errors.email?.[0]}
+                                            placeholder="jane@example.com"
+                                            required
+                                        />
+                                    </div>
+
                                     <FormField
                                         label="Subject"
                                         id="subject"
@@ -202,37 +222,37 @@ export default function ContactPage() {
                                         value={form.subject}
                                         onChange={v => updateField('subject', v)}
                                         error={errors.subject?.[0]}
-                                        placeholder="What is this about?"
+                                        placeholder="How can we help?"
                                         required
                                     />
 
                                     <div>
-                                        <label htmlFor="message" className="block text-[#8888AA] font-mono text-xs font-bold uppercase tracking-widest mb-2">
+                                        <label htmlFor="message" className="block text-[#757575] text-[10px] font-bold uppercase tracking-widest mb-2">
                                             Message
                                         </label>
                                         <textarea
                                             id="message"
                                             value={form.message}
                                             onChange={e => updateField('message', e.target.value)}
-                                            placeholder="Your message..."
+                                            placeholder="Write your message here..."
                                             required
-                                            rows={5}
-                                            className="bg-[#0A0A0F] border border-[#2D2D44] text-[#F0F0FF] rounded-md px-3 py-2 focus:outline-none focus:border-[#00FF87] focus:ring-1 focus:ring-[#00FF87]/20 placeholder:text-[#8888AA]/50 w-full font-mono text-sm transition-colors resize-none"
+                                            rows={6}
+                                            className="bg-[#F8F9FA] border border-[#E0E0E0] text-[#212121] rounded-xl px-4 py-3 focus:outline-none focus:border-[#1A237E] focus:ring-2 focus:ring-[#1A237E]/20 placeholder:text-[#BDBDBD] w-full text-base transition-all resize-none shadow-sm hover:border-[#BDBDBD]"
                                         />
                                         {errors.message?.[0] && (
-                                            <p className="text-[#FF3333] text-xs font-mono mt-1">{errors.message[0]}</p>
+                                            <p className="text-[#D32F2F] text-xs font-semibold mt-1.5">{errors.message[0]}</p>
                                         )}
                                     </div>
 
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-[#00FF87] text-black font-mono font-bold px-5 py-2.5 rounded-md hover:bg-[#00e87a] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 flex items-center justify-center gap-2"
+                                        className="w-full bg-[#1A237E] text-white font-bold text-sm tracking-wide px-6 py-4 rounded-xl hover:bg-[#283593] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-xl hover:shadow-[#1A237E]/20 mt-4"
                                     >
                                         {loading ? (
                                             <>
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                PROCESSING...
+                                                <Loader2 className="h-5 w-5 animate-spin" />
+                                                Transmitting...
                                             </>
                                         ) : (
                                             'Send Message'
@@ -269,7 +289,7 @@ function FormField({
 }) {
     return (
         <div>
-            <label htmlFor={id} className="block text-[#8888AA] font-mono text-xs font-bold uppercase tracking-widest mb-2">
+            <label htmlFor={id} className="block text-[#757575] text-[10px] font-bold uppercase tracking-widest mb-2">
                 {label}
             </label>
             <input
@@ -279,10 +299,10 @@ function FormField({
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
                 required={required}
-                className="bg-[#0A0A0F] border border-[#2D2D44] text-[#F0F0FF] rounded-md px-3 py-2 focus:outline-none focus:border-[#00FF87] focus:ring-1 focus:ring-[#00FF87]/20 placeholder:text-[#8888AA]/50 w-full font-mono text-sm transition-colors"
+                className="bg-[#F8F9FA] border border-[#E0E0E0] text-[#212121] rounded-xl px-4 py-3 focus:outline-none focus:border-[#1A237E] focus:ring-2 focus:ring-[#1A237E]/20 placeholder:text-[#BDBDBD] w-full text-base transition-all shadow-sm hover:border-[#BDBDBD]"
             />
             {error && (
-                <p className="text-[#FF3333] text-xs font-mono mt-1">{error}</p>
+                <p className="text-[#D32F2F] text-xs font-semibold mt-1.5">{error}</p>
             )}
         </div>
     )

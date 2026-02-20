@@ -1,8 +1,7 @@
-// app/portal/profile/page.tsx — IIMS IT Club Operative Dossier (v4.0)
+// app/portal/members/[id]/page.tsx — IIMS IT Club Member View (v4.0)
 import { createServerClient } from '@/lib/supabase-server'
-import { redirect } from 'next/navigation'
-import { User, Mail, Github, Linkedin, Calendar, Edit2, ShieldCheck, Trophy, Target, Zap, ChevronRight, MapPin, Terminal } from 'lucide-react'
-import { formatDate } from '@/lib/utils'
+import { redirect, notFound } from 'next/navigation'
+import { Mail, Github, Linkedin, Calendar, ShieldCheck, Trophy, Target, Zap, MessageSquare, MapPin, Terminal, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import Avatar from '@/components/ui/Avatar'
 import { cn } from '@/lib/utils'
@@ -10,22 +9,27 @@ import { getSession } from '@/lib/auth'
 
 type Member = any
 
-export const revalidate = 0
+export const revalidate = 60
 
-export default async function ProfilePage() {
+export default async function MemberViewPage({ params }: { params: { id: string } }) {
     const session = await getSession()
     if (!session) redirect('/portal/login')
+
+    // If viewing own profile, redirect to the editable central dossier
+    if (session.user.id === params.id) {
+        redirect('/portal/profile')
+    }
 
     const supabase = createServerClient()
 
     const { data } = await supabase
         .from('members')
         .select('*')
-        .eq('id', session.user.id)
-        .single()
+        .eq('id', params.id)
+        .maybeSingle()
 
     const member = data as any
-    if (!member) redirect('/portal/login')
+    if (!member) return notFound()
 
     // Get rank for profile display
     const { count: rankCount } = await supabase
@@ -37,6 +41,11 @@ export default async function ProfilePage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-10 pb-16 animate-fade-up">
+            <Link href="/portal/dashboard" className="inline-flex items-center gap-2 text-[#757575] hover:text-[#1A237E] font-bold text-xs uppercase tracking-widest transition-all group">
+                <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                Return to Directory
+            </Link>
+
             {/* Dossier Header */}
             <section className="relative bg-[#1A237E] rounded-[3rem] p-10 md:p-14 text-white shadow-2xl overflow-hidden group">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-[#E53935]/10 rounded-full blur-3xl -translate-y-48 translate-x-48" />
@@ -154,14 +163,13 @@ export default async function ProfilePage() {
                         </div>
 
                         <div className="pt-8 border-t border-[#E0E0E0]">
-                            <Link href="/portal/profile/edit" className="bg-[#1A237E] rounded-xl p-5 flex items-center justify-between group cursor-pointer hover:bg-[#283593] transition-all shadow-md shadow-[#1A237E]/20">
+                            <Link href={`/portal/messages/${member.id}`} className="bg-[#1A237E] rounded-xl p-5 flex items-center justify-between group cursor-pointer hover:bg-[#283593] transition-all shadow-md shadow-[#1A237E]/20">
                                 <div className="flex items-center gap-4">
                                     <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-lg text-white">
-                                        <Edit2 className="h-4 w-4" />
+                                        <MessageSquare className="h-4 w-4" />
                                     </div>
-                                    <span className="text-xs font-bold uppercase tracking-widest text-white mt-0.5">Update Profile</span>
+                                    <span className="text-xs font-bold uppercase tracking-widest text-white mt-0.5">Send Message</span>
                                 </div>
-                                <ChevronRight className="h-4 w-4 text-white/50 group-hover:translate-x-1 group-hover:text-white transition-all" />
                             </Link>
                         </div>
                     </div>

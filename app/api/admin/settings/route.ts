@@ -1,36 +1,41 @@
-// app/api/admin/settings/route.ts
-// Admin settings API — PATCH to update site_settings row (id='global').
-
+// app/api/admin/settings/route.ts — Admin Settings API (v4.0 Spec-Compliant)
+// Settings use key-value format per CONTEXT.md §7 site_settings table
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { assertRole } from '@/lib/auth'
+import { createServerClient } from '@/lib/supabase-server'
+import { z } from 'zod'
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-async function assertAdmin() {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        { cookies: { get: (name) => cookieStore.get(name)?.value } }
-    )
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return null
-    const { data } = await supabaseAdmin.from('members').select('role').eq('id', session.user.id).single()
-    return data?.role === 'admin' ? session : null
-}
+const updateSettingSchema = z.object({
+    key: z.string().regex(/^[a-z_]+$/),
+    value: z.string(),
+})
 
 export async function PATCH(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const fields = await req.json()
-    const { error } = await supabaseAdmin
+    // Settings require superadmin per CONTEXT.md §14
+    const admin = await assertRole('superadmin')
+    const body = await req.json()
+    const parsed = updateSettingSchema.safeParse(body)
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    }
+
+    const supabase = createServerClient()
+    const { error } = await supabase
         .from('site_settings')
-        .update({ ...fields, updated_at: new Date().toISOString() })
-        .eq('id', 'global')
+        .update({
+            value: parsed.data.value,
+            updated_by: admin.id,
+            updated_at: new Date().toISOString(),
+        })
+        .eq('key', parsed.data.key)
+
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await supabase.from('audit_logs').insert({
+        admin_id: admin.id,
+        action: 'update_setting',
+        meta: parsed.data
+    })
+
     return NextResponse.json({ success: true })
 }

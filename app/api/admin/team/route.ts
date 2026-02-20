@@ -1,49 +1,39 @@
-// app/api/admin/team/route.ts
-// Admin team API — CRUD for team_members table.
-
+// app/api/admin/team/route.ts — Admin Team/Role Management API (v4.0 Spec-Compliant)
+// Team members are just members with admin/superadmin roles (CONTEXT.md §7)
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { assertRole } from '@/lib/auth'
+import { createServerClient } from '@/lib/supabase-server'
+import { z } from 'zod'
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-async function assertAdmin() {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        { cookies: { get: (name) => cookieStore.get(name)?.value } }
-    )
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return null
-    const { data } = await supabaseAdmin.from('members').select('role').eq('id', session.user.id).single()
-    return data?.role === 'admin' ? session : null
-}
-
-export async function POST(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const body = await req.json()
-    const { error } = await supabaseAdmin.from('team_members').insert(body)
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ success: true })
-}
+const updateRoleSchema = z.object({
+    id: z.string().uuid(),
+    role: z.enum(['member', 'admin', 'superadmin']),
+    club_post: z.enum([
+        'General Member', 'Web Development', 'Cybersecurity',
+        'AI & Machine Learning', 'Mobile Development', 'Cloud & DevOps',
+        'Data Science', 'Open Source', 'Graphic Design'
+    ]).optional(),
+})
 
 export async function PATCH(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const { id, ...fields } = await req.json()
-    const { error } = await supabaseAdmin.from('team_members').update(fields).eq('id', id)
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ success: true })
-}
+    const admin = await assertRole('superadmin')
+    const body = await req.json()
+    const parsed = updateRoleSchema.safeParse(body)
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    }
 
-export async function DELETE(req: NextRequest) {
-    if (!await assertAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    const { id } = await req.json()
-    const { error } = await supabaseAdmin.from('team_members').delete().eq('id', id)
+    const { id, ...fields } = parsed.data
+    const supabase = createServerClient()
+    const { error } = await supabase.from('members').update(fields).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await supabase.from('audit_logs').insert({
+        admin_id: admin.id,
+        action: 'update_member_role',
+        target_id: id,
+        meta: fields
+    })
+
     return NextResponse.json({ success: true })
 }

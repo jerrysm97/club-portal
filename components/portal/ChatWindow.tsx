@@ -1,25 +1,23 @@
-// components/portal/ChatWindow.tsx — IIMS Collegiate Chat Interface
+// components/portal/ChatWindow.tsx — IIMS IT Club Chat Interface (v4.0)
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Send, Loader2, MoreVertical, ShieldCheck, ChevronDown, CheckCheck } from 'lucide-react'
+import { Send, Loader2, MoreVertical, ShieldCheck, ChevronDown, CheckCheck, Lock } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import { createClient } from '@/lib/supabase/client'
 import { sendMessage } from '@/app/portal/(protected)/messages/actions'
-// Import types safely
-type Message = any
-type Member = any
 import { formatDate, cn } from '@/lib/utils'
 import Link from 'next/link'
 
 interface ChatWindowProps {
-    initialMessages: Message[]
-    currentUser: any // Member-like
-    otherUser: any // Member-like
+    initialMessages: any[]
+    currentUser: any
+    otherUser: any
+    conversationId: string | null
 }
 
-export default function ChatWindow({ initialMessages, currentUser, otherUser }: ChatWindowProps) {
-    const [messages, setMessages] = useState<Message[]>(initialMessages)
+export default function ChatWindow({ initialMessages, currentUser, otherUser, conversationId }: ChatWindowProps) {
+    const [messages, setMessages] = useState<any[]>(initialMessages)
     const [input, setInput] = useState('')
     const [sending, setSending] = useState(false)
     const scrollRef = useRef<HTMLDivElement>(null)
@@ -27,18 +25,20 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser }: 
     const supabase = createClient()
 
     useEffect(() => {
-        // Subscribe to direct messages between me and otherUser
+        // Only Subscribe if there's an established conversation channel
+        if (!conversationId) return
+
         const channel = supabase
-            .channel(`member-chat:${currentUser.id}-${otherUser.id}`)
+            .channel(`member-chat:${conversationId}`)
             .on('postgres_changes', {
                 event: 'INSERT',
                 schema: 'public',
                 table: 'messages',
-                filter: `receiver_id=eq.${currentUser.id}`
+                filter: `conversation_id=eq.${conversationId}`
             }, (payload) => {
-                const newMsg = payload.new as Message
-                // Only add if it's from our specific otherUser
-                if (newMsg.sender_id === otherUser.id) {
+                const newMsg = payload.new
+                // Prevent duplicate processing if it's our own optimistic message
+                if (newMsg.sender_id !== currentUser.id) {
                     setMessages(prev => [...prev, newMsg])
                 }
             })
@@ -47,7 +47,7 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser }: 
         return () => {
             supabase.removeChannel(channel)
         }
-    }, [currentUser.id, otherUser.id])
+    }, [conversationId, currentUser.id])
 
     useEffect(() => {
         scrollToBottom()
@@ -69,23 +69,24 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser }: 
 
         // Optimistic update
         const tempId = crypto.randomUUID()
-        const optimisticMsg: Message = {
+        const optimisticMsg = {
             id: tempId,
             content,
             sender_id: currentUser.id,
-            receiver_id: otherUser.id,
+            conversation_id: conversationId,
             created_at: new Date().toISOString(),
-            is_read: false,
             is_deleted: false,
-        } as any
+        }
 
         setMessages(prev => [...prev, optimisticMsg])
 
+        // Server Action
         const res = await sendMessage(otherUser.id, content)
         setSending(false)
 
         if (res?.error) {
-            // Ideally revert, for now just show error
+            // Rollback optimistic message upon hard failure
+            setMessages(prev => prev.filter(m => m.id !== tempId))
             console.error('Transmission failed:', res.error)
         }
     }
@@ -93,67 +94,74 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser }: 
     return (
         <div className="flex flex-col h-full bg-white relative">
             {/* Dynamic Header */}
-            <header className="h-20 flex items-center justify-between px-8 border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+            <header className="h-[72px] md:h-20 flex items-center justify-between px-6 md:px-8 border-b border-[#E0E0E0] bg-white/90 backdrop-blur-md sticky top-0 z-10 shrink-0">
                 <div className="flex items-center gap-4">
-                    <Link href="/portal/messages" className="lg:hidden p-2 -ml-2 text-gray-400">
+                    <Link href="/portal/messages" className="lg:hidden p-2 -ml-2 text-[#9E9E9E] hover:bg-[#F5F5F5] rounded-lg">
                         <ChevronDown className="h-5 w-5 rotate-90" />
                     </Link>
                     <div className="relative">
-                        <Avatar src={otherUser.avatar_url} name={otherUser.name} size="md" className="ring-2 ring-gray-50 shadow-sm" />
-                        <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 bg-emerald-500 border-2 border-white rounded-full" />
+                        <Avatar src={otherUser.avatar_url} name={otherUser.name} size="md" className="ring-2 ring-[#F8F9FA] shadow-sm" />
+                        <div className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-[#4CAF50] border-2 border-white rounded-full" />
                     </div>
                     <div>
-                        <h3 className="text-[#111827] font-poppins font-bold text-sm leading-none flex items-center gap-2">
+                        <h3 className="text-[#212121] font-bold text-sm leading-none flex items-center gap-2">
                             {otherUser.name}
-                            {otherUser.role === 'admin' && <ShieldCheck className="h-3.5 w-3.5 text-[#C3161C]" />}
+                            {['admin', 'superadmin'].includes(otherUser.role) && (
+                                <ShieldCheck className="h-4 w-4 text-[#1A237E]" />
+                            )}
                         </h3>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mt-1 block">
-                            Active Frequency
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#9E9E9E] mt-1.5 block">
+                            {otherUser.club_post || 'Member'}
                         </span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button className="p-2.5 rounded-xl text-gray-400 hover:text-[#58151C] hover:bg-gray-50 transition-all">
+                    <button className="p-2.5 rounded-xl text-[#9E9E9E] hover:text-[#1A237E] hover:bg-[#F8F9FA] transition-all">
                         <MoreVertical className="h-5 w-5" />
                     </button>
                 </div>
             </header>
 
             {/* Message Stream */}
-            <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar bg-[url('/grid-subtle.svg')] bg-[length:40px_40px]" ref={scrollRef}>
-                <div className="py-10 text-center">
-                    <span className="px-4 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                        Uplink established · End-to-end Encrypted
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 md:space-y-8 bg-[#F8F9FA]/30 custom-scrollbar" ref={scrollRef}>
+                <div className="py-8 text-center">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#1A237E]/5 border border-[#1A237E]/10 text-[10px] font-bold text-[#1A237E] uppercase tracking-widest">
+                        <Lock className="h-3 w-3" /> End-to-End Encrypted Session
                     </span>
                 </div>
 
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender_id === currentUser.id
                     const showAvatar = !isMe && (idx === 0 || messages[idx - 1].sender_id !== msg.sender_id)
+                    const isContinuous = idx > 0 && messages[idx - 1].sender_id === msg.sender_id
 
                     return (
-                        <div key={msg.id} className={cn("flex group animate-fade-up", isMe ? 'justify-end' : 'justify-start')}>
-                            <div className={cn("flex gap-3 max-w-[85%] sm:max-w-[70%]", isMe && 'flex-row-reverse')}>
+                        <div key={msg.id} className={cn("flex group animate-fade-up", isMe ? 'justify-end' : 'justify-start', isContinuous ? 'mt-2' : '')}>
+                            <div className={cn("flex gap-3 max-w-[85%] sm:max-w-[75%]", isMe && 'flex-row-reverse')}>
                                 {!isMe && (
-                                    <div className="w-8 flex-shrink-0 flex items-end">
-                                        {showAvatar && <Avatar src={otherUser.avatar_url} name={otherUser.name} size="xs" className="ring-2 ring-white shadow-sm" />}
+                                    <div className="w-8 flex-shrink-0 flex items-end mb-1">
+                                        {showAvatar ? (
+                                            <Avatar src={otherUser.avatar_url} name={otherUser.name} size="xs" className="ring-2 ring-white shadow-sm" />
+                                        ) : (
+                                            <div className="w-8" />
+                                        )}
                                     </div>
                                 )}
 
-                                <div className={cn("space-y-1", isMe ? 'items-end' : 'items-start')}>
+                                <div className={cn("space-y-1.5", isMe ? 'items-end' : 'items-start')}>
                                     <div className={cn(
-                                        "px-5 py-3 rounded-[1.5rem] font-medium text-sm leading-relaxed shadow-sm",
+                                        "px-5 py-3 rounded-2xl font-medium text-sm leading-relaxed shadow-sm transition-all",
                                         isMe
-                                            ? 'bg-[#58151C] text-white rounded-tr-none'
-                                            : 'bg-gray-50 text-[#111827] border border-gray-100 rounded-tl-none'
+                                            ? 'bg-[#1A237E] text-white rounded-br-sm'
+                                            : 'bg-white text-[#212121] border border-[#E0E0E0] rounded-bl-sm'
                                     )}>
                                         {msg.content}
                                     </div>
-                                    <div className={cn("flex items-center gap-1.5 text-[9px] font-bold text-gray-400 uppercase tracking-tighter px-1", isMe && "flex-row-reverse")}>
+                                    <div className={cn("flex items-center gap-1.5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-wider px-1", isMe && "flex-row-reverse")}>
                                         {formatDate(msg.created_at)}
                                         {isMe && (
-                                            <CheckCheck className={cn("h-3 w-3", msg.is_read ? "text-blue-500" : "text-gray-300")} />
+                                            <CheckCheck className="h-3.5 w-3.5 text-[#4CAF50]/60" />
                                         )}
                                     </div>
                                 </div>
@@ -164,24 +172,24 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser }: 
             </div>
 
             {/* Action Bar */}
-            <footer className="p-6 bg-white border-t border-gray-100 sticky bottom-0 z-10">
-                <form onSubmit={handleSend} className="max-w-4xl mx-auto flex gap-4">
+            <footer className="p-4 md:p-6 bg-white border-t border-[#E0E0E0] sticky bottom-0 z-10 shrink-0">
+                <form onSubmit={handleSend} className="max-w-5xl mx-auto flex gap-3 md:gap-4">
                     <div className="flex-1 relative">
                         <input
                             type="text"
-                            placeholder="Type your transmission..."
+                            placeholder="Type a message..."
                             value={input}
                             onChange={e => setInput(e.target.value)}
-                            className="w-full bg-gray-50 border-transparent rounded-[1.5rem] px-6 py-4 text-[#111827] font-medium text-sm focus:bg-white focus:ring-4 focus:ring-[#58151C]/5 transition-all outline-none pr-12"
+                            className="w-full bg-[#F5F5F5] border-transparent rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-[#212121] font-medium text-sm focus:bg-white focus:border-[#1A237E]/30 focus:ring-4 focus:ring-[#1A237E]/10 transition-all outline-none"
                             autoFocus
                         />
                     </div>
                     <button
                         type="submit"
                         disabled={!input.trim() || sending}
-                        className="h-14 w-14 rounded-2xl bg-[#C3161C] text-white flex items-center justify-center shadow-lg shadow-red-100 hover:bg-[#A31217] hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex-shrink-0"
+                        className="h-12 w-12 md:h-[54px] md:w-[54px] rounded-2xl bg-[#E53935] text-white flex items-center justify-center shadow-md shadow-[#E53935]/20 hover:bg-[#C62828] hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-[#E53935] transition-all shrink-0"
                     >
-                        {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                        {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-1" />}
                     </button>
                 </form>
             </footer>

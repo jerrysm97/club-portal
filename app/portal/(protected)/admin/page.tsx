@@ -1,4 +1,4 @@
-// app/portal/admin/page.tsx — IIMS Collegiate Base Command
+// app/portal/admin/page.tsx — IIMS IT Club Base Command (v4.0)
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -30,30 +30,31 @@ export default function AdminPage() {
 
         try {
             // Check session and admin status
-            const { data: { session } } = await supabase.auth.getSession()
+            const { data: { user } } = await supabase.auth.getUser()
+            const session = user ? { user } : null
             if (!session) {
                 router.push('/portal/login')
                 return
             }
 
             const { data: member } = await supabase
-                .from('members' as any)
+                .from('members')
                 .select('role')
                 .eq('id', session.user.id)
                 .single()
 
-            if (!member || !['admin', 'superadmin'].includes((member as any).role)) {
+            if (!member || !['admin', 'superadmin'].includes(member.role)) {
                 router.push('/portal/dashboard')
                 return
             }
 
-            // Parallel data fetching with updated table names
+            // Parallel data fetching
             const [m, p, e, c, r] = await Promise.all([
-                supabase.from('members' as any).select('*').order('created_at', { ascending: false }),
-                supabase.from('posts' as any).select('*, author:members(name, avatar_url)').order('created_at', { ascending: false }),
-                supabase.from('public_events' as any).select('*').order('event_date', { ascending: false }),
-                supabase.from('ctf_challenges' as any).select('*, solved_count:ctf_submissions(count)').order('points', { ascending: true }),
-                supabase.from('documents' as any).select('*, uploader:members(name)').order('created_at', { ascending: false })
+                supabase.from('members').select('*').order('created_at', { ascending: false }),
+                supabase.from('posts').select('*, author:members(full_name, avatar_url)').order('created_at', { ascending: false }),
+                supabase.from('public_events').select('*').order('event_date', { ascending: false }),
+                supabase.from('ctf_challenges').select('id, title, category, difficulty, points, is_active, hint, created_at, solves_count').order('points', { ascending: true }),
+                supabase.from('documents').select('*, uploader:members(full_name)').order('created_at', { ascending: false })
             ])
 
             setData({
@@ -77,10 +78,10 @@ export default function AdminPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-100px)] animate-pulse">
-                <div className="h-16 w-16 bg-gray-50 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
-                    <Loader2 className="h-8 w-8 text-[#C3161C] animate-spin" />
+                <div className="h-16 w-16 bg-[#F8F9FA] rounded-[2rem] flex items-center justify-center mb-6 shadow-sm border border-[#E0E0E0]">
+                    <Loader2 className="h-8 w-8 text-[#1A237E] animate-spin" />
                 </div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">Synchronizing Command Center</p>
+                <p className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">Synchronizing Command Center</p>
             </div>
         )
     }
@@ -88,10 +89,12 @@ export default function AdminPage() {
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-100px)] text-center p-12">
-                <AlertTriangle className="h-12 w-12 text-red-500 mb-6" />
-                <h2 className="text-2xl font-poppins font-black text-gray-900 mb-2">Tactical Link Severed</h2>
-                <p className="text-gray-500 max-w-sm mb-8">{error}</p>
-                <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[#58151C] text-white rounded-2xl font-bold shadow-xl shadow-red-900/10">Re-establish Connection</button>
+                <AlertTriangle className="h-12 w-12 text-[#E53935] mb-6" />
+                <h2 className="text-2xl font-bold text-[#212121] mb-2">Tactical Link Severed</h2>
+                <p className="text-[#757575] max-w-sm mb-8 font-medium">{error}</p>
+                <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[#1A237E] text-white rounded-xl font-bold tracking-widest text-xs uppercase shadow-md shadow-[#1A237E]/20 hover:bg-[#283593] transition-colors">
+                    Re-establish Connection
+                </button>
             </div>
         )
     }
@@ -100,14 +103,14 @@ export default function AdminPage() {
         <div className="flex h-[calc(100vh-64px)] bg-white overflow-hidden -m-8">
             <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-            <main className="flex-1 overflow-y-auto p-12 custom-scrollbar animate-fade-up">
-                <header className="mb-12 flex items-center justify-between">
+            <main className="flex-1 overflow-y-auto p-8 md:p-12 custom-scrollbar animate-fade-up">
+                <header className="mb-10 flex items-center justify-between">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#58151C]/5 text-[#58151C] font-black text-[10px] uppercase tracking-widest mb-4 border border-[#58151C]/10">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#E53935]/10 text-[#D32F2F] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#FFCDD2]">
                             <ShieldCheck className="h-3.5 w-3.5" /> Sector Command
                         </div>
-                        <h1 className="text-4xl font-poppins font-black text-[#111827] capitalize">
-                            {activeTab.replace('-', ' ')} <span className="text-[#C3161C]">Console</span>
+                        <h1 className="text-4xl font-bold text-[#212121] capitalize leading-tight">
+                            {activeTab.replace('-', ' ')} <span className="text-[#1A237E]">Console</span>
                         </h1>
                     </div>
                 </header>

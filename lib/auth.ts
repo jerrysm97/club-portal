@@ -23,7 +23,8 @@ export async function getSession() {
             },
         }
     )
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user } } = await supabase.auth.getUser()
+    const session = user ? { user } : null
     return session
 }
 

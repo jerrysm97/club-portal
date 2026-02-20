@@ -1,4 +1,4 @@
-// components/portal/ConversationList.tsx — IIMS Collegiate Thread List
+// components/portal/ConversationList.tsx — IIMS IT Club Comms List (v4.0)
 'use client'
 
 import Link from 'next/link'
@@ -9,8 +9,9 @@ import { MessageSquare, Search, Filter } from 'lucide-react'
 
 interface ConversationListProps {
     conversations: {
+        conversation_id: string,
         otherMember: { id: string, name: string, avatar_url: string | null },
-        lastMessage: { content: string, created_at: string },
+        lastMessage: { content: string, created_at: string, isMine: boolean },
         unreadCount: number
     }[],
     currentMemberId: string
@@ -23,29 +24,29 @@ export default function ConversationList({ conversations, currentMemberId }: Con
     return (
         <div className="w-full h-full flex flex-col">
             {/* List Header */}
-            <div className="p-6 border-b border-gray-100 bg-white">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-[#111827] font-poppins font-black text-sm flex items-center gap-2 uppercase tracking-widest">
-                        <MessageSquare className="h-4 w-4 text-[#C3161C]" />
-                        Encrypted Comms
+            <div className="p-5 md:p-6 border-b border-[#E0E0E0] bg-white">
+                <div className="flex items-center justify-between mb-5">
+                    <h2 className="text-[#212121] font-bold text-sm flex items-center gap-2 uppercase tracking-widest">
+                        <MessageSquare className="h-4 w-4 text-[#1A237E]" />
+                        Direct Messages
                     </h2>
-                    <div className="p-2 rounded-lg bg-gray-50 text-gray-400">
+                    <button className="p-2 rounded-xl bg-[#F8F9FA] text-[#757575] hover:text-[#1A237E] hover:bg-[#E8EAF6] transition-colors border border-transparent hover:border-[#E8EAF6]">
                         <Filter className="h-3.5 w-3.5" />
-                    </div>
+                    </button>
                 </div>
 
                 <div className="relative group">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-[#58151C] transition-colors" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9E9E9E] group-focus-within:text-[#1A237E] transition-colors" />
                     <input
                         type="text"
-                        placeholder="Search frequency..."
-                        className="w-full bg-gray-50 border-transparent rounded-xl py-2 pl-10 pr-4 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-[#58151C]/10 transition-all outline-none"
+                        placeholder="Search members..."
+                        className="w-full bg-[#F5F5F5] border border-transparent rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:bg-white focus:border-[#1A237E]/30 focus:ring-4 focus:ring-[#1A237E]/10 transition-all outline-none text-[#212121] placeholder:text-[#9E9E9E]"
                     />
                 </div>
             </div>
 
             {/* List Content */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/30">
+            <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#F8F9FA]/50">
                 {conversations.length > 0 ? (
                     conversations.map(({ otherMember, lastMessage, unreadCount }) => {
                         const isActive = activeOtherId === otherMember.id
@@ -55,54 +56,50 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                                 key={otherMember.id}
                                 href={`/portal/messages/${otherMember.id}`}
                                 className={cn(
-                                    "block p-5 transition-all relative group",
+                                    "block p-4 md:p-5 transition-all relative group border-b border-[#E0E0E0]/50",
                                     isActive
-                                        ? "bg-white shadow-lg z-10 scale-[1.02]"
-                                        : "hover:bg-white/60"
+                                        ? "bg-white shadow-sm z-10 scale-[1.01] border-l-4 border-l-[#1A237E]"
+                                        : "hover:bg-white border-l-4 border-l-transparent"
                                 )}
                             >
-                                {isActive && (
-                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#C3161C]" />
-                                )}
-
                                 <div className="flex items-center gap-4">
-                                    <div className="relative">
+                                    <div className="relative shrink-0">
                                         <Avatar
                                             src={otherMember.avatar_url}
                                             name={otherMember.name}
                                             className={cn(
-                                                "w-12 h-12 ring-2 transition-all shadow-sm",
-                                                isActive ? "ring-[#58151C]/10" : "ring-white"
+                                                "w-11 h-11 md:w-12 md:h-12 ring-2 transition-all shadow-sm",
+                                                isActive ? "ring-[#1A237E]/20" : "ring-white"
                                             )}
                                         />
                                         {unreadCount > 0 && (
-                                            <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-[#C3161C] border-2 border-white rounded-full animate-ping" />
+                                            <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-[#E53935] border-2 border-white rounded-full flex" />
                                         )}
                                     </div>
 
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-baseline mb-1">
+                                        <div className="flex justify-between items-baseline mb-0.5">
                                             <h4 className={cn(
                                                 "text-sm font-bold truncate transition-colors",
-                                                isActive ? "text-[#58151C]" : "text-[#111827]"
+                                                isActive ? "text-[#1A237E]" : "text-[#212121]"
                                             )}>
                                                 {otherMember.name}
                                             </h4>
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">
+                                            <span className="text-[9px] font-bold text-[#9E9E9E] uppercase tracking-wider shrink-0 ml-2">
                                                 {formatDate(lastMessage.created_at)}
                                             </span>
                                         </div>
 
                                         <div className="flex items-center gap-2">
                                             <p className={cn(
-                                                "text-xs truncate flex-1",
-                                                unreadCount > 0 ? "text-[#111827] font-bold" : "text-gray-400 font-medium"
+                                                "text-xs truncate flex-1 leading-snug",
+                                                unreadCount > 0 ? "text-[#212121] font-bold" : "text-[#757575] font-medium"
                                             )}>
-                                                {lastMessage.content}
+                                                {lastMessage.isMine && "You: "}{lastMessage.content}
                                             </p>
                                             {unreadCount > 0 && (
-                                                <span className="bg-[#C3161C] text-white text-[8px] font-black rounded-lg px-2 py-0.5">
-                                                    {unreadCount}
+                                                <span className="bg-[#E53935] text-white text-[9px] font-bold rounded-md px-1.5 py-0.5 shadow-sm shrink-0">
+                                                    New
                                                 </span>
                                             )}
                                         </div>
@@ -112,11 +109,12 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                         )
                     })
                 ) : (
-                    <div className="p-12 text-center animate-fade-up">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
-                            <MessageSquare className="h-6 w-6 text-gray-200" />
+                    <div className="p-10 text-center animate-fade-up flex flex-col items-center justify-center h-full">
+                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-sm border border-[#E0E0E0]">
+                            <MessageSquare className="h-6 w-6 text-[#9E9E9E]" />
                         </div>
-                        <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">No Frequencies Detected</p>
+                        <p className="text-[#424242] font-bold text-sm uppercase tracking-widest">Inbox Zero</p>
+                        <p className="text-[#9E9E9E] text-xs font-medium mt-1">Select a member to start.</p>
                     </div>
                 )}
             </div>

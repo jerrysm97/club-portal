@@ -1,13 +1,24 @@
-// app/api/contact/route.ts — Contact Form API (CONTEXT §14)
+// app/api/contact/route.ts — IIMS IT Club Contact Form API (v4.0)
 import { NextRequest, NextResponse } from 'next/server'
 import { contactSchema } from '@/lib/validations'
 import { createAdminSupabaseClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
+import { contactFormLimiter } from '@/lib/ratelimit'
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
-        // Rate limiting by IP (simple in-memory approach)
         const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+
+        // Apply Rate Limiting
+        if (ip !== 'unknown') {
+            const { success } = await contactFormLimiter.limit(ip)
+            if (!success) {
+                return NextResponse.json(
+                    { error: 'Too many requests. Please wait a moment before trying again.' },
+                    { status: 429 }
+                )
+            }
+        }
 
         const body = await req.json()
         const result = contactSchema.safeParse(body)
@@ -33,7 +44,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                 ip_address: ip,
             })
         } catch {
-            // Table may not exist yet — continue to send email anyway
             console.warn('[contact] Could not insert into contact_messages table')
         }
 
@@ -41,18 +51,31 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const resend = new Resend(process.env.RESEND_API_KEY || 're_stub')
 
         const { error: emailError } = await resend.emails.send({
-            from: 'ICEHC Portal <onboarding@resend.dev>',
-            to: ['cybersec@iimscollege.edu.np'],
+            from: 'IIMS IT Club <onboarding@resend.dev>',
+            to: ['itclub@iimscollege.edu.np'],
             replyTo: email,
-            subject: `[ICEHC Contact] ${subject}`,
+            subject: `[IT Club Inquiry] ${subject}`,
             html: `
-                <div style="font-family: 'Courier New', monospace; padding: 20px; background: #0A0A0F; color: #F0F0FF; border: 1px solid #2D2D44; border-radius: 8px;">
-                    <h2 style="color: #00FF87; margin-top: 0;">New Contact Form Submission</h2>
-                    <p><strong style="color: #00D4FF;">Name:</strong> ${name}</p>
-                    <p><strong style="color: #00D4FF;">Email:</strong> ${email}</p>
-                    <p><strong style="color: #00D4FF;">Subject:</strong> ${subject}</p>
-                    <hr style="border: none; border-top: 1px solid #2D2D44; margin: 20px 0;" />
-                    <p style="white-space: pre-wrap;">${message}</p>
+                <div style="font-family: Arial, sans-serif; padding: 30px; background: #F8F9FA; color: #212121; border: 1px solid #E0E0E0; border-radius: 12px; max-width: 600px; margin: 0 auto;">
+                    <div style="text-align: center; border-bottom: 2px solid #1A237E; padding-bottom: 20px; margin-bottom: 20px;">
+                        <h2 style="color: #1A237E; margin: 0; font-size: 24px; letter-spacing: -0.5px;">IIMS IT Club Dispatch</h2>
+                        <p style="color: #757575; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">New External Transmission</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 25px; border-radius: 8px; border: 1px solid #EEEEEE; margin-bottom: 20px;">
+                        <p style="margin: 0 0 10px 0;"><strong style="color: #1A237E; display: inline-block; width: 80px;">Name:</strong> <span style="font-weight: 500;">${name}</span></p>
+                        <p style="margin: 0 0 10px 0;"><strong style="color: #1A237E; display: inline-block; width: 80px;">Email:</strong> <a href="mailto:${email}" style="color: #E53935; text-decoration: none; font-weight: 500;">${email}</a></p>
+                        <p style="margin: 0 0 10px 0;"><strong style="color: #1A237E; display: inline-block; width: 80px;">Subject:</strong> <span style="font-weight: 500;">${subject}</span></p>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 8px; border: 1px solid #EEEEEE;">
+                        <h3 style="color: #1A237E; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #EEEEEE; padding-bottom: 10px; margin-top: 0;">Message Content</h3>
+                        <p style="white-space: pre-wrap; color: #424242; line-height: 1.6; font-size: 15px; margin-bottom: 0;">${message}</p>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <p style="color: #9E9E9E; font-size: 11px;">This transmission was securely routed via the IIMS IT Club Portal.</p>
+                    </div>
                 </div>
             `,
         })
