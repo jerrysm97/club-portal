@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const { data: member } = await supabaseAdmin
         .from('members')
         .select('status')
-        .eq('id', session.user.id)
+        .eq('user_id', session.user.id)
         .single()
 
     if (!member || member.status !== 'approved') {

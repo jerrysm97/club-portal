@@ -29,43 +29,27 @@ export default function AdminPage() {
         setError(null)
 
         try {
-            // Check session and admin status
-            const { data: { user } } = await supabase.auth.getUser()
-            const session = user ? { user } : null
-            if (!session) {
+            // Fetch all admin data through the server-side API route
+            // which uses the service role key and bypasses RLS
+            const res = await fetch('/api/admin/members')
+            if (res.status === 401 || res.status === 403) {
                 router.push('/portal/login')
                 return
             }
-
-            const { data: member } = await supabase
-                .from('members')
-                .select('role')
-                .eq('id', session.user.id)
-                .single()
-
-            if (!member || !['admin', 'superadmin'].includes(member.role)) {
-                router.push('/portal/dashboard')
-                return
+            if (!res.ok) {
+                throw new Error('Failed to load admin data')
             }
 
-            // Parallel data fetching
-            const [m, p, e, c, r] = await Promise.all([
-                supabase.from('members').select('*').order('created_at', { ascending: false }),
-                supabase.from('posts').select('*, author:members(full_name, avatar_url)').order('created_at', { ascending: false }),
-                supabase.from('public_events').select('*').order('event_date', { ascending: false }),
-                supabase.from('ctf_challenges').select('id, title, category, difficulty, points, is_active, hint, created_at, solves_count').order('points', { ascending: true }),
-                supabase.from('documents').select('*, uploader:members(full_name)').order('created_at', { ascending: false })
-            ])
-
+            const adminData = await res.json()
             setData({
-                members: m.data || [],
-                posts: p.data || [],
-                events: e.data || [],
-                challenges: c.data || [],
-                resources: r.data || []
+                members: adminData.members || [],
+                posts: adminData.posts || [],
+                events: adminData.events || [],
+                challenges: adminData.challenges || [],
+                resources: adminData.resources || []
             })
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to load data')
         } finally {
             setLoading(false)
         }

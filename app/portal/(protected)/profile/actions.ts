@@ -46,7 +46,7 @@ export async function updateProfile(formData: FormData) {
         const { error } = await supabase
             .from('members')
             .update(updatePayload)
-            .eq('id', session.user.id)
+            .eq('user_id', session.user.id)
 
         if (error) {
             console.error('Profile update error:', error)
@@ -100,7 +100,7 @@ export async function uploadAvatar(formData: FormData) {
     const { error: updateError } = await supabase
         .from('members')
         .update({ avatar_url: publicUrl })
-        .eq('id', session.user.id)
+        .eq('user_id', session.user.id)
 
     if (updateError) {
         return { error: 'Avatar uploaded but profile link failed' }

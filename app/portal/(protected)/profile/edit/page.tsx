@@ -31,7 +31,7 @@ export default function EditProfilePage() {
             const { data } = await supabase
                 .from('members')
                 .select('*')
-                .eq('id', session.user.id)
+                .eq('user_id', session.user.id)
                 .single()
 
             if (data) setMember(data)

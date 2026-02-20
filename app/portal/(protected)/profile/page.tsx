@@ -21,7 +21,7 @@ export default async function ProfilePage() {
     const { data } = await supabase
         .from('members')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('user_id', session.user.id)
         .single()
 
     const member = data as any

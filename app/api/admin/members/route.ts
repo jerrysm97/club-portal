@@ -7,10 +7,31 @@ import { z } from 'zod'
 const updateMemberSchema = z.object({
     id: z.string().uuid(),
     status: z.enum(['pending', 'approved', 'rejected', 'banned']).optional(),
-    role: z.enum(['member', 'admin', 'superadmin']).optional(),
+    role: z.enum(['member', 'bod', 'admin']).optional(),
     reject_reason: z.string().max(500).optional(),
     ban_reason: z.string().max(500).optional(),
 })
+
+export async function GET() {
+    await assertRole('admin')
+    const supabase = createServerClient()
+
+    const [members, posts, events, challenges, resources] = await Promise.all([
+        supabase.from('members').select('*').order('joined_at', { ascending: false }),
+        supabase.from('posts').select('*, author:members(full_name, avatar_url)').order('created_at', { ascending: false }),
+        supabase.from('public_events').select('*').order('event_date', { ascending: false }),
+        supabase.from('ctf_challenges').select('id, title, category, difficulty, points, is_active, hint, created_at, solves_count').order('points', { ascending: true }),
+        supabase.from('documents').select('*, uploader:members(full_name)').order('created_at', { ascending: false }),
+    ])
+
+    return NextResponse.json({
+        members: members.data || [],
+        posts: posts.data || [],
+        events: events.data || [],
+        challenges: challenges.data || [],
+        resources: resources.data || [],
+    })
+}
 
 export async function PATCH(req: NextRequest) {
     const admin = await assertRole('admin')
