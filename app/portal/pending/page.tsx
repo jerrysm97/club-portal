@@ -1,11 +1,17 @@
 // app/portal/pending/page.tsx — Awaiting approval screen (IIMS v4.0)
-import { createServerClient } from '@/lib/supabase-server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { Shield, Mail, CheckCircle2, Clock } from 'lucide-react'
 import SignOutButton from './SignOutButton'
 import { redirect } from 'next/navigation'
 
 export default async function PendingPage() {
-    const supabase = createServerClient()
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { cookies: { get: (name) => cookieStore.get(name)?.value } }
+    )
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -99,10 +105,10 @@ export default async function PendingPage() {
 function StatusStep({ status, label }: { status: 'complete' | 'pending' | 'locked'; label: string }) {
     return (
         <div className={`flex items-center gap-3 p-3 rounded-xl border text-sm transition-all ${status === 'complete'
-                ? 'text-[#2E7D32] bg-[#E8F5E9] border-[#2E7D32]/20 font-medium'
-                : status === 'pending'
-                    ? 'text-[#F57F17] bg-[#FFF8E1] border-[#F57F17]/20 font-medium'
-                    : 'text-[#9E9E9E] bg-white border-[#E0E0E0]'
+            ? 'text-[#2E7D32] bg-[#E8F5E9] border-[#2E7D32]/20 font-medium'
+            : status === 'pending'
+                ? 'text-[#F57F17] bg-[#FFF8E1] border-[#F57F17]/20 font-medium'
+                : 'text-[#9E9E9E] bg-white border-[#E0E0E0]'
             }`}>
             {status === 'complete' ? (
                 <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
