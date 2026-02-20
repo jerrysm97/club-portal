@@ -1,9 +1,9 @@
-// components/portal/PortalNavbar.tsx — IIMS Collegiate Mobile Portal Navbar
+// components/portal/PortalNavbar.tsx — IIMS IT Club Mobile Topbar (v4.0)
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, X, ShieldCheck, LogOut, LayoutDashboard, MessageSquare, Calendar, FileText, Terminal, User, Bell, Rss, ChevronRight } from 'lucide-react'
+import { Menu, X, ShieldCheck, LogOut, LayoutDashboard, MessageSquare, Calendar, FileText, Terminal, User, Bell, Rss, GraduationCap, Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import Avatar from '@/components/ui/Avatar'
@@ -17,7 +17,8 @@ const NAV_ITEMS = [
     { href: '/portal/ctf', label: 'CTF Arena', icon: Terminal },
     { href: '/portal/resources', label: 'Documents', icon: FileText },
     { href: '/portal/messages', label: 'Messages', icon: MessageSquare },
-    { href: '/portal/notifications', label: 'Alerts', icon: Bell },
+    { href: '/portal/notifications', label: 'Notifications', icon: Bell },
+    { href: '/portal/leaderboard', label: 'Leaderboard', icon: Trophy },
     { href: '/portal/profile', label: 'Profile', icon: User },
 ]
 
@@ -36,42 +37,40 @@ export default function PortalNavbar({ member }: { member: Member }) {
     }
 
     return (
-        <nav className="md:hidden sticky top-0 z-[60] bg-[#58151C] shadow-lg">
-            <div className="flex items-center justify-between px-6 h-16">
-                <Link href="/portal/dashboard" className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center shadow-lg transform rotate-[-3deg]">
-                        <ShieldCheck className="h-4.5 w-4.5 text-[#58151C]" />
+        <nav className="md:hidden sticky top-0 z-[60] bg-white border-b border-[#E0E0E0] shadow-sm">
+            <div className="flex items-center justify-between px-5 h-14">
+                <Link href="/portal/dashboard" className="flex items-center gap-2.5">
+                    <div className="h-8 w-8 rounded-lg bg-[#1A237E] flex items-center justify-center">
+                        <GraduationCap className="h-4 w-4 text-white" />
                     </div>
-                    <span className="font-poppins font-black text-white text-sm tracking-tight">IIMS CYBER</span>
+                    <span className="font-bold text-[#212121] text-sm">IT Club</span>
                 </Link>
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="text-white bg-white/10 p-2 rounded-xl active:scale-95 transition-all"
+                    className="text-[#757575] hover:text-[#212121] p-2 rounded-lg hover:bg-[#F5F5F5] transition-all active:scale-95"
                     aria-label={isOpen ? 'Close menu' : 'Open menu'}
                 >
-                    {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </button>
             </div>
 
             {/* Mobile Menu Overlay */}
             {isOpen && (
-                <div className="fixed inset-0 top-16 bg-white z-[70] flex flex-col overflow-y-auto animate-fade-up">
-                    {/* Identity Summary */}
-                    <div className="flex items-center gap-4 p-6 border-b border-gray-100 bg-gray-50">
-                        <Avatar src={member.avatar_url} name={member.name} size="md" className="ring-2 ring-white shadow-md" />
+                <div className="fixed inset-0 top-14 bg-white z-[70] flex flex-col overflow-y-auto">
+                    {/* Identity */}
+                    <div className="flex items-center gap-3 p-5 border-b border-[#E0E0E0] bg-[#F8F9FA]">
+                        <Avatar src={member.avatar_url} name={member.name} size="md" className="ring-2 ring-[#E0E0E0]" />
                         <div className="min-w-0">
-                            <p className="font-poppins font-bold text-[#111827] truncate">{member.name}</p>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 truncate">
-                                {member.club_post || member.role} • {member.points} PTS
+                            <p className="font-semibold text-[#212121] truncate">{member.name}</p>
+                            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9E9E9E] truncate">
+                                {member.club_post || member.role} • {member.points ?? 0} pts
                             </p>
                         </div>
                     </div>
 
                     {/* Navigation Links */}
-                    <div className="flex-1 p-4 space-y-1">
-                        <div className="px-4 py-2 mt-4 mb-2">
-                            <span className="text-gray-300 text-[10px] font-black uppercase tracking-[0.2em]">Core Operations</span>
-                        </div>
+                    <div className="flex-1 p-4 space-y-0.5">
+                        <p className="text-[#9E9E9E] text-[10px] font-semibold uppercase tracking-widest px-3 py-2">Navigation</p>
 
                         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
                             const active = pathname === href || pathname.startsWith(href + '/')
@@ -81,49 +80,46 @@ export default function PortalNavbar({ member }: { member: Member }) {
                                     href={href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
-                                        'flex items-center gap-4 px-5 py-4 rounded-2xl text-sm transition-all transition-colors',
+                                        'flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-all',
                                         active
-                                            ? 'bg-[#58151C] text-white shadow-xl shadow-red-100 font-bold'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-[#58151C]'
+                                            ? 'bg-[#E53935]/8 text-[#E53935] font-medium'
+                                            : 'text-[#757575] hover:bg-[#F5F5F5] hover:text-[#212121]'
                                     )}
                                 >
-                                    <Icon className={cn("h-5 w-5", active ? "text-white" : "text-gray-400")} />
-                                    <span className="flex-1">{label}</span>
-                                    {active && <ChevronRight className="h-4 w-4 opacity-50" />}
+                                    <Icon className="h-4 w-4 flex-shrink-0" />
+                                    <span>{label}</span>
                                 </Link>
                             )
                         })}
 
                         {isAdmin && (
-                            <div className="mt-6 border-t border-gray-100 pt-4">
-                                <div className="px-4 pb-4">
-                                    <span className="text-gray-300 text-[10px] font-black uppercase tracking-[0.2em]">Administration</span>
-                                </div>
+                            <div className="mt-4 pt-4 border-t border-[#E0E0E0]">
+                                <p className="text-[#9E9E9E] text-[10px] font-semibold uppercase tracking-widest px-3 pb-2">Administration</p>
                                 <Link
                                     href="/portal/admin"
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
-                                        'flex items-center gap-4 px-5 py-4 rounded-2xl text-sm transition-all font-bold',
+                                        'flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-all font-semibold',
                                         pathname.startsWith('/portal/admin')
-                                            ? 'bg-[#FCD34D] text-[#58151C] shadow-lg shadow-amber-100'
-                                            : 'text-[#58151C] bg-[#FCD34D]/10 hover:bg-[#FCD34D]/20'
+                                            ? 'bg-[#1A237E] text-white'
+                                            : 'text-[#1A237E] hover:bg-[#1A237E]/8'
                                     )}
                                 >
-                                    <ShieldCheck className="h-5 w-5" />
-                                    <span className="flex-1">Base Command Panel</span>
+                                    <ShieldCheck className="h-4 w-4 flex-shrink-0" />
+                                    <span>Admin Panel</span>
                                 </Link>
                             </div>
                         )}
                     </div>
 
-                    {/* Bottom Actions */}
-                    <div className="p-6 border-t border-gray-100 mt-auto">
+                    {/* Sign Out */}
+                    <div className="p-4 border-t border-[#E0E0E0]">
                         <button
                             onClick={handleSignOut}
-                            className="flex w-full items-center justify-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-red-50 hover:text-[#C3161C] transition-all"
+                            className="flex w-full items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm text-[#9E9E9E] bg-[#F5F5F5] hover:bg-[#FFEBEE] hover:text-[#B71C1C] transition-all"
                         >
-                            <LogOut className="h-5 w-5" />
-                            <span>Terminate Session</span>
+                            <LogOut className="h-4 w-4" />
+                            <span>Sign Out</span>
                         </button>
                     </div>
                 </div>

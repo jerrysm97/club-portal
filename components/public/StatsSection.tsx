@@ -1,37 +1,30 @@
-// components/public/StatsSection.tsx — IIMS College Dark Stats Counter
-import { Users, Calendar, Building2, Trophy } from 'lucide-react'
-// Import types safely
-type SiteSettings = any
+// components/public/StatsSection.tsx — IIMS IT Club Light Stats (v4.0)
+import { Users, Calendar, Shield, Code2 } from 'lucide-react'
 
-export default function StatsSection({ settings }: { settings?: SiteSettings | null }) {
+export default function StatsSection() {
     return (
-        <section className="py-20 bg-[#1A1A2E] relative overflow-hidden">
-            {/* Subtle decorations */}
-            <div className="absolute inset-0 hero-grid opacity-[0.04] pointer-events-none" />
-            <div className="absolute top-0 right-0 w-96 h-96 bg-[#D32F2F]/10 rounded-full blur-[150px]" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F4C542]/10 rounded-full blur-[150px]" />
-
-            <div className="max-w-7xl mx-auto px-6 relative z-10">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        <section className="py-16 bg-[#F8F9FA] border-y border-[#E0E0E0]">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                     <StatCard
-                        icon={<Users className="h-7 w-7" />}
-                        value="5000+"
-                        label="Alumni Worldwide"
+                        icon={<Users className="h-6 w-6 text-[#E53935]" />}
+                        value="120+"
+                        label="Active Members"
                     />
                     <StatCard
-                        icon={<Calendar className="h-7 w-7" />}
-                        value="20+"
-                        label="Years of Excellence"
+                        icon={<Calendar className="h-6 w-6 text-[#E53935]" />}
+                        value="30+"
+                        label="Events Hosted"
                     />
                     <StatCard
-                        icon={<Building2 className="h-7 w-7" />}
-                        value="100+"
-                        label="Partner Companies"
+                        icon={<Shield className="h-6 w-6 text-[#E53935]" />}
+                        value="50+"
+                        label="CTF Solves"
                     />
                     <StatCard
-                        icon={<Trophy className="h-7 w-7" />}
-                        value="A+"
-                        label="QAA Rating"
+                        icon={<Code2 className="h-6 w-6 text-[#E53935]" />}
+                        value="5+"
+                        label="Years Active"
                     />
                 </div>
             </div>
@@ -41,14 +34,14 @@ export default function StatsSection({ settings }: { settings?: SiteSettings | n
 
 function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
     return (
-        <div className="flex flex-col items-center group text-center py-4">
-            <div className="mb-5 p-4 rounded-2xl bg-white/5 text-[#F4C542] border border-white/10 transition-all duration-300 group-hover:-translate-y-1 group-hover:bg-white/10">
+        <div className="bg-white border border-[#E0E0E0] rounded-xl p-6 text-center shadow-sm hover:shadow-md hover:border-[#1A237E]/20 transition-all duration-200 group">
+            <div className="flex justify-center mb-3">
                 {icon}
             </div>
-            <div className="font-poppins font-bold text-4xl md:text-5xl text-white mb-2 group-hover:text-[#F4C542] transition-colors">
+            <div className="font-bold text-4xl text-[#1A237E] mb-1 group-hover:text-[#E53935] transition-colors">
                 {value}
             </div>
-            <div className="text-white/40 text-xs font-semibold uppercase tracking-[0.2em]">
+            <div className="text-[#757575] text-xs font-semibold uppercase tracking-widest">
                 {label}
             </div>
         </div>

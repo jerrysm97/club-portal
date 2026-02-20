@@ -25,8 +25,8 @@ export default async function ProtectedPortalLayout({
     const adminSupabase = createAdminSupabaseClient()
     const { data: memberData } = await adminSupabase
         .from('members')
-        .select('*')
-        .eq('id', user.id)
+        .select('id, user_id, name, role, status, avatar_url, points, club_post')
+        .eq('user_id', user.id)
         .single()
 
     const member = memberData as any | null
@@ -55,7 +55,7 @@ export default async function ProtectedPortalLayout({
 
     // ── Step 4: Render portal shell ──
     return (
-        <div className="flex min-h-screen bg-black">
+        <div className="flex min-h-screen bg-[#F8F9FA]">
             {/* Desktop Sidebar */}
             <Sidebar
                 member={member}

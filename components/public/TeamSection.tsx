@@ -1,4 +1,4 @@
-// components/public/TeamSection.tsx — IIMS College Faculty & Leadership
+// components/public/TeamSection.tsx — IIMS IT Club Team Section (v4.0)
 import Avatar from '@/components/ui/Avatar'
 // Import types safely
 type TeamMember = any
@@ -8,15 +8,15 @@ export default function TeamSection({ team }: { team: TeamMember[] }) {
     if (team.length === 0) return null
 
     return (
-        <section className="py-24 bg-[#F5F5F5]">
+        <section className="py-24 bg-[#F8F9FA]">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="text-center mb-16 animate-fade-up">
-                    <span className="text-[#D32F2F] text-xs font-bold uppercase tracking-widest mb-4 block">Our People</span>
-                    <h2 className="text-4xl md:text-5xl font-poppins font-bold text-[#1A1A2E] mb-4">
-                        Meet the <span className="text-[#D32F2F]">Team</span>
+                    <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-4 block">Our People</span>
+                    <h2 className="text-4xl md:text-5xl font-bold text-[#212121] mb-4">
+                        Meet the <span className="text-[#1A237E]">Team</span>
                     </h2>
-                    <p className="text-[#666666] max-w-xl mx-auto text-lg leading-relaxed font-medium">
-                        Industry-experienced faculty and passionate student leaders driving academic excellence.
+                    <p className="text-[#757575] max-w-xl mx-auto text-lg leading-relaxed">
+                        Passionate student leaders and IT professionals driving the IIMS IT Club forward.
                     </p>
                 </div>
 
@@ -38,10 +38,10 @@ export default function TeamSection({ team }: { team: TeamMember[] }) {
                                     )}
                                 </div>
                             </div>
-                            <h3 className="font-poppins font-bold text-lg text-[#1A1A2E] group-hover:text-[#D32F2F] transition-colors mb-1">
+                            <h3 className="font-bold text-lg text-[#212121] group-hover:text-[#E53935] transition-colors mb-1">
                                 {member.name}
                             </h3>
-                            <p className="text-[#999999] text-xs font-semibold tracking-wider uppercase">
+                            <p className="text-[#757575] text-xs font-semibold tracking-wider uppercase">
                                 {member.role}
                             </p>
                         </div>

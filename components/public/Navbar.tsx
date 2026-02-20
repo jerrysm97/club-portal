@@ -1,9 +1,10 @@
-// components/public/Navbar.tsx — ICEHC Dark Terminal Navbar
+// components/public/Navbar.tsx — IIMS IT Club Official Navbar (v4.0)
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Shield } from 'lucide-react'
+import { Menu, X, GraduationCap } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
     { href: '/', label: 'Home' },
@@ -18,43 +19,40 @@ export default function Navbar() {
     const pathname = usePathname()
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 50)
+        const onScroll = () => setScrolled(window.scrollY > 20)
         window.addEventListener('scroll', onScroll, { passive: true })
         return () => window.removeEventListener('scroll', onScroll)
     }, [])
 
     return (
-        <header
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'backdrop-blur-md bg-black/80 border-b border-[#1E1E2E]'
-                    : 'bg-transparent'
-                }`}
-        >
+        <header className={cn(
+            'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+            scrolled ? 'bg-[#1A237E] shadow-lg' : 'bg-[#1A237E]'
+        )}>
             <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                {/* Logo / Brand */}
+                {/* Brand */}
                 <div className="flex items-center gap-3">
                     <a
                         href="https://iimscollege.edu.np/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 group"
+                        aria-label="IIMS College Website"
                     >
-                        <div className="h-8 w-8 rounded-md bg-[#0A0A0F] border border-[#2D2D44] flex items-center justify-center group-hover:border-[#00FF87]/30 transition-colors">
-                            <Shield className="h-4 w-4 text-[#00FF87]" />
+                        <div className="h-9 w-9 rounded-lg bg-white/15 flex items-center justify-center group-hover:bg-white/25 transition-colors">
+                            <GraduationCap className="h-5 w-5 text-white" />
                         </div>
-                        <span className="font-mono font-bold text-[#F0F0FF] text-sm tracking-tight hidden sm:inline">
-                            IIMS
-                        </span>
                     </a>
-                    <span className="text-[#2D2D44] font-mono hidden sm:inline">×</span>
-                    <Link href="/" className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-[#F0F0FF] text-sm tracking-tight">
-                            ICEHC
-                        </span>
-                        <span className="text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 font-mono text-[10px] px-1.5 py-0.5 rounded-full hidden sm:inline">
-                            v1.0
-                        </span>
-                    </Link>
+                    <div className="border-l border-white/20 pl-3">
+                        <Link href="/" className="group">
+                            <span className="font-semibold text-white text-base block leading-tight group-hover:text-white/90 transition-colors">
+                                IT Club
+                            </span>
+                            <span className="text-white/50 text-[11px] block leading-tight">
+                                IIMS College, Kathmandu
+                            </span>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Desktop Nav */}
@@ -65,10 +63,12 @@ export default function Navbar() {
                             <Link
                                 key={href}
                                 href={href}
-                                className={`font-mono text-sm px-4 py-2 rounded-md transition-all ${active
-                                        ? 'text-[#00FF87] bg-[#00FF87]/10'
-                                        : 'text-[#8888AA] hover:text-[#F0F0FF] hover:bg-[#12121A]'
-                                    }`}
+                                className={cn(
+                                    'text-sm px-4 py-2 rounded-lg transition-all font-medium',
+                                    active
+                                        ? 'text-white bg-white/15'
+                                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                                )}
                             >
                                 {label}
                             </Link>
@@ -76,16 +76,16 @@ export default function Navbar() {
                     })}
                     <Link
                         href="/portal/login"
-                        className="ml-3 bg-[#00FF87] text-black font-mono font-bold text-sm px-5 py-2 rounded-md hover:bg-[#00e87a] active:scale-95 transition-all duration-150"
+                        className="ml-3 bg-[#E53935] text-white font-semibold text-sm px-5 py-2 rounded-lg hover:bg-[#C62828] active:scale-95 transition-all duration-150 shadow-md"
                     >
-                        Member Portal →
+                        Member Login
                     </Link>
                 </div>
 
                 {/* Mobile Hamburger */}
                 <button
                     onClick={() => setMenuOpen(!menuOpen)}
-                    className="md:hidden text-[#F0F0FF] p-2 rounded-md hover:bg-[#12121A] transition-colors"
+                    className="md:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
                     aria-label={menuOpen ? 'Close menu' : 'Open menu'}
                 >
                     {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -94,7 +94,7 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {menuOpen && (
-                <div className="md:hidden bg-[#0A0A0F] border-t border-[#1E1E2E] px-6 py-4 space-y-1 animate-fade-up">
+                <div className="md:hidden bg-[#0D1757] border-t border-white/10 px-6 py-4 space-y-1">
                     {NAV_LINKS.map(({ href, label }) => {
                         const active = pathname === href
                         return (
@@ -102,10 +102,12 @@ export default function Navbar() {
                                 key={href}
                                 href={href}
                                 onClick={() => setMenuOpen(false)}
-                                className={`block font-mono text-sm px-4 py-3 rounded-md transition-all ${active
-                                        ? 'text-[#00FF87] bg-[#00FF87]/10'
-                                        : 'text-[#8888AA] hover:text-[#F0F0FF] hover:bg-[#12121A]'
-                                    }`}
+                                className={cn(
+                                    'block text-sm px-4 py-3 rounded-lg transition-all font-medium',
+                                    active
+                                        ? 'text-white bg-white/15'
+                                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                                )}
                             >
                                 {label}
                             </Link>
@@ -114,9 +116,9 @@ export default function Navbar() {
                     <Link
                         href="/portal/login"
                         onClick={() => setMenuOpen(false)}
-                        className="block text-center bg-[#00FF87] text-black font-mono font-bold text-sm px-5 py-2.5 rounded-md hover:bg-[#00e87a] transition-all mt-3"
+                        className="block text-center bg-[#E53935] text-white font-semibold text-sm px-5 py-3 rounded-lg hover:bg-[#C62828] transition-all mt-3"
                     >
-                        Member Portal →
+                        Member Login
                     </Link>
                 </div>
             )}

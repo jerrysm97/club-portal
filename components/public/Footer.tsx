@@ -1,6 +1,6 @@
-// components/public/Footer.tsx — ICEHC Dark Terminal Footer
+// components/public/Footer.tsx — IIMS IT Club Official Footer (v4.0)
 import Link from 'next/link'
-import { Shield, Mail, ExternalLink } from 'lucide-react'
+import { GraduationCap, Mail, ExternalLink } from 'lucide-react'
 
 const QUICK_LINKS = [
     { href: '/', label: 'Home' },
@@ -11,52 +11,51 @@ const QUICK_LINKS = [
 ]
 
 const EXTERNAL_LINKS = [
-    { href: 'https://iimscollege.edu.np/capture-the-flag/', label: 'IIMS CTF Page' },
-    { href: 'https://iimscollege.edu.np/it-club/', label: 'IIMS IT Club' },
+    { href: 'https://iimscollege.edu.np/it-club/', label: 'IIMS IT Club Page' },
+    { href: 'https://iimscollege.edu.np/capture-the-flag/', label: 'CTF Program' },
+    { href: 'https://iimscollege.edu.np/iims-hackathon/', label: 'IIMS Hackathon' },
     { href: 'https://iimscollege.edu.np/', label: 'IIMS College' },
 ]
 
 export default function Footer() {
     return (
-        <footer className="bg-[#0A0A0F] border-t border-[#1E1E2E]">
-            <div className="max-w-7xl mx-auto px-6 py-12">
+        <footer className="bg-[#1A237E] text-white">
+            <div className="max-w-7xl mx-auto px-6 py-14">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                     {/* Col 1 — Brand */}
                     <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <div className="h-8 w-8 rounded-md bg-black border border-[#2D2D44] flex items-center justify-center">
-                                <Shield className="h-4 w-4 text-[#00FF87]" />
+                        <div className="flex items-center gap-3 mb-5">
+                            <div className="h-10 w-10 rounded-lg bg-white/15 flex items-center justify-center">
+                                <GraduationCap className="h-5 w-5 text-white" />
                             </div>
-                            <span className="font-mono font-bold text-[#F0F0FF] text-sm">ICEHC</span>
+                            <div>
+                                <span className="font-bold text-white text-base block leading-tight">IIMS IT Club</span>
+                                <span className="text-white/50 text-xs block">Kathmandu, Nepal</span>
+                            </div>
                         </div>
-                        <p className="font-mono text-xs text-[#00FF87] mb-3">
-                            Hack the future. Secure the present.
+                        <p className="text-white/70 text-sm leading-relaxed mb-4">
+                            Code. Build. Innovate. — The official IT Club of IIMS College, empowering the next generation of tech leaders.
                         </p>
-                        <p className="text-[#8888AA] text-sm font-sans">
-                            A club under{' '}
-                            <a
-                                href="https://iimscollege.edu.np/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-[#00D4FF] hover:underline"
-                            >
-                                IIMS College
-                            </a>
-                            , Kathmandu
-                        </p>
+                        <a
+                            href="mailto:itclub@iimscollege.edu.np"
+                            className="flex items-center gap-2 text-white/60 text-sm hover:text-white transition-colors"
+                        >
+                            <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                            itclub@iimscollege.edu.np
+                        </a>
                     </div>
 
                     {/* Col 2 — Quick Links */}
                     <div>
-                        <h3 className="font-mono font-bold text-[#F0F0FF] text-xs uppercase tracking-widest mb-4">
+                        <h3 className="font-semibold text-white text-sm uppercase tracking-widest mb-4 opacity-60">
                             Quick Links
                         </h3>
-                        <ul className="space-y-2">
+                        <ul className="space-y-2.5">
                             {QUICK_LINKS.map(({ href, label }) => (
                                 <li key={href}>
                                     <Link
                                         href={href}
-                                        className="text-[#8888AA] text-sm font-sans hover:text-[#00D4FF] transition-colors"
+                                        className="text-white/60 text-sm hover:text-white transition-colors"
                                     >
                                         {label}
                                     </Link>
@@ -65,42 +64,50 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Col 3 — Contact & External */}
+                    {/* Col 3 — IIMS Links */}
                     <div>
-                        <h3 className="font-mono font-bold text-[#F0F0FF] text-xs uppercase tracking-widest mb-4">
-                            Contact
+                        <h3 className="font-semibold text-white text-sm uppercase tracking-widest mb-4 opacity-60">
+                            IIMS Programs
                         </h3>
-                        <a
-                            href="mailto:cybersec@iimscollege.edu.np"
-                            className="flex items-center gap-2 text-[#8888AA] text-sm font-sans hover:text-[#00D4FF] transition-colors mb-4"
-                        >
-                            <Mail className="h-3.5 w-3.5 flex-shrink-0" />
-                            cybersec@iimscollege.edu.np
-                        </a>
-                        <div className="space-y-2">
+                        <div className="space-y-2.5">
                             {EXTERNAL_LINKS.map(({ href, label }) => (
                                 <a
                                     key={href}
                                     href={href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 text-[#8888AA] text-sm font-sans hover:text-[#00D4FF] transition-colors"
+                                    className="flex items-center gap-2 text-white/60 text-sm hover:text-white transition-colors"
                                 >
                                     <ExternalLink className="h-3 w-3 flex-shrink-0" />
                                     {label}
                                 </a>
                             ))}
                         </div>
+                        <div className="mt-5 pt-5 border-t border-white/10">
+                            <p className="text-white/40 text-xs leading-relaxed">
+                                BCS Hons · BBUS Hons · BIHM Hons · MBA<br />
+                                In partnership with Taylor&apos;s University, Malaysia
+                            </p>
+                        </div>
                     </div>
                 </div>
 
                 {/* Bottom bar */}
-                <div className="mt-10 pt-6 border-t border-[#1E1E2E] flex flex-col md:flex-row items-center justify-between gap-3">
-                    <p className="text-[#8888AA] text-xs font-sans text-center md:text-left">
-                        © 2025 IIMS Cybersecurity & Ethical Hacking Club. All rights reserved.
+                <div className="mt-10 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
+                    <p className="text-white/40 text-xs text-center md:text-left">
+                        © 2026 IIMS IT Club. An official club of{' '}
+                        <a
+                            href="https://iimscollege.edu.np/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-white/60 hover:text-white transition-colors underline underline-offset-2"
+                        >
+                            IIMS College, Kathmandu, Nepal
+                        </a>
+                        .
                     </p>
-                    <p className="text-[#8888AA]/50 text-xs font-mono text-center md:text-right">
-                        In collaboration with Taylor&apos;s University & GDS
+                    <p className="text-white/30 text-xs text-center md:text-right">
+                        Taylor&apos;s University Affiliated
                     </p>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-// components/portal/Sidebar.tsx — IIMS Collegiate Maroon Sidebar
+// components/portal/Sidebar.tsx — IIMS IT Club White Sidebar (v4.0)
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -18,8 +18,8 @@ import {
     User,
     ShieldCheck,
     LogOut,
-    ChevronRight,
-    Trophy
+    Trophy,
+    GraduationCap
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -53,43 +53,41 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
     }
 
     return (
-        <aside className="hidden md:flex flex-col w-64 min-h-screen bg-[#58151C] fixed left-0 top-0 bottom-0 z-50 shadow-2xl">
+        <aside className="hidden md:flex flex-col w-64 min-h-screen bg-white border-r border-[#E0E0E0] fixed left-0 top-0 bottom-0 z-50 shadow-sm">
             {/* Brand Header */}
-            <div className="h-20 flex items-center px-8 border-b border-white/5 bg-black/10">
+            <div className="h-16 flex items-center px-5 border-b border-[#E0E0E0]">
                 <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-white flex items-center justify-center shadow-lg transform rotate-[-3deg]">
-                        <ShieldCheck className="h-5 w-5 text-[#58151C]" />
+                    <div className="h-9 w-9 rounded-lg bg-[#1A237E] flex items-center justify-center shadow-sm">
+                        <GraduationCap className="h-5 w-5 text-white" />
                     </div>
-                    <div className="flex flex-col">
-                        <span className="font-poppins font-black text-white text-sm tracking-tight leading-none">IIMS CYBER</span>
-                        <span className="text-[#FECACA] text-[10px] font-bold tracking-[0.2em] mt-1">v2.0 PORTAL</span>
+                    <div>
+                        <span className="font-bold text-[#212121] text-sm block leading-tight">IIMS IT Club</span>
+                        <span className="text-[#9E9E9E] text-[10px] block leading-tight">Member Portal</span>
                     </div>
                 </div>
             </div>
 
             {/* Identity Summary */}
-            <div className="px-6 py-8">
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all cursor-pointer group">
+            <div className="px-4 py-4 border-b border-[#E0E0E0]">
+                <Link href="/portal/profile" className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#F5F5F5] transition-colors group">
                     <Avatar
                         src={member.avatar_url}
                         name={member.name}
                         size="sm"
-                        className="ring-2 ring-white/10 group-hover:ring-[#C3161C]/50 transition-all"
+                        className="ring-2 ring-[#E0E0E0] group-hover:ring-[#1A237E]/30 transition-all flex-shrink-0"
                     />
                     <div className="min-w-0">
-                        <p className="text-white text-sm font-bold truncate">{member.name}</p>
-                        <p className="text-[#FECACA] text-[10px] font-black uppercase tracking-widest truncate opacity-60">
+                        <p className="text-[#212121] text-sm font-semibold truncate">{member.name}</p>
+                        <p className="text-[#9E9E9E] text-[10px] font-medium uppercase tracking-wider truncate">
                             {member.club_post || member.role}
                         </p>
                     </div>
-                </div>
+                </Link>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar" aria-label="Main Navigation">
-                <div className="px-4 pb-4">
-                    <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.2em]">Core Operations</span>
-                </div>
+            <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto" aria-label="Main Navigation">
+                <p className="text-[#9E9E9E] text-[10px] font-semibold uppercase tracking-widest px-3 pb-2">Navigation</p>
 
                 {navItems.map(({ href, icon: Icon, label }) => {
                     const active = pathname === href || pathname.startsWith(href + '/')
@@ -98,15 +96,14 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
                             key={href}
                             href={href}
                             className={cn(
-                                'flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm transition-all relative group',
+                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all',
                                 active
-                                    ? 'bg-white text-[#58151C] font-bold shadow-xl shadow-black/20 translate-x-1'
-                                    : 'text-[#FECACA] hover:bg-white/10 hover:text-white'
+                                    ? 'bg-[#E53935]/8 text-[#E53935] font-medium'
+                                    : 'text-[#757575] hover:text-[#212121] hover:bg-[#F5F5F5]'
                             )}
                         >
-                            <Icon className={cn("h-5 w-5 flex-shrink-0 transition-transform", active ? "scale-110" : "group-hover:scale-110")} />
+                            <Icon className="h-4 w-4 flex-shrink-0" />
                             <span className="flex-1">{label}</span>
-                            {active && <ChevronRight className="h-4 w-4 opacity-50" />}
                         </Link>
                     )
                 })}
@@ -115,16 +112,16 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
                 <Link
                     href="/portal/notifications"
                     className={cn(
-                        'flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm transition-all group mt-1',
+                        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all',
                         pathname.startsWith('/portal/notifications')
-                            ? 'bg-white text-[#58151C] font-bold shadow-xl shadow-black/20 translate-x-1'
-                            : 'text-[#FECACA] hover:bg-white/10 hover:text-white'
+                            ? 'bg-[#E53935]/8 text-[#E53935] font-medium'
+                            : 'text-[#757575] hover:text-[#212121] hover:bg-[#F5F5F5]'
                     )}
                 >
-                    <Bell className={cn("h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110")} />
-                    <span className="flex-1">Alerts</span>
+                    <Bell className="h-4 w-4 flex-shrink-0" />
+                    <span className="flex-1">Notifications</span>
                     {unreadNotifications > 0 && (
-                        <span className="bg-[#FCD34D] text-[#58151C] text-[10px] font-black rounded-lg px-2 py-0.5 shadow-lg group-hover:scale-110 transition-transform">
+                        <span className="bg-[#E53935] text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
                             {unreadNotifications > 99 ? '99+' : unreadNotifications}
                         </span>
                     )}
@@ -132,34 +129,32 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
 
                 {/* Admin Section */}
                 {isAdmin && (
-                    <div className="mt-8">
-                        <div className="px-4 pb-4">
-                            <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.2em]">Administration</span>
-                        </div>
+                    <div className="mt-4 pt-4 border-t border-[#E0E0E0]">
+                        <p className="text-[#9E9E9E] text-[10px] font-semibold uppercase tracking-widest px-3 pb-2">Administration</p>
                         <Link
                             href="/portal/admin"
                             className={cn(
-                                'flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm transition-all group',
+                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all',
                                 pathname.startsWith('/portal/admin')
-                                    ? 'bg-[#FCD34D] text-[#58151C] font-bold shadow-xl shadow-black/20'
-                                    : 'text-[#FCD34D]/80 hover:bg-[#FCD34D] hover:text-[#58151C]'
+                                    ? 'bg-[#1A237E] text-white font-medium'
+                                    : 'text-[#1A237E] hover:bg-[#1A237E]/8'
                             )}
                         >
-                            <ShieldCheck className="h-5 w-5 flex-shrink-0" />
-                            <span className="flex-1 font-bold">Base Command</span>
+                            <ShieldCheck className="h-4 w-4 flex-shrink-0" />
+                            <span className="font-semibold">Admin Panel</span>
                         </Link>
                     </div>
                 )}
             </nav>
 
             {/* Footer / Sign Out */}
-            <div className="p-4 border-t border-white/5 bg-black/5">
+            <div className="p-3 border-t border-[#E0E0E0]">
                 <button
                     onClick={handleSignOut}
-                    className="flex w-full items-center gap-3 px-5 py-4 rounded-2xl text-sm text-[#FECACA]/60 hover:bg-red-500/10 hover:text-white transition-all group"
+                    className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#9E9E9E] hover:bg-[#FFEBEE] hover:text-[#B71C1C] transition-all"
                 >
-                    <LogOut className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                    <span className="font-bold">Abort Session</span>
+                    <LogOut className="h-4 w-4 flex-shrink-0" />
+                    <span>Sign Out</span>
                 </button>
             </div>
         </aside>

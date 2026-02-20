@@ -1,71 +1,69 @@
-// components/public/HeroSection.tsx — IIMS College Modern Hero
+// components/public/HeroSection.tsx — IIMS IT Club Hero (v4.0)
 import Link from 'next/link'
-import { ArrowRight, Play, ChevronDown } from 'lucide-react'
+import { ArrowRight, ChevronDown, Code2, Users, Shield, Trophy } from 'lucide-react'
 
 export default function HeroSection() {
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-            {/* Dark Background with Overlay */}
-            <div className="absolute inset-0 bg-[#1A1A2E]" />
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523050854058-8df90110c476?w=1920&q=80')] bg-cover bg-center opacity-20" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A2E]/60 via-[#1A1A2E]/40 to-[#1A1A2E]" />
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#1A237E] via-[#1A237E] to-[#0D1757]">
+            {/* Subtle pattern overlay */}
+            <div className="absolute inset-0 opacity-[0.04]" style={{
+                backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+                backgroundSize: '40px 40px'
+            }} />
 
-            {/* Subtle grid */}
-            <div className="absolute inset-0 hero-grid opacity-[0.05] pointer-events-none" />
+            {/* Gradient glow */}
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#E53935]/10 rounded-full blur-[120px] pointer-events-none" />
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-20 text-center">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/10 mb-8 animate-fade-up backdrop-blur-sm">
+            <div className="relative z-10 max-w-7xl mx-auto px-6 pt-28 pb-20 text-center">
+                {/* Club badge */}
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 mb-8 backdrop-blur-sm">
                     <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F4C542] opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F4C542]"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E53935] opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E53935]"></span>
                     </span>
                     <span className="text-xs font-semibold text-white/80 tracking-wide uppercase">
-                        Admissions Open 2026
+                        IIMS College Official Club
                     </span>
                 </div>
 
                 {/* Headline */}
-                <h1 className="font-poppins font-bold text-5xl md:text-7xl lg:text-8xl mb-8 tracking-tight text-white animate-fade-up leading-[1.05]">
-                    Shape Your Future<br className="hidden md:block" />
-                    <span className="text-[#F4C542]">
-                        at IIMS College
-                    </span>
+                <h1 className="font-bold text-5xl md:text-7xl lg:text-8xl mb-6 tracking-tight text-white leading-[1.05]">
+                    IIMS IT Club
                 </h1>
-
-                <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-up font-medium">
-                    Discover world-class programs in management, technology, and innovation.
-                    Join a community of ambitious learners and industry leaders.
+                <p className="text-[#E53935] font-bold text-2xl md:text-3xl mb-6 tracking-wide">
+                    Code. Build. Innovate.
+                </p>
+                <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
+                    The official IT Club of IIMS College, Kathmandu — empowering BCS, BBUS, BIHM, and MBA students through technology, collaboration, and real-world challenges.
                 </p>
 
                 {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
                     <Link
-                        href="/portal/signup"
-                        className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#D32F2F] text-white font-bold text-base hover:bg-[#B71C1C] transition-all hover:scale-[1.02] flex items-center justify-center gap-3 shadow-xl shadow-red-900/30"
+                        href="/portal/login"
+                        className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#E53935] text-white font-bold text-base hover:bg-[#C62828] transition-all hover:scale-[1.02] flex items-center justify-center gap-3 shadow-xl shadow-red-900/30 active:scale-95"
                     >
-                        Apply Now
+                        Join the Club
                         <ArrowRight className="h-5 w-5" />
                     </Link>
                     <Link
                         href="/about"
                         className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-bold text-base hover:bg-white/20 transition-all flex items-center justify-center gap-3"
                     >
-                        <Play className="h-4 w-4" />
-                        Explore Programs
+                        Learn More
                     </Link>
                 </div>
 
                 {/* Stats Row */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 max-w-3xl mx-auto animate-fade-up">
-                    <MiniStat value="20+" label="Years" />
-                    <MiniStat value="5000+" label="Alumni" />
-                    <MiniStat value="50+" label="Faculty" />
-                    <MiniStat value="15+" label="Programs" />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+                    <HeroStat icon={<Users className="h-5 w-5" />} value="120+" label="Members" />
+                    <HeroStat icon={<Code2 className="h-5 w-5" />} value="30+" label="Events Hosted" />
+                    <HeroStat icon={<Shield className="h-5 w-5" />} value="50+" label="CTF Solves" />
+                    <HeroStat icon={<Trophy className="h-5 w-5" />} value="5+" label="Years Active" />
                 </div>
 
                 {/* Scroll indicator */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+                <div className="mt-16 flex justify-center animate-bounce">
                     <ChevronDown className="h-6 w-6 text-white/30" />
                 </div>
             </div>
@@ -73,15 +71,12 @@ export default function HeroSection() {
     )
 }
 
-function MiniStat({ value, label }: { value: string; label: string }) {
+function HeroStat({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
     return (
-        <div className="text-center">
-            <div className="font-poppins font-bold text-3xl md:text-4xl text-white mb-1">
-                {value}
-            </div>
-            <div className="text-white/40 text-xs font-semibold uppercase tracking-widest">
-                {label}
-            </div>
+        <div className="bg-white/8 border border-white/10 rounded-2xl p-5 text-center backdrop-blur-sm">
+            <div className="flex justify-center mb-2 text-[#E53935]">{icon}</div>
+            <div className="font-bold text-3xl text-white mb-1">{value}</div>
+            <div className="text-white/50 text-xs font-semibold uppercase tracking-widest">{label}</div>
         </div>
     )
 }

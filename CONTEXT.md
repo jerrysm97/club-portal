@@ -1,7 +1,24 @@
-# CONTEXT.md — IIMS Cybersecurity Club Portal
-> **Version:** 3.0.0 | **Architecture:** Production-Ready, Security-Hardened
-> **College Website:** https://iimscollege.edu.np/
-> **Single source of truth.** Every AI session and every contributor MUST read this before writing a single line of code.
+# CONTEXT.md — IIMS IT Club Portal
+> **Version:** 4.0.0 | **Architecture:** Production-Ready, Security-Hardened  
+> **Institution:** IIMS College, Kathmandu, Nepal → https://iimscollege.edu.np/  
+> **Club:** IIMS IT Club → https://iimscollege.edu.np/it-club/  
+> **CTF Reference:** https://iimscollege.edu.np/capture-the-flag/  
+> **Single source of truth.** Every AI session and every contributor MUST read this entire file before writing a single line of code.
+
+---
+
+## CHANGELOG: v3.0 → v4.0
+
+| Change | Reason |
+|---|---|
+| **Theme changed**: Dark terminal → IIMS College official brand (light, professional, navy/crimson) | Match the actual IIMS College website aesthetic |
+| **Club renamed**: "Cybersecurity Club" → "IIMS IT Club" | Align with the official IIMS IT Club |
+| **Email domain updated**: cybersec@ → itclub@iimscollege.edu.np | Correct club identity |
+| **Color system replaced**: Terminal emerald/black → IIMS Navy/Crimson/White | Official IIMS brand |
+| **Font updated**: JetBrains Mono primary → Inter primary (JetBrains Mono for code/CTF only) | IIMS site uses clean sans-serif |
+| **All security fixes from v3.0 RETAINED** | Non-negotiable |
+| **All database schema from v3.0 RETAINED** | Non-negotiable |
+| **Implementation plan RETAINED + expanded** | Non-negotiable |
 
 ---
 
@@ -10,7 +27,7 @@
 1. [Project Identity & Brand Alignment](#1-project-identity--brand-alignment)
 2. [Project Overview & Feature Map](#2-project-overview--feature-map)
 3. [Tech Stack](#3-tech-stack)
-4. [Design System — IIMS Stealth Terminal](#4-design-system--iims-stealth-terminal)
+4. [Design System — IIMS College Official Theme](#4-design-system--iims-college-official-theme)
 5. [Folder Structure](#5-folder-structure)
 6. [Environment Variables](#6-environment-variables)
 7. [Complete Database Schema (Security-Hardened)](#7-complete-database-schema-security-hardened)
@@ -36,17 +53,29 @@
 
 | Field | Value |
 |---|---|
-| Club Name | IIMS Cybersecurity Club |
+| Club Name | IIMS IT Club |
 | College | IIMS College, Kathmandu, Nepal |
 | College Website | https://iimscollege.edu.np/ |
-| Club Email | cybersec@iimscollege.edu.np |
-| Project Folder | `iims-cyber-club` |
+| IT Club Page | https://iimscollege.edu.np/it-club/ |
+| CTF Program Page | https://iimscollege.edu.np/capture-the-flag/ |
+| Hackathon Page | https://iimscollege.edu.np/iims-hackathon/ |
+| Club Email | itclub@iimscollege.edu.np |
+| Project Folder | `iims-it-club` |
 | Domain Structure | Single domain — portal at `/portal/*` |
 | Architecture Level | Production-Ready, Security-Hardened |
-| Design Language | IIMS Stealth Terminal (college-branded cyber dark theme) |
+| Design Language | IIMS College Official Theme (light, professional, navy/crimson) |
 
 ### 1.1 IIMS College Brand Context
-IIMS College offers programs in IT (BCS Hons), Business, and Hospitality. They actively run a **Capture The Flag** program (`/iims-hackathon`, `/capture-the-flag`) and an **IT Club**. The cybersecurity club portal must feel like an official, premium IIMS sub-product — not a generic side project. The design blends IIMS's professional academic identity with a hacker/cybersecurity aesthetic.
+
+IIMS College is one of Nepal's leading international institutions offering:
+- **BCS (Hons)** — Bachelor of Computer Science
+- **BBUS (Hons)** — Bachelors of Business
+- **BIHM (Hons)** — Bachelor of International Hospitality Management
+- **MBA** — Master of Business Administration
+
+All programs are delivered in partnership with **Taylor's University, Malaysia**. IIMS actively runs a **Capture The Flag** competition, a **Hackathon**, and an **IT Club**. This portal is the official digital home for the IT Club — it must feel like a premium, official IIMS sub-product.
+
+The design must mirror and extend the IIMS College website aesthetic: clean white surfaces, deep navy headers, crimson accent buttons, professional typography, and institutional credibility. It is NOT a dark-mode hacker project. It is a polished academic club portal.
 
 ---
 
@@ -58,31 +87,31 @@ One Next.js 14 project. Two experiences. One domain.
 
 | Page | Route | Description |
 |---|---|---|
-| Homepage | `/` | Hero with IIMS branding, club intro, live stats, featured events |
+| Homepage | `/` | Hero with IIMS branding, IT Club intro, live stats, featured events |
 | About | `/about` | Team, mission, IIMS affiliation, club history, gallery |
-| Events | `/events` | Public event listings (workshops, CTFs, seminars) |
-| Contact | `/contact` | Contact form with rate limiting |
+| Events | `/events` | Public event listings (workshops, CTFs, seminars, hackathons) |
+| Contact | `/contact` | Rate-limited contact form |
 
 ### 2.2 Private Member Portal (`/portal/*`) — Approved members only
 
 | Feature | Route | Access Level |
 |---|---|---|
 | Login | `/portal/login` | Public |
-| Registration Complete | `/portal/register` | Post-magic-link, pre-approval |
+| Register / Profile Setup | `/portal/register` | Post-magic-link, pre-approval |
 | Pending Approval | `/portal/pending` | Registered, unapproved |
 | Dashboard | `/portal/dashboard` | `approved` members |
 | Post Feed | `/portal/feed` | `approved` members |
-| Direct Messages List | `/portal/messages` | `approved` members |
+| Direct Messages | `/portal/messages` | `approved` members |
 | DM Thread | `/portal/messages/[conversationId]` | `approved` members |
 | Notifications | `/portal/notifications` | `approved` members |
 | Documents | `/portal/documents` | `approved` members |
-| Events Portal | `/portal/events` | `approved` members |
+| Events (Portal) | `/portal/events` | `approved` members |
 | Event Detail + RSVP | `/portal/events/[id]` | `approved` members |
 | CTF Challenges | `/portal/ctf` | `approved` members |
 | CTF Challenge Detail | `/portal/ctf/[challengeId]` | `approved` members |
 | Leaderboard | `/portal/leaderboard` | `approved` members |
 | Own Profile | `/portal/profile` | `approved` members |
-| View Member Profile | `/portal/members/[id]` | `approved` members |
+| Member Profile | `/portal/members/[id]` | `approved` members |
 | Admin Panel | `/portal/admin` | `admin` / `superadmin` only |
 
 ---
@@ -102,7 +131,7 @@ One Next.js 14 project. Two experiences. One domain.
 | Hosting | Vercel | — | Edge middleware supported |
 | Rate Limiting | Upstash Redis | Latest | `@upstash/ratelimit` + `@upstash/redis` |
 | Markdown | `react-markdown` + `remark-gfm` | Latest | Posts, event descriptions |
-| Notifications UI | Custom `Toast.tsx` | — | Non-blocking, bottom-right |
+| Notifications UI | Custom `Toast.tsx` | — | Non-blocking, top-right |
 | Date Handling | `date-fns` | Latest | Formatting, relative time |
 | Form Validation | `zod` | Latest | Schema validation everywhere |
 | Icons | `lucide-react` | Latest | Only icon library permitted |
@@ -111,160 +140,192 @@ One Next.js 14 project. Two experiences. One domain.
 
 ---
 
-## 4. DESIGN SYSTEM — IIMS STEALTH TERMINAL
+## 4. DESIGN SYSTEM — IIMS COLLEGE OFFICIAL THEME
 
-> **CRITICAL RULE:** This is a **dark-only** design system. It is inspired by IIMS College's professional maroon/navy brand identity fused with a hacker terminal aesthetic. No `bg-white`. No `bg-gray-*`. No light mode. No external UI libraries.
+> **CRITICAL RULE:** This is a **light-mode-first** design system. It directly mirrors and extends the IIMS College website (https://iimscollege.edu.np/). The palette is deep navy + crimson red + clean white. No dark backgrounds as primary surfaces. No terminal aesthetics as base. Code blocks and CTF sections may use dark styling as intentional contrast.
 
-### 4.1 IIMS Brand Color Extraction
-From https://iimscollege.edu.np/ — the college uses deep maroon/burgundy as primary brand color, navy/dark blue as secondary, and gold/amber accents. The cybersecurity club inherits this but darkens and "terminalifies" it.
+### 4.1 IIMS Brand Color System
 
-### 4.2 Full Color Palette
+Extracted directly from https://iimscollege.edu.np/:
 
 | Token Name | Hex | Tailwind Class | Usage |
 |---|---|---|---|
-| **Pure Black** | `#000000` | `bg-black` | Page backgrounds |
-| **Matte Dark** | `#0A0A0F` | `bg-[#0A0A0F]` | Cards, surfaces, modals |
-| **Elevated Surface** | `#12121A` | `bg-[#12121A]` | Hover states, nested panels |
-| **Deep Navy** | `#0D1B2A` | `bg-[#0D1B2A]` | Secondary surfaces (IIMS brand echo) |
-| **Border Dark** | `#1E1E2E` | `border-[#1E1E2E]` | Subtle borders |
-| **Border Visible** | `#2D2D44` | `border-[#2D2D44]` | Active borders, dividers |
-| **IIMS Maroon** | `#8B1A1A` | `text-[#8B1A1A]` `bg-[#8B1A1A]` | IIMS brand accent, special badges |
-| **IIMS Maroon Light** | `#C0392B` | `text-[#C0392B]` | Maroon highlights, active states |
-| **Terminal Emerald** | `#00FF87` | `text-[#00FF87]` `bg-[#00FF87]` | Primary CTA, success, online dot |
-| **Emerald Dim** | `#10B981` | `text-[#10B981]` | Secondary success, solved badges |
-| **Hacker Cyan** | `#00D4FF` | `text-[#00D4FF]` | Tags, badges, links, highlights |
-| **Cyan Dim** | `#06B6D4` | `text-[#06B6D4]` | Secondary cyan usage |
-| **IIMS Gold** | `#D4AF37` | `text-[#D4AF37]` | Leaderboard #1, premium badges, IIMS brand echo |
-| **Danger Red** | `#FF3333` | `text-[#FF3333]` `bg-[#FF3333]` | Errors, delete, reject, ban |
-| **Warning Amber** | `#F59E0B` | `text-[#F59E0B]` | Warnings, pending, medium difficulty |
-| **Ghost White** | `#F0F0FF` | `text-[#F0F0FF]` | Primary readable text |
-| **Muted Slate** | `#8888AA` | `text-[#8888AA]` | Subtitles, timestamps, placeholders |
-| **Invisible** | `transparent` | `bg-transparent` | Ghost buttons |
+| **IIMS Navy** | `#1A237E` | `bg-[#1A237E]` `text-[#1A237E]` | Primary brand — headers, nav, hero bg |
+| **IIMS Navy Dark** | `#0D1757` | `bg-[#0D1757]` | Hover on navy elements |
+| **IIMS Navy Light** | `#283593` | `bg-[#283593]` | Active states on navy |
+| **IIMS Crimson** | `#E53935` | `bg-[#E53935]` `text-[#E53935]` | Primary CTA buttons, accent, links |
+| **IIMS Crimson Dark** | `#C62828` | `bg-[#C62828]` | Hover on crimson buttons |
+| **IIMS Crimson Light** | `#EF5350` | `text-[#EF5350]` | Lighter accent usage |
+| **White** | `#FFFFFF` | `bg-white` | Primary surface background |
+| **Off-White** | `#F8F9FA` | `bg-[#F8F9FA]` | Page background, alternating rows |
+| **Light Grey** | `#F5F5F5` | `bg-[#F5F5F5]` | Card backgrounds, input backgrounds |
+| **Border Light** | `#E0E0E0` | `border-[#E0E0E0]` | Subtle dividers, card borders |
+| **Border Mid** | `#BDBDBD` | `border-[#BDBDBD]` | Active borders, form outlines |
+| **Text Primary** | `#212121` | `text-[#212121]` | Primary body text |
+| **Text Secondary** | `#424242` | `text-[#424242]` | Secondary text |
+| **Text Muted** | `#757575` | `text-[#757575]` | Captions, timestamps, placeholders |
+| **Text Disabled** | `#9E9E9E` | `text-[#9E9E9E]` | Disabled states |
+| **Success Green** | `#2E7D32` | `text-[#2E7D32]` `bg-[#2E7D32]` | Approved, solved, success states |
+| **Success Light** | `#E8F5E9` | `bg-[#E8F5E9]` | Success badge backgrounds |
+| **Warning Amber** | `#F57F17` | `text-[#F57F17]` | Pending, medium difficulty, warnings |
+| **Warning Light** | `#FFF8E1` | `bg-[#FFF8E1]` | Warning badge backgrounds |
+| **Danger Red** | `#B71C1C` | `text-[#B71C1C]` | Errors, delete, reject, ban |
+| **Danger Light** | `#FFEBEE` | `bg-[#FFEBEE]` | Error badge backgrounds |
+| **Info Blue** | `#0277BD` | `text-[#0277BD]` | Info messages, links |
+| **Info Light** | `#E1F5FE` | `bg-[#E1F5FE]` | Info badge backgrounds |
+| **Gold** | `#F9A825` | `text-[#F9A825]` | Leaderboard #1, star badges |
+| **Silver** | `#90A4AE` | `text-[#90A4AE]` | Leaderboard #2 |
+| **Bronze** | `#A1887F` | `text-[#A1887F]` | Leaderboard #3 |
+| **Code BG** | `#1E1E2E` | `bg-[#1E1E2E]` | Code blocks, CTF terminal sections only |
+| **Code Text** | `#CDD6F4` | `text-[#CDD6F4]` | Code block text |
 
-### 4.3 UI Primitives (Copy-Paste Ready)
+### 4.2 UI Primitives (Copy-Paste Ready)
 
 ```
-PAGE BG:        bg-black min-h-screen
+PAGE BG:          bg-[#F8F9FA] min-h-screen
 
-CARD:           bg-[#0A0A0F] border border-[#2D2D44] rounded-lg p-6
-CARD (hover):   hover:bg-[#12121A] hover:border-[#00FF87]/30 transition-all duration-200
-CARD (navy):    bg-[#0D1B2A] border border-[#2D2D44] rounded-lg p-6
+CARD:             bg-white border border-[#E0E0E0] rounded-xl p-6 shadow-sm
+CARD (hover):     hover:shadow-md hover:border-[#1A237E]/20 transition-all duration-200
+CARD (featured):  bg-white border-l-4 border-l-[#E53935] rounded-xl p-6 shadow-sm
 
-INPUT:          bg-[#0A0A0F] border border-[#2D2D44] text-[#F0F0FF] rounded-md px-3 py-2
-                focus:outline-none focus:border-[#00FF87] focus:ring-1 focus:ring-[#00FF87]/20
-                placeholder:text-[#8888AA] w-full font-mono text-sm transition-colors
-TEXTAREA:       Same as INPUT — add resize-none
-SELECT:         Same as INPUT
+INPUT:            bg-white border border-[#E0E0E0] text-[#212121] rounded-lg px-3 py-2.5
+                  focus:outline-none focus:border-[#1A237E] focus:ring-2 focus:ring-[#1A237E]/10
+                  placeholder:text-[#9E9E9E] w-full text-sm transition-colors
+TEXTAREA:         Same as INPUT — add resize-none
+SELECT:           Same as INPUT
 
-BTN PRIMARY:    bg-[#00FF87] text-black font-mono font-bold px-5 py-2.5 rounded-md
-                hover:bg-[#00e87a] active:scale-95 disabled:opacity-40
-                disabled:cursor-not-allowed transition-all duration-150
-BTN SECONDARY:  border border-[#2D2D44] text-[#F0F0FF] font-mono px-5 py-2.5 rounded-md
-                hover:bg-[#12121A] hover:border-[#00FF87]/50 transition-all
-BTN DANGER:     bg-[#FF3333] text-white font-mono font-bold px-5 py-2.5 rounded-md
-                hover:bg-[#e02020] active:scale-95 disabled:opacity-40 transition-all
-BTN GHOST:      text-[#8888AA] font-mono px-4 py-2 rounded-md
-                hover:text-[#F0F0FF] hover:bg-[#12121A] transition-all
-BTN IIMS:       bg-[#8B1A1A] text-white font-mono font-bold px-5 py-2.5 rounded-md
-                hover:bg-[#C0392B] transition-all                   ← For IIMS-branded CTAs
+BTN PRIMARY:      bg-[#E53935] text-white font-semibold px-5 py-2.5 rounded-lg
+                  hover:bg-[#C62828] active:scale-95 disabled:opacity-50
+                  disabled:cursor-not-allowed transition-all duration-150
+BTN SECONDARY:    bg-[#1A237E] text-white font-semibold px-5 py-2.5 rounded-lg
+                  hover:bg-[#0D1757] active:scale-95 disabled:opacity-50 transition-all
+BTN OUTLINE:      border-2 border-[#1A237E] text-[#1A237E] font-semibold px-5 py-2.5 rounded-lg
+                  hover:bg-[#1A237E] hover:text-white transition-all
+BTN GHOST:        text-[#757575] px-4 py-2 rounded-lg
+                  hover:text-[#212121] hover:bg-[#F5F5F5] transition-all
+BTN DANGER:       bg-[#B71C1C] text-white font-semibold px-5 py-2.5 rounded-lg
+                  hover:bg-[#7F0000] active:scale-95 transition-all
+BTN IIMS:         bg-[#1A237E] text-white font-semibold px-5 py-2.5 rounded-lg
+                  border border-[#1A237E] hover:bg-[#0D1757] transition-all
 
-BADGE (cyan):   text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30
-                font-mono text-xs px-2 py-0.5 rounded-full
-BADGE (green):  text-[#00FF87] bg-[#00FF87]/10 border border-[#00FF87]/30
-BADGE (red):    text-[#FF3333] bg-[#FF3333]/10 border border-[#FF3333]/30
-BADGE (amber):  text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30
-BADGE (gold):   text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/30
-BADGE (maroon): text-[#C0392B] bg-[#8B1A1A]/20 border border-[#8B1A1A]/40
+BADGE (navy):     text-[#1A237E] bg-[#1A237E]/10 border border-[#1A237E]/20
+                  text-xs font-medium px-2.5 py-0.5 rounded-full
+BADGE (crimson):  text-[#E53935] bg-[#E53935]/10 border border-[#E53935]/20
+                  text-xs font-medium px-2.5 py-0.5 rounded-full
+BADGE (success):  text-[#2E7D32] bg-[#E8F5E9] border border-[#2E7D32]/20
+BADGE (warning):  text-[#F57F17] bg-[#FFF8E1] border border-[#F57F17]/20
+BADGE (danger):   text-[#B71C1C] bg-[#FFEBEE] border border-[#B71C1C]/20
+BADGE (info):     text-[#0277BD] bg-[#E1F5FE] border border-[#0277BD]/20
 
-MODAL OVERLAY:  fixed inset-0 z-50 flex items-center justify-center
-                bg-black/85 backdrop-blur-md
-MODAL PANEL:    bg-[#0A0A0F] border border-[#2D2D44] rounded-xl p-6 max-w-lg w-full mx-4
-                shadow-2xl shadow-black/50
+MODAL OVERLAY:    fixed inset-0 z-50 flex items-center justify-center
+                  bg-[#212121]/60 backdrop-blur-sm
+MODAL PANEL:      bg-white border border-[#E0E0E0] rounded-2xl p-6 max-w-lg w-full mx-4
+                  shadow-2xl
 
-TOAST SUCCESS:  fixed bottom-4 right-4 z-50 bg-[#0A0A0F] border-l-4 border-[#00FF87]
-                text-[#F0F0FF] px-4 py-3 rounded-md shadow-xl font-mono text-sm
-                flex items-center gap-2
-TOAST ERROR:    Same but border-[#FF3333]
-TOAST WARN:     Same but border-[#F59E0B]
-TOAST INFO:     Same but border-[#00D4FF]
+TOAST SUCCESS:    fixed top-4 right-4 z-50 bg-white border-l-4 border-[#2E7D32]
+                  text-[#212121] px-4 py-3 rounded-lg shadow-lg text-sm
+                  flex items-center gap-2
+TOAST ERROR:      Same but border-[#B71C1C]
+TOAST WARN:       Same but border-[#F57F17]
+TOAST INFO:       Same but border-[#0277BD]
 
-SIDEBAR:        bg-[#0A0A0F] border-r border-[#1E1E2E] h-screen w-64 fixed left-0 top-0
-                flex flex-col overflow-y-auto
-NAV ITEM:       flex items-center gap-3 px-4 py-2.5 rounded-md font-mono text-sm
-                text-[#8888AA] hover:text-[#F0F0FF] hover:bg-[#12121A] transition-all
-NAV ITEM ACT:   text-[#00FF87] bg-[#00FF87]/10 hover:bg-[#00FF87]/15
+NAVBAR (public):  bg-[#1A237E] text-white shadow-lg
+                  — logo left, nav links center, CTA right
+SIDEBAR (portal): bg-white border-r border-[#E0E0E0] h-screen w-64 fixed left-0 top-0
+                  flex flex-col overflow-y-auto shadow-sm
+NAV ITEM:         flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm
+                  text-[#757575] hover:text-[#212121] hover:bg-[#F5F5F5] transition-all
+NAV ITEM ACTIVE:  text-[#E53935] bg-[#E53935]/8 hover:bg-[#E53935]/10 font-medium
 
-DIVIDER:        border-t border-[#1E1E2E] my-4
-SKELETON:       bg-[#1E1E2E] animate-pulse rounded-md
-ONLINE DOT:     h-2 w-2 rounded-full bg-[#00FF87] animate-pulse
+TOPBAR (portal):  bg-white border-b border-[#E0E0E0] h-16 sticky top-0 z-40
+                  flex items-center justify-between px-6 shadow-sm
 
-MSG BUBBLE SELF:  bg-[#00FF87]/15 border border-[#00FF87]/25 text-[#F0F0FF]
-                  rounded-2xl rounded-br-sm px-4 py-2 max-w-xs ml-auto font-sans text-sm
-MSG BUBBLE OTHER: bg-[#0A0A0F] border border-[#2D2D44] text-[#F0F0FF]
-                  rounded-2xl rounded-bl-sm px-4 py-2 max-w-xs font-sans text-sm
+DIVIDER:          border-t border-[#E0E0E0] my-4
+SKELETON:         bg-[#E0E0E0] animate-pulse rounded-lg
+ONLINE DOT:       h-2 w-2 rounded-full bg-[#2E7D32]
 
-TERMINAL BLOCK: bg-black border border-[#2D2D44] rounded-md p-4 font-mono text-sm
-                text-[#00FF87] overflow-x-auto
-TERMINAL PROMPT: text-[#00D4FF] before:content-['$_']
+MSG BUBBLE SELF:  bg-[#1A237E] text-white rounded-2xl rounded-br-sm
+                  px-4 py-2 max-w-xs ml-auto text-sm
+MSG BUBBLE OTHER: bg-[#F5F5F5] border border-[#E0E0E0] text-[#212121]
+                  rounded-2xl rounded-bl-sm px-4 py-2 max-w-xs text-sm
 
-LEADERBOARD #1: bg-[#D4AF37]/10 border-[#D4AF37]/40 text-[#D4AF37]
-LEADERBOARD #2: bg-[#C0C0C0]/10 border-[#C0C0C0]/40 text-[#C0C0C0]
-LEADERBOARD #3: bg-[#CD7F32]/10 border-[#CD7F32]/40 text-[#CD7F32]
+CODE BLOCK:       bg-[#1E1E2E] text-[#CDD6F4] rounded-lg p-4 font-mono text-sm
+                  overflow-x-auto border border-[#2D2D44]
+CTF TERMINAL:     bg-[#1E1E2E] text-[#CDD6F4] rounded-lg p-4 font-mono text-sm
+                  border border-[#2D2D44]
+                  (Only CTF challenge descriptions and code use dark styling)
+
+HERO (public):    bg-[#1A237E] text-white py-20
+                  — gradient: from-[#1A237E] to-[#0D1757]
+SECTION ALT:      bg-[#F8F9FA]
+SECTION WHITE:    bg-white
+
+LEADERBOARD #1:   bg-[#FFF8E1] border-[#F9A825]/30 — gold accent
+LEADERBOARD #2:   bg-[#F5F5F5] border-[#90A4AE]/30 — silver accent
+LEADERBOARD #3:   bg-[#FBE9E7] border-[#A1887F]/30 — bronze accent
+YOUR ROW:         border-l-4 border-l-[#1A237E] bg-[#E8EAF6]
+
+STAT CARD:        bg-white border border-[#E0E0E0] rounded-xl p-5 shadow-sm
+                  — icon in crimson, number in navy, label in muted
 ```
 
-### 4.4 Typography
+### 4.3 Typography
 
 | Font | Usage | Weights | Load via |
 |---|---|---|---|
-| **JetBrains Mono** | Headings, labels, badges, buttons, code, terminal | 400, 700 | `next/font/google` |
-| **Inter** | Body text, paragraphs, form inputs, descriptions | 300, 400, 600 | `next/font/google` |
+| **Inter** | ALL text — headings, body, labels, buttons, nav | 300, 400, 500, 600, 700 | `next/font/google` |
+| **JetBrains Mono** | Code blocks, CTF sections, flag input only | 400, 700 | `next/font/google` |
 
-> Load fonts in `app/layout.tsx` using `next/font/google` — never via `<link>` tags in HTML.
+> Load fonts in `app/layout.tsx` via `next/font/google`. Never via `<link>` tags.
 
-### 4.5 IIMS Branding Integration Rules
+### 4.4 IIMS Branding Integration Rules
 
-- Public homepage header must show: IIMS College logo link (linking to https://iimscollege.edu.np/) + "Cybersecurity Club" wordmark
-- Footer must include: "A club under IIMS College, Kathmandu" + link to https://iimscollege.edu.np/
-- The `/about` page links to IIMS's CTF page: https://iimscollege.edu.np/capture-the-flag/
-- The `/about` page links to the IT Club page: https://iimscollege.edu.np/it-club/
-- IIMS Maroon (`#8B1A1A` / `#C0392B`) is used sparingly as a prestige/institutional accent
+- **Public navbar**: IIMS College logo (link to https://iimscollege.edu.np/) + "IT Club" wordmark side by side
+- **Portal sidebar header**: IIMS IT Club logo + college name
+- **Footer**: "IIMS IT Club is an official club of IIMS College, Kathmandu, Nepal" + link to https://iimscollege.edu.np/
+- **About page**: Links to https://iimscollege.edu.np/it-club/ and https://iimscollege.edu.np/capture-the-flag/
+- **Any stats section**: Show IIMS college stats (15 years, 7000+ alumni, #253 global rank, 450+ companies)
+- **Partner strip**: Show Taylor's University logo (https://iimscollege.edu.np/taylor-university/)
+- **Programs mentioned**: BCS, BBUS, BIHM, MBA — membership open to all IIMS students
 
-### 4.6 Prohibited Patterns
+### 4.5 Prohibited Patterns
 
 - ❌ `window.alert()` or `window.confirm()` → use `Modal.tsx` / `Toast.tsx`
-- ❌ Infinite scroll without skeleton states
-- ❌ Client-side filtering for datasets > 50 rows
-- ❌ Any external UI library (Radix, MUI, Shadcn, Headless UI)
-- ❌ Light mode styles (`bg-white`, `bg-gray-*`, `text-gray-900`)
+- ❌ Dark backgrounds as primary surfaces (dark only for code/CTF blocks)
+- ❌ External UI libraries (Radix, MUI, Shadcn, Headless UI)
 - ❌ Raw `<img>` tags → use Next.js `<Image />`
 - ❌ `console.log` in committed code
 - ❌ `any` TypeScript type → use `unknown` and narrow
+- ❌ `.select('*')` on any growing table
 - ❌ `(supabase.from('table' as any) as any)` → always pass `Database` generic
+- ❌ Inline scroll-jacking or animation libraries
+- ❌ Emojis as primary UI elements (text only, never as icons)
 
-### 4.7 Iconography
+### 4.6 Iconography
 
-Use **Lucide React** exclusively. Sizes: `h-4 w-4` inline, `h-5 w-5` buttons, `h-6 w-6` nav.
+Use **Lucide React** exclusively. Sizes: `h-4 w-4` inline, `h-5 w-5` buttons, `h-6 w-6` nav/section.  
+Color: match context — crimson for CTA actions, navy for navigation, muted for metadata.
 
 ---
 
 ## 5. FOLDER STRUCTURE
 
 ```
-iims-cyber-club/
+iims-it-club/
 │
 ├── app/
 │   ├── layout.tsx                           ← Root layout: fonts, ToastProvider, metadata
 │   ├── globals.css                          ← Tailwind directives + custom scrollbar
 │   │
 │   ├── (public)/
-│   │   ├── layout.tsx                       ← Public Navbar + Footer
-│   │   ├── page.tsx                         ← Homepage
-│   │   ├── about/page.tsx
-│   │   ├── events/page.tsx
-│   │   └── contact/page.tsx
+│   │   ├── layout.tsx                       ← Public Navbar (navy) + Footer (navy)
+│   │   ├── page.tsx                         ← Homepage: Hero, Stats, Events, Team
+│   │   ├── about/page.tsx                   ← Mission, gallery, IIMS affiliation
+│   │   ├── events/page.tsx                  ← Published events grid
+│   │   └── contact/page.tsx                 ← Rate-limited contact form
 │   │
 │   └── portal/
-│       ├── layout.tsx                       ← Auth gate → Sidebar shell
+│       ├── layout.tsx                       ← Auth gate → Sidebar + Topbar shell
 │       ├── login/page.tsx                   ← Magic link send form
 │       ├── register/page.tsx                ← Complete profile after first login
 │       ├── pending/page.tsx                 ← Awaiting approval screen
@@ -295,7 +356,7 @@ iims-cyber-club/
 │   │   ├── posts/route.ts
 │   │   ├── events/route.ts                  ← Zod-validated CRUD
 │   │   ├── documents/route.ts
-│   │   ├── ctf/route.ts                     ← Challenge management (flag hashed here)
+│   │   ├── ctf/route.ts                     ← Challenge mgmt (flag hashed here)
 │   │   ├── broadcast/route.ts               ← Bulk notification insert
 │   │   ├── settings/route.ts
 │   │   └── export-csv/route.ts
@@ -316,24 +377,29 @@ iims-cyber-club/
 │   │   ├── Pagination.tsx
 │   │   ├── Skeleton.tsx
 │   │   ├── Badge.tsx
-│   │   ├── Avatar.tsx                       ← With IIMS-branded fallback initials
+│   │   ├── Avatar.tsx                       ← IIMS-branded fallback initials
 │   │   ├── MarkdownEditor.tsx               ← Write + preview tabs
-│   │   └── MarkdownRenderer.tsx            ← Sanitized render
+│   │   └── MarkdownRenderer.tsx
 │   ├── public/
-│   │   ├── Navbar.tsx                       ← IIMS logo + club name
-│   │   ├── Footer.tsx                       ← IIMS affiliation footer
-│   │   ├── HeroSection.tsx                  ← Terminal animation hero
+│   │   ├── Navbar.tsx                       ← Navy navbar: IIMS logo + IT Club
+│   │   ├── Footer.tsx                       ← Navy footer: IIMS affiliation
+│   │   ├── HeroSection.tsx                  ← Navy hero with IIMS stats
+│   │   ├── StatsBar.tsx                     ← Members, events, CTF solves, rank
 │   │   ├── EventCard.tsx
+│   │   ├── TeamSection.tsx
+│   │   ├── GallerySection.tsx
+│   │   ├── IIMSAffiliationStrip.tsx         ← Taylor's Uni + IIMS partner logos
 │   │   └── ContactForm.tsx
 │   └── portal/
-│       ├── Sidebar.tsx                      ← Nav + unread badges
+│       ├── Sidebar.tsx                      ← White sidebar: nav + unread badges
+│       ├── Topbar.tsx                       ← White topbar: search + profile + bell
 │       ├── PostCard.tsx
 │       ├── PostComposer.tsx
 │       ├── MessageThread.tsx
 │       ├── ConversationList.tsx
 │       ├── NotificationItem.tsx
 │       ├── CTFChallengeCard.tsx
-│       ├── FlagSubmitForm.tsx
+│       ├── FlagSubmitForm.tsx               ← Mono font, dark terminal look
 │       ├── LeaderboardTable.tsx
 │       ├── MemberCard.tsx
 │       ├── EventCard.tsx
@@ -369,11 +435,11 @@ iims-cyber-club/
 │   └── useNotifications.ts
 │
 ├── types/
-│   └── database.ts                          ← Auto-generated by: supabase gen types typescript
+│   └── database.ts                          ← Auto-generated: supabase gen types typescript
 │
 ├── middleware.ts
 ├── .env.local
-└── CONTEXT.md
+└── CONTEXT.md                              ← This file
 ```
 
 ---
@@ -391,15 +457,17 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...            # ⚠️ SERVER ONLY — NEVER prefi
 # ── Email ─────────────────────────────────────────────────
 RESEND_API_KEY=re_...
 RESEND_FROM_EMAIL=noreply@iimscollege.edu.np
-RESEND_NOTIFY_EMAIL=cybersec@iimscollege.edu.np
+RESEND_NOTIFY_EMAIL=itclub@iimscollege.edu.np
 
 # ── Rate Limiting (Upstash Redis) ─────────────────────────
 UPSTASH_REDIS_REST_URL=https://...upstash.io
 UPSTASH_REDIS_REST_TOKEN=...
 
 # ── App ───────────────────────────────────────────────────
-NEXT_PUBLIC_SITE_URL=http://localhost:3000   # → set to Vercel domain on production
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_COLLEGE_URL=https://iimscollege.edu.np/
+NEXT_PUBLIC_CLUB_PAGE_URL=https://iimscollege.edu.np/it-club/
+NEXT_PUBLIC_CTF_PAGE_URL=https://iimscollege.edu.np/capture-the-flag/
 ```
 
 ---
@@ -413,14 +481,14 @@ Run this in full in the **Supabase SQL Editor**. Order matters.
 -- EXTENSIONS
 -- =============================================
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";  -- For gen_random_bytes if needed
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- =============================================
 -- MEMBERS
--- NOTE: user_id = auth.users.id (FK)
--- NOTE: id = club-internal UUID (PK)
--- These are TWO DIFFERENT UUIDs. Never conflate them.
--- All role checks use: .eq('user_id', session.user.id) — NOT .eq('id', ...)
+-- IMPORTANT: user_id = auth.users.id (FK)
+--            id = club-internal UUID (PK)
+-- These are TWO DIFFERENT UUIDs. Never conflate.
+-- All auth checks use: .eq('user_id', session.user.id) — NOT .eq('id', ...)
 -- =============================================
 CREATE TABLE members (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -428,6 +496,9 @@ CREATE TABLE members (
   full_name     text NOT NULL CHECK (length(full_name) BETWEEN 2 AND 100),
   email         text UNIQUE NOT NULL,
   student_id    text UNIQUE CHECK (length(student_id) <= 20),
+  -- Program must be a valid IIMS program
+  program       text CHECK (program IN ('BCS', 'BBUS', 'BIHM', 'MBA', 'Other')),
+  intake        text CHECK (length(intake) <= 20),  -- e.g. "Jan 2024"
   role          text NOT NULL DEFAULT 'member'
                 CHECK (role IN ('member', 'admin', 'superadmin')),
   status        text NOT NULL DEFAULT 'pending'
@@ -435,8 +506,9 @@ CREATE TABLE members (
   -- club_post MUST default to 'General Member'. Never trust client input.
   club_post     text NOT NULL DEFAULT 'General Member'
                 CHECK (club_post IN (
-                  'General Member', 'Web Security', 'Forensics', 'Cryptography',
-                  'Penetration Testing', 'OSINT', 'Reverse Engineering', 'Malware Analysis'
+                  'General Member', 'Web Development', 'Cybersecurity',
+                  'AI & Machine Learning', 'Mobile Development', 'Cloud & DevOps',
+                  'Data Science', 'Open Source', 'Graphic Design'
                 )),
   bio           text CHECK (length(bio) <= 500),
   avatar_url    text,
@@ -453,7 +525,7 @@ CREATE TABLE members (
 );
 
 -- =============================================
--- POSTS
+-- POSTS (Club Feed)
 -- =============================================
 CREATE TABLE posts (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -461,7 +533,7 @@ CREATE TABLE posts (
   title       text CHECK (length(title) <= 200),
   content     text NOT NULL CHECK (length(content) BETWEEN 1 AND 10000),
   type        text DEFAULT 'post'
-              CHECK (type IN ('post', 'announcement', 'resource')),
+              CHECK (type IN ('post', 'announcement', 'resource', 'project')),
   is_pinned   boolean DEFAULT false,
   created_at  timestamptz DEFAULT now(),
   updated_at  timestamptz DEFAULT now()
@@ -534,7 +606,7 @@ CREATE TABLE notifications (
 );
 
 -- =============================================
--- DOCUMENTS
+-- DOCUMENTS (Club Resources)
 -- =============================================
 CREATE TABLE documents (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -542,10 +614,10 @@ CREATE TABLE documents (
   title          text NOT NULL CHECK (length(title) BETWEEN 2 AND 200),
   description    text CHECK (length(description) <= 1000),
   file_url       text NOT NULL,
-  file_size      bigint CHECK (file_size > 0 AND file_size <= 52428800), -- max 50MB
+  file_size      bigint CHECK (file_size > 0 AND file_size <= 52428800),
   file_type      text,
   category       text DEFAULT 'general' CHECK (category IN (
-    'general', 'study-material', 'writeup', 'presentation', 'report', 'other'
+    'general', 'study-material', 'writeup', 'presentation', 'report', 'project', 'other'
   )),
   is_public      boolean DEFAULT false,
   download_count integer DEFAULT 0 CHECK (download_count >= 0),
@@ -568,7 +640,7 @@ CREATE TABLE public_events (
   meeting_link    text,
   cover_image_url text,
   type            text DEFAULT 'workshop' CHECK (type IN (
-    'workshop', 'ctf', 'seminar', 'meetup', 'competition', 'other'
+    'workshop', 'ctf', 'hackathon', 'seminar', 'meetup', 'competition', 'other'
   )),
   max_attendees   integer CHECK (max_attendees > 0),
   is_published    boolean DEFAULT false,
@@ -590,7 +662,7 @@ CREATE TABLE event_rsvps (
 
 -- =============================================
 -- CTF CHALLENGES
--- CRITICAL: 'flag' column stores SHA-256 hex digest ONLY.
+-- CRITICAL: 'flag_hash' stores SHA-256 hex digest ONLY.
 -- Raw flag is NEVER stored. Comparison is SERVER-SIDE ONLY.
 -- =============================================
 CREATE TABLE ctf_challenges (
@@ -603,7 +675,7 @@ CREATE TABLE ctf_challenges (
   )),
   difficulty   text NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard', 'insane')),
   points       integer NOT NULL CHECK (points > 0 AND points <= 10000),
-  -- STORED AS SHA-256 HEX DIGEST — NEVER the raw flag
+  -- STORED AS SHA-256 HEX DIGEST ONLY — NEVER the raw flag string
   flag_hash    text NOT NULL CHECK (length(flag_hash) = 64),
   flag_format  text DEFAULT 'IIMS{...}',
   hint         text CHECK (length(hint) <= 500),
@@ -612,10 +684,9 @@ CREATE TABLE ctf_challenges (
   solves_count integer DEFAULT 0 CHECK (solves_count >= 0),
   created_at   timestamptz DEFAULT now()
 );
--- RENAME 'flag' to 'flag_hash' to make the security contract explicit in code
 
 -- =============================================
--- CTF SOLVES (unique: one solve per member per challenge)
+-- CTF SOLVES
 -- =============================================
 CREATE TABLE ctf_solves (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -627,33 +698,28 @@ CREATE TABLE ctf_solves (
 
 -- =============================================
 -- CTF TRIGGER — ATOMIC points update
--- NEVER update points from application code. ONLY this trigger writes points.
--- This prevents TOCTOU race conditions completely.
+-- NEVER update points from application code. ONLY this trigger.
+-- Prevents TOCTOU race conditions entirely.
 -- =============================================
 CREATE OR REPLACE FUNCTION fn_on_ctf_solve()
 RETURNS TRIGGER AS $$
 DECLARE
   v_points integer;
 BEGIN
-  -- Get challenge points
   SELECT points INTO v_points FROM ctf_challenges WHERE id = NEW.challenge_id;
 
   -- Atomic increment: no read-modify-write in app layer
-  UPDATE members
-    SET points = points + v_points
-    WHERE id = NEW.member_id;
+  UPDATE members SET points = points + v_points WHERE id = NEW.member_id;
 
-  -- Atomic increment solve count
-  UPDATE ctf_challenges
-    SET solves_count = solves_count + 1
-    WHERE id = NEW.challenge_id;
+  -- Atomic solve count increment
+  UPDATE ctf_challenges SET solves_count = solves_count + 1 WHERE id = NEW.challenge_id;
 
-  -- Auto-create notification for the solver
+  -- Auto-notification for the solver
   INSERT INTO notifications (recipient_id, type, title, body, link)
   VALUES (
     NEW.member_id,
     'ctf_solved',
-    'Flag Captured! 🏴',
+    'Challenge Solved!',
     'You earned ' || v_points || ' points.',
     '/portal/leaderboard'
   );
@@ -668,8 +734,8 @@ CREATE TRIGGER trg_ctf_solve
 
 -- =============================================
 -- AUTH TRIGGER — Prevent orphaned auth users
--- When auth.users row is created, auto-create a pending members row.
--- This replaces the fragile application-layer rollback pattern.
+-- Auto-creates a pending members row on auth.users insert.
+-- Replaces fragile application-layer rollback pattern.
 -- =============================================
 CREATE OR REPLACE FUNCTION fn_on_auth_user_created()
 RETURNS TRIGGER AS $$
@@ -682,7 +748,7 @@ BEGIN
     'pending',
     'member'
   )
-  ON CONFLICT (user_id) DO NOTHING; -- Idempotent: safe to re-run
+  ON CONFLICT (user_id) DO NOTHING;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -712,7 +778,7 @@ CREATE TABLE contact_messages (
   email      text NOT NULL CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
   subject    text NOT NULL CHECK (length(subject) BETWEEN 5 AND 200),
   message    text NOT NULL CHECK (length(message) BETWEEN 10 AND 3000),
-  ip_hash    text,           -- Hashed IP for rate limit auditing (never store raw IP in prod)
+  ip_hash    text,
   is_read    boolean DEFAULT false,
   created_at timestamptz DEFAULT now()
 );
@@ -741,18 +807,20 @@ CREATE TABLE site_settings (
 
 INSERT INTO site_settings (key, value) VALUES
   ('registration_open',  'true'),
-  ('site_title',         'IIMS Cybersecurity Club'),
-  ('hero_tagline',       'Hack the future. Secure the present.'),
-  ('hero_subtext',       'Official cybersecurity club of IIMS College, Kathmandu.'),
-  ('contact_email',      'cybersec@iimscollege.edu.np'),
+  ('site_title',         'IIMS IT Club'),
+  ('hero_tagline',       'Code. Build. Innovate.'),
+  ('hero_subtext',       'Official IT Club of IIMS College, Kathmandu, Nepal.'),
+  ('contact_email',      'itclub@iimscollege.edu.np'),
   ('ctf_enabled',        'true'),
   ('college_url',        'https://iimscollege.edu.np/'),
-  ('ctf_page_url',       'https://iimscollege.edu.np/capture-the-flag/');
+  ('club_page_url',      'https://iimscollege.edu.np/it-club/'),
+  ('ctf_page_url',       'https://iimscollege.edu.np/capture-the-flag/'),
+  ('hackathon_url',      'https://iimscollege.edu.np/iims-hackathon/');
 
 -- =============================================
 -- PERFORMANCE INDEXES
 -- =============================================
-CREATE INDEX idx_members_user_id       ON members(user_id);       -- Critical for auth checks
+CREATE INDEX idx_members_user_id       ON members(user_id);
 CREATE INDEX idx_members_status        ON members(status);
 CREATE INDEX idx_members_role          ON members(role);
 CREATE INDEX idx_members_points        ON members(points DESC);
@@ -777,11 +845,11 @@ CREATE INDEX idx_documents_category    ON documents(category);
 
 | Bucket | Visibility | Max Size | Allowed MIME Types | Usage |
 |---|---|---|---|---|
-| `club-documents` | **Private** | 50MB | `application/pdf`, `application/zip`, `application/vnd.*` | Member docs, writeups |
+| `club-documents` | **Private** | 50MB | `application/pdf`, `application/zip`, `application/vnd.*` | Club docs, writeups, reports |
 | `public-gallery` | Public | 10MB | `image/jpeg`, `image/png`, `image/webp` | Event photos, gallery |
 | `event-images` | Public | 5MB | `image/jpeg`, `image/png`, `image/webp` | Event cover images |
 | `team-avatars` | Public | 2MB | `image/jpeg`, `image/png`, `image/webp` | Member profile photos |
-| `ctf-files` | **Private** | 20MB | Any | Challenge attachments |
+| `ctf-files` | **Private** | 20MB | Any | Challenge attachment files |
 
 > Signed URL expiry: `club-documents` = 1hr, `ctf-files` = 2hr. Always generate server-side.
 
@@ -792,24 +860,22 @@ CREATE INDEX idx_documents_category    ON documents(category);
 Enable on **every** table. Use the service role to bypass RLS in admin API routes.
 
 ```sql
--- ── MEMBERS ──────────────────────────────────────────────────
+-- ── MEMBERS ─────────────────────────────────────────────
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Approved members can view approved members"
   ON members FOR SELECT
   USING (status = 'approved');
 
--- Members can only update their own non-sensitive fields
-CREATE POLICY "Members can update own profile"
+CREATE POLICY "Members can update own non-sensitive profile fields"
   ON members FOR UPDATE
   USING (auth.uid() = user_id)
   WITH CHECK (
-    -- Prevent self-escalation: role and status cannot be changed via RLS
     role = (SELECT role FROM members WHERE user_id = auth.uid()) AND
     status = (SELECT status FROM members WHERE user_id = auth.uid())
   );
 
--- ── POSTS ─────────────────────────────────────────────────────
+-- ── POSTS ────────────────────────────────────────────────
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Approved members can read posts"
@@ -831,19 +897,19 @@ CREATE POLICY "Authors can update own posts within 24h"
     created_at > now() - INTERVAL '24 hours'
   );
 
--- ── CTF CHALLENGES ────────────────────────────────────────────
+-- ── CTF CHALLENGES ──────────────────────────────────────
 ALTER TABLE ctf_challenges ENABLE ROW LEVEL SECURITY;
 
--- CRITICAL: This policy returns rows but the SELECT in code MUST exclude 'flag_hash'
-CREATE POLICY "Approved members can read active challenges (no flag)"
+-- Application code MUST use explicit column list — NEVER .select('*')
+-- flag_hash must NEVER appear in any client-facing SELECT
+CREATE POLICY "Approved members can read active challenges"
   ON ctf_challenges FOR SELECT
   USING (
     is_active = true AND
     EXISTS (SELECT 1 FROM members WHERE user_id = auth.uid() AND status = 'approved')
   );
--- Application code MUST always use explicit column list — NEVER .select('*') on ctf_challenges
 
--- ── MESSAGES ──────────────────────────────────────────────────
+-- ── MESSAGES ─────────────────────────────────────────────
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Members can read messages in their conversations"
@@ -851,41 +917,37 @@ CREATE POLICY "Members can read messages in their conversations"
   USING (EXISTS (
     SELECT 1 FROM conversation_participants cp
     JOIN members m ON m.id = cp.member_id
-    WHERE cp.conversation_id = messages.conversation_id
-      AND m.user_id = auth.uid()
+    WHERE cp.conversation_id = messages.conversation_id AND m.user_id = auth.uid()
   ));
 
-CREATE POLICY "Members can insert messages to their conversations"
+CREATE POLICY "Members can send messages to their conversations"
   ON messages FOR INSERT
   WITH CHECK (EXISTS (
     SELECT 1 FROM conversation_participants cp
     JOIN members m ON m.id = cp.member_id
-    WHERE cp.conversation_id = messages.conversation_id
-      AND m.user_id = auth.uid()
+    WHERE cp.conversation_id = messages.conversation_id AND m.user_id = auth.uid()
   ));
 
--- ── NOTIFICATIONS ─────────────────────────────────────────────
+-- ── NOTIFICATIONS ────────────────────────────────────────
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Members can read own notifications"
   ON notifications FOR SELECT
   USING (recipient_id = (SELECT id FROM members WHERE user_id = auth.uid()));
 
-CREATE POLICY "Members can mark own notifications as read"
+CREATE POLICY "Members can mark own notifications read"
   ON notifications FOR UPDATE
   USING (recipient_id = (SELECT id FROM members WHERE user_id = auth.uid()))
-  WITH CHECK (is_read = true);  -- Can only set to true, not back to false
+  WITH CHECK (is_read = true);
 
--- ── CONTACT MESSAGES ─────────────────────────────────────────
+-- ── CONTACT MESSAGES ────────────────────────────────────
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Anyone can submit contact form"
   ON contact_messages FOR INSERT WITH CHECK (true);
--- Admin reads via service role only
 
--- ── AUDIT LOGS ────────────────────────────────────────────────
+-- ── AUDIT LOGS ──────────────────────────────────────────
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
--- No SELECT policy: audit logs are admin-only, read via service role
+-- No SELECT policy — admin reads via service role only
 ```
 
 ---
@@ -895,18 +957,18 @@ ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ### 10.1 Auth Flow
 
 ```
-1. User enters email → POST /portal/login
-2. Supabase sends Magic Link (handled by Resend via custom SMTP)
+1. User enters IIMS email → POST /portal/login
+2. Supabase sends Magic Link via Resend
 3. User clicks link → Supabase creates JWT session cookie
-4. Supabase auth trigger: fn_on_auth_user_created() creates members row atomically
-5. middleware.ts runs on protected routes:
+4. DB trigger fn_on_auth_user_created() atomically creates pending members row
+5. middleware.ts runs on every /portal/* request:
 
-   ┌─ No Supabase session?          → redirect /portal/login
-   ├─ Session exists, status=pending → redirect /portal/pending
-   ├─ Session exists, status=rejected → redirect /portal/login?reason=rejected
-   ├─ Session exists, status=banned  → clear cookies properly → /portal/login?reason=banned
-   ├─ Session + approved             → allow /portal/* (except /admin)
-   └─ Session + admin/superadmin    → allow /portal/admin
+   ┌─ No session?              → redirect /portal/login
+   ├─ status = pending          → redirect /portal/pending
+   ├─ status = rejected         → redirect /portal/login?reason=rejected
+   ├─ status = banned           → clear sb-* cookies properly → /portal/login?reason=banned
+   ├─ status = approved         → allow /portal/* (except /admin)
+   └─ role = admin/superadmin   → allow /portal/admin
 ```
 
 ### 10.2 `assertRole()` — The Correct Pattern
@@ -925,33 +987,31 @@ export async function assertRole(minRole: 'member' | 'admin' | 'superadmin') {
   const { data: member, error } = await supabase
     .from('members')
     .select('id, role, status')
-    .eq('user_id', session.user.id)  // ← user_id, never id
+    .eq('user_id', session.user.id)  // ← user_id, NEVER id
     .single()
 
   if (error || !member) throw new Error('MEMBER_NOT_FOUND')
   if (member.status !== 'approved') throw new Error('NOT_APPROVED')
 
   const hierarchy = { member: 0, admin: 1, superadmin: 2 }
-  if (hierarchy[member.role] < hierarchy[minRole]) throw new Error('INSUFFICIENT_ROLE')
-
+  if (hierarchy[member.role as keyof typeof hierarchy] < hierarchy[minRole]) {
+    throw new Error('INSUFFICIENT_ROLE')
+  }
   return member
 }
 ```
 
-### 10.3 `lib/supabase-server.ts` — The Correct Pattern
+### 10.3 `lib/supabase-server.ts`
 
 ```typescript
-// lib/supabase-server.ts
-import 'server-only'  // ← Prevents this file from being bundled client-side
+import 'server-only'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
-// ✅ CORRECT: Uses SERVICE_ROLE_KEY (no NEXT_PUBLIC_ prefix)
-// ✅ CORRECT: Passes Database generic for full type safety
 export function createServerClient() {
   return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,  // ← Never anon key
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,  // ← service role, never anon
     { auth: { persistSession: false, autoRefreshToken: false } }
   )
 }
@@ -960,11 +1020,9 @@ export function createServerClient() {
 ### 10.4 `lib/supabase.ts` — Browser Client
 
 ```typescript
-// lib/supabase.ts  (client-safe)
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
-// ✅ CORRECT: Passes Database generic — no more 'as any'
 export function createClient() {
   return createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -973,10 +1031,9 @@ export function createClient() {
 }
 ```
 
-### 10.5 `middleware.ts` — Correct Cookie Handling
+### 10.5 `middleware.ts`
 
 ```typescript
-// middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
@@ -990,20 +1047,9 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         get: (name) => request.cookies.get(name)?.value,
-        set: (name, value, options) => {
-          response.cookies.set({ name, value, ...options })
-        },
+        set: (name, value, options) => { response.cookies.set({ name, value, ...options }) },
         remove: (name, options) => {
-          // ✅ CORRECT: Use .set with maxAge:0 AND copy all options from incoming cookie
-          // to ensure path/domain match — prevents infinite redirect loop on ban
-          const existingCookie = request.cookies.get(name)
-          response.cookies.set({
-            name, value: '',
-            ...options,
-            maxAge: 0,
-            // Preserve original path/domain if they exist
-            path: existingCookie ? '/' : options?.path,
-          })
+          response.cookies.set({ name, value: '', ...options, maxAge: 0, path: '/' })
         }
       }
     }
@@ -1012,15 +1058,12 @@ export async function middleware(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession()
   const path = request.nextUrl.pathname
 
-  const isPortalRoute = path.startsWith('/portal') &&
-    !path.startsWith('/portal/login') &&
-    !path.startsWith('/portal/pending') &&
-    !path.startsWith('/portal/register')
+  const isProtected = path.startsWith('/portal') &&
+    !['/portal/login', '/portal/pending', '/portal/register'].some(p => path.startsWith(p))
 
-  if (!isPortalRoute) return response
+  if (!isProtected) return response
   if (!session) return NextResponse.redirect(new URL('/portal/login', request.url))
 
-  // Fetch member status (lightweight — uses signed cookie cache when possible)
   const { data: member } = await supabase
     .from('members')
     .select('status, role')
@@ -1034,14 +1077,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/portal/login?reason=rejected', request.url))
   }
   if (member.status === 'banned') {
-    const banResponse = NextResponse.redirect(new URL('/portal/login?reason=banned', request.url))
-    // ✅ CORRECT: Clear all Supabase auth cookies with proper options
+    const banRes = NextResponse.redirect(new URL('/portal/login?reason=banned', request.url))
     request.cookies.getAll().forEach(cookie => {
       if (cookie.name.startsWith('sb-')) {
-        banResponse.cookies.set({ name: cookie.name, value: '', maxAge: 0, path: '/' })
+        banRes.cookies.set({ name: cookie.name, value: '', maxAge: 0, path: '/' })
       }
     })
-    return banResponse
+    return banRes
   }
   if (path.startsWith('/portal/admin') && !['admin', 'superadmin'].includes(member.role)) {
     return NextResponse.redirect(new URL('/portal/dashboard', request.url))
@@ -1050,229 +1092,84 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
-export const config = {
-  matcher: ['/portal/:path*']
-}
+export const config = { matcher: ['/portal/:path*'] }
 ```
 
 ---
 
-## 11. SECURITY VULNERABILITY FIXES (MANDATORY)
+## 11. SECURITY VULNERABILITY FIXES (MANDATORY — ALL RESOLVED)
 
-> This section documents every vulnerability identified in the diagnostic report and the exact fix to implement. **All fixes are non-negotiable.**
-
----
-
-### FIX 1 — CTF Race Condition (TOCTOU) ✅ RESOLVED VIA DB TRIGGER
-
-**Vulnerability:** Application code read `member.points`, added challenge points, then wrote back. Two concurrent requests read the same base value and double-write.
-
-**Fix:** Points are **NEVER** updated from application code. The `trg_ctf_solve` trigger in Section 7 handles all point updates atomically at the database level. The API route `/api/ctf/submit` only inserts into `ctf_solves`. The trigger does the rest.
+### FIX 1 — CTF Race Condition (TOCTOU) ✅
+**Problem:** App-layer read-modify-write on `members.points`. Concurrent requests double-write.  
+**Fix:** `trg_ctf_solve` trigger handles all point updates atomically. App only inserts into `ctf_solves`. Never touches `members.points`.
 
 ```typescript
-// ✅ CORRECT: app/api/ctf/submit/route.ts
-// Only insert the solve. NEVER touch member.points from here.
+// /api/ctf/submit — only insert the solve. Trigger does the rest.
 const { error } = await supabaseAdmin.from('ctf_solves').insert({
   challenge_id: challengeId,
   member_id: member.id
 })
-if (error?.code === '23505') {
-  return NextResponse.json({ error: 'Already solved' }, { status: 409 })
-}
-// Points are updated atomically by the DB trigger. No application-layer math.
+if (error?.code === '23505') return NextResponse.json({ error: 'Already solved' }, { status: 409 })
 ```
 
----
+### FIX 2 — Privilege Escalation via ID Mismatch ✅
+**Problem:** Auth checks used `.eq('id', session.user.id)` — wrong field.  
+**Fix:** All auth checks use `.eq('user_id', session.user.id)`.
 
-### FIX 2 — Privilege Escalation via ID Mismatch ✅ RESOLVED
+### FIX 3 — Missing Zod Validation on Admin Mutations ✅
+**Problem:** Raw `req.json()` passed directly to Supabase on admin routes.  
+**Fix:** Every admin API route validates via Zod before touching the database.
 
-**Vulnerability:** `assertAdmin()` queried `.eq('id', session.user.id)`. But `members.id` is the club UUID, while `session.user.id` is `auth.users.id` stored in `members.user_id`. These are different UUIDs.
-
-**Fix:** All role/status checks use `.eq('user_id', session.user.id)`. See `assertRole()` in Section 10.2. This is enforced everywhere — in middleware, in every API route, in all server components.
-
-```typescript
-// ❌ WRONG — never do this
-.eq('id', session.user.id)
-
-// ✅ CORRECT — always do this
-.eq('user_id', session.user.id)
-```
-
----
-
-### FIX 3 — Missing Zod Validation on Admin Mutations ✅ RESOLVED
-
-**Vulnerability:** Raw `req.json()` passed directly to Supabase `.insert(body)` on admin routes.
-
-**Fix:** Every admin API route validates its request body with a Zod schema before touching the database.
-
-```typescript
-// lib/validations.ts — Event schema example
-export const createEventSchema = z.object({
-  title:        z.string().min(2).max(200),
-  slug:         z.string().regex(/^[a-z0-9-]+$/),
-  description:  z.string().min(10),
-  short_desc:   z.string().max(200).optional(),
-  event_date:   z.string().datetime(),
-  end_date:     z.string().datetime().optional(),
-  location:     z.string().max(300).optional(),
-  meeting_link: z.string().url().optional().or(z.literal('')),
-  type:         z.enum(['workshop','ctf','seminar','meetup','competition','other']),
-  max_attendees: z.number().positive().optional(),
-})
-
-// app/api/admin/events/route.ts
-export async function POST(req: NextRequest) {
-  const admin = await assertRole('admin')  // throws if not admin
-  const body = await req.json()
-  const parsed = createEventSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
-  }
-  const { data, error } = await supabaseAdmin
-    .from('public_events')
-    .insert({ ...parsed.data, created_by: admin.id })
-  // ...
-}
-```
-
----
-
-### FIX 4 — CTF Flag Leakage ✅ RESOLVED
-
-**Vulnerability:** Flag fetched using the user's session client and included in SELECT. Any user could query the API directly and see all flags.
-
-**Fix (3-part):**
-
-**Part A — Rename column:** `flag` → `flag_hash` (makes the contract explicit in code).
-
-**Part B — RLS SELECT never includes `flag_hash`:** Application code must explicitly list columns.
-
-**Part C — Flag comparison is server-side only:**
+### FIX 4 — CTF Flag Leakage ✅
+**Problem:** Flag accessible via client session query.  
+**Fix:** Column named `flag_hash` (SHA-256 only). Comparison server-side only via service role.
 
 ```typescript
 // lib/crypto.ts
 import 'server-only'
 import { createHash } from 'crypto'
-
-export function hashFlag(rawFlag: string): string {
-  return createHash('sha256').update(rawFlag.trim().toLowerCase()).digest('hex')
+export function hashFlag(raw: string): string {
+  return createHash('sha256').update(raw.trim().toLowerCase()).digest('hex')
 }
 
-// app/api/ctf/submit/route.ts
-import 'server-only'
-import { hashFlag } from '@/lib/crypto'
-import { createServerClient } from '@/lib/supabase-server'
+// /api/ctf/submit — full flow
+const { data: challenge } = await supabaseAdmin
+  .from('ctf_challenges')
+  .select('id, points, flag_hash, is_active')  // explicit columns, no *
+  .eq('id', challengeId).eq('is_active', true).single()
 
-export async function POST(req: NextRequest) {
-  const member = await assertRole('member')
-  const { challengeId, flag } = submitFlagSchema.parse(await req.json())
-
-  // ✅ Use SERVICE ROLE client to fetch flag_hash (bypasses RLS)
-  // ✅ Never use the user's anon-key session for this
-  const supabaseAdmin = createServerClient()
-  const { data: challenge } = await supabaseAdmin
-    .from('ctf_challenges')
-    .select('id, points, flag_hash, is_active')  // ← explicit columns. No *.
-    .eq('id', challengeId)
-    .eq('is_active', true)
-    .single()
-
-  if (!challenge) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-
-  // ✅ Hash the user's submitted flag and compare — never send hash to client
-  const submittedHash = hashFlag(flag)
-  if (submittedHash !== challenge.flag_hash) {
-    return NextResponse.json({ correct: false }, { status: 200 })
-  }
-
-  // Insert solve — trigger handles points atomically
-  await supabaseAdmin.from('ctf_solves').insert({
-    challenge_id: challengeId,
-    member_id: member.id
-  })
-
-  return NextResponse.json({ correct: true })
+const submittedHash = hashFlag(flag)
+if (submittedHash !== challenge.flag_hash) {
+  await new Promise(r => setTimeout(r, 50))  // anti-timing
+  return NextResponse.json({ correct: false })
 }
+await supabaseAdmin.from('ctf_solves').insert({ challenge_id: challengeId, member_id: member.id })
+return NextResponse.json({ correct: true })
 ```
 
----
+### FIX 5 — Orphaned Auth Users ✅
+**Problem:** App-layer rollback fails on crash, leaving ghost auth users.  
+**Fix:** `trg_auth_user_created` creates `members` row atomically. `/api/auth/register` only UPDATES.
 
-### FIX 5 — Orphaned Auth User (Atomic Registration) ✅ RESOLVED VIA DB TRIGGER
+### FIX 6 — `club_post` Social Engineering ✅
+**Problem:** Client could submit `club_post: "Super Admin"`.  
+**Fix:** `club_post` hardcoded to `'General Member'` server-side. CHECK constraint enforces whitelist in DB.
 
-**Vulnerability:** Application created `auth.users` row, then tried to create `members` row. If the second step failed, an orphaned auth account remained.
+### FIX 7 — Server Client Used Wrong Key ✅
+**Problem:** `supabase-server.ts` used anon key, defeating RLS bypass.  
+**Fix:** Uses `SUPABASE_SERVICE_ROLE_KEY` + `import 'server-only'`.
 
-**Fix:** The `trg_auth_user_created` trigger in Section 7 creates the `members` row atomically inside Postgres whenever an `auth.users` row is inserted. No application-layer rollback needed.
+### FIX 8 — TypeScript `any` Contagion ✅
+**Problem:** `as any` everywhere, compiler blind to schema changes.  
+**Fix:** Both clients receive `Database` generic. Run `supabase gen types` after every schema change.
 
-The `/api/auth/register` route now only **updates** the existing members row with profile data (full_name, student_id, bio, skills) — it never inserts.
+### FIX 9 — Cookie Destruction on Ban ✅
+**Problem:** Cookie clearing didn't match path/domain, causing infinite redirect.  
+**Fix:** Uses `path: '/'` on all `sb-*` cookies. See middleware Section 10.5.
 
-```typescript
-// app/api/auth/register/route.ts
-// The members row already exists (created by DB trigger).
-// This route only updates profile fields.
-const { error } = await supabaseAdmin
-  .from('members')
-  .update({
-    full_name: parsed.data.full_name,
-    student_id: parsed.data.student_id,
-    bio: parsed.data.bio ?? null,
-    skills: parsed.data.skills ?? [],
-    // ✅ club_post ALWAYS defaults to 'General Member'. Client cannot set this.
-    club_post: 'General Member',
-  })
-  .eq('user_id', session.user.id)  // ← user_id
-```
-
----
-
-### FIX 6 — Social Engineering via `club_post` ✅ RESOLVED
-
-**Vulnerability:** Client could submit `club_post: "Super Admin"` on registration, making them appear as authority.
-
-**Fix (3-part):**
-- Database: `club_post` has a `CHECK` constraint with whitelist of valid values (see Section 7).
-- API: `club_post` is hardcoded to `'General Member'` in the registration route — never taken from client payload.
-- Zod schema: `club_post` is excluded from the registration schema entirely.
-
----
-
-### FIX 7 — Supabase Server Client Used Anon Key ✅ RESOLVED
-
-**Vulnerability:** `lib/supabase-server.ts` used `NEXT_PUBLIC_SUPABASE_ANON_KEY` instead of the service role key — completely defeating RLS bypass for admin operations.
-
-**Fix:** See corrected `lib/supabase-server.ts` in Section 10.3. Uses `SUPABASE_SERVICE_ROLE_KEY`. Also adds `import 'server-only'` to prevent client bundle inclusion.
-
----
-
-### FIX 8 — TypeScript `any` Contagion ✅ RESOLVED
-
-**Vulnerability:** `(supabase.from('ctf_challenges' as any) as any)` — completely blind to schema changes.
-
-**Fix:** Both client and server Supabase clients now receive the `Database` generic. Run `supabase gen types typescript --project-id YOUR_ID > types/database.ts` after every schema change. The types file is the contract.
-
-```typescript
-// ✅ CORRECT — full type safety, compiler catches column errors
-const { data } = await supabase
-  .from('ctf_challenges')  // TypeScript knows all columns here
-  .select('id, title, description, category, difficulty, points, flag_format, hint, file_url, solves_count, is_active')
-  .eq('is_active', true)
-```
-
----
-
-### FIX 9 — Cookie Destruction on Ban ✅ RESOLVED
-
-**Vulnerability:** Cookie clearing on ban didn't match the original `path`/`domain` options, causing infinite redirect loops.
-
-**Fix:** See corrected middleware in Section 10.5. Uses `path: '/'` on all Supabase cookies (`sb-*` prefix) and iterates all request cookies to clear them properly.
-
----
-
-### FIX 10 — Rate Limiting on All Public Endpoints ✅ IMPLEMENTED
-
-**Vulnerability:** Registration, flag submission, and contact form had no rate limiting — vulnerable to brute-force and quota exhaustion.
-
-**Fix:** See Section 17 for full Upstash Redis rate limiting implementation.
+### FIX 10 — No Rate Limiting ✅
+**Problem:** `/api/auth/register`, `/api/contact`, `/api/ctf/submit` open to bots.  
+**Fix:** Upstash Redis rate limiters. See Section 17.
 
 ---
 
@@ -1280,159 +1177,143 @@ const { data } = await supabase
 
 ### 12.1 Member Registration & Approval
 
-1. Visitor enters email at `/portal/login` → click "Send Magic Link"
-2. Resend delivers email (custom branded template)
-3. First-time: Supabase auth trigger creates `members` row automatically
-4. User redirected to `/portal/register` → fill: `full_name`, `student_id`, `bio`, `skills[]`
-5. Submit → API updates members row → status remains `pending`
-6. Redirect to `/portal/pending` — "Your application is under review."
-7. Admin approves in admin panel → `status = 'approved'` → welcome email sent via Resend
-8. Member can now access dashboard
+1. Visitor enters IIMS email → "Send Magic Link"
+2. Resend delivers branded email
+3. First login → DB trigger creates `pending` members row
+4. User fills `/portal/register`: `full_name`, `student_id`, `program`, `intake`, `bio`, `skills[]`
+5. Status stays `pending` → redirect `/portal/pending`
+6. Admin approves → `status = 'approved'` → welcome email via Resend
+7. Member accesses portal
 
 **Registration Zod Schema:**
 ```typescript
 export const registerSchema = z.object({
   full_name:  z.string().min(2).max(100).trim(),
   student_id: z.string().min(3).max(20).trim(),
+  program:    z.enum(['BCS', 'BBUS', 'BIHM', 'MBA', 'Other']),
+  intake:     z.string().max(20).optional(),
   bio:        z.string().max(500).optional(),
-  skills:     z.array(z.enum(['web','forensics','crypto','pwn','reversing','osint','misc'])).max(7),
-  // club_post is NOT in this schema — hardcoded server-side
+  skills:     z.array(z.string()).max(10),
+  // club_post is NOT in schema — hardcoded server-side as 'General Member'
 })
 ```
 
-### 12.2 Member Dashboard (`/portal/dashboard`)
-All data fetched in parallel server-side via `Promise.all()`:
-- Welcome banner: "Hello, [name]" + current date
+### 12.2 Dashboard (`/portal/dashboard`)
+Parallel server-side fetch via `Promise.all()`:
+- Welcome banner: "Hello, [name]" + program badge + membership date
 - 4 stat cards: Total members | Active CTF challenges | Upcoming events | Your rank
-- Last 3 pinned announcements
-- Next 2 events with RSVP button
-- CTF progress bar: N solved / total
-- Latest 3 unread notifications with "View all" link
+- 3 pinned announcements
+- Next 2 events with RSVP CTA
+- CTF progress: N solved / total challenges
+- Latest 3 unread notifications
 
 ### 12.3 Post Feed (`/portal/feed`)
-- Paginated 20/page, sorted by `is_pinned DESC, created_at DESC`
-- Post types: `announcement` (amber badge), `resource` (cyan badge), `post` (muted)
-- Markdown rendered via `MarkdownRenderer.tsx` (no raw HTML)
-- Reactions: toggle like (1 per member), live count via Realtime
-- Comments: expandable, 20/page, members delete own
-- Compose: members create `post`/`resource`. Admins create `announcement`.
-- Edit: author can edit own post (24h window enforced by RLS)
-- Admin: pin, delete any (with `ConfirmModal`)
-- Search: server-side `ilike` on `title || content`
+- 20/page, sorted by `is_pinned DESC, created_at DESC`
+- Post types: `announcement` (crimson badge), `resource` (navy badge), `project` (green badge), `post` (muted)
+- Markdown rendered via `MarkdownRenderer.tsx`
+- Reactions: toggle, live count via Realtime
+- Comments: expandable thread
+- Compose: members create `post`/`resource`/`project`. Admins create `announcement`.
+- Edit: 24h window (enforced by RLS)
+- Search: `ilike` server-side
 
 ### 12.4 Direct Messaging (`/portal/messages`)
-See Section 15 for Realtime setup. Layout:
-- Left panel (`w-72 border-r`): conversation list sorted by `updated_at DESC`
-  - Each item: avatar, name, last message (60 char), unread badge, relative time
-  - "New DM" button → member search modal
-- Right panel (`flex-1`): chat window
-  - Messages oldest→newest, auto-scroll on load/new message
-  - Self: right-aligned emerald bubble. Other: left-aligned dark bubble
-  - Timestamps on hover
-  - Soft delete own messages (shows `[message deleted]`)
-  - Input: textarea + Send (Ctrl+Enter)
-- Unread count badge on sidebar icon via `useNotifications`
+- Left panel: conversation list sorted `updated_at DESC` — avatar, name, snippet, unread badge
+- Right panel: chat thread oldest→newest, auto-scroll
+- Self: right-aligned navy bubble. Other: left-aligned grey bubble
+- Input: textarea + Send (Ctrl+Enter)
+- Realtime via `useRealtimeMessages(convId)`
 
-### 12.5 Notifications (`/portal/notifications`)
-- 30/page, newest first
-- Unread: `bg-[#00FF87]/5 border-l-2 border-[#00FF87]`
-- "Mark all read" button
-- Click → navigate to `link` + mark read
-- Live unread count on sidebar bell via Realtime
+### 12.5 CTF System (`/portal/ctf`)
+- Grid with category/difficulty filters
+- Difficulty colors: `easy`=green, `medium`=amber, `hard`=red, `insane`=red+bold
+- Solved cards: green "✓ SOLVED" badge
+- Challenge detail: Markdown description, code block sections use dark styling
+- `FlagSubmitForm.tsx`: uses JetBrains Mono, `IIMS{` prefix enforced client-side for UX
+- Server-side SHA256 comparison (Fix 4)
+- Leaderboard: rank / avatar / name / points / solved / last solve
 
-### 12.6 Documents (`/portal/documents`)
-- Category filter tabs: All | Study Material | Writeups | Presentations | Reports | Other
-- Cards: file-type icon, title, uploader, category badge, size, date, download count
-- Download: server-side signed URL (1hr expiry)
-- Upload: member uploads → `club-documents` bucket → metadata to DB
-- Admin: delete, toggle `is_public`, change category
-- Search: server-side `ilike` on `title || description`
+### 12.6 Events System
+**Public** (`/events`): published events, no RSVP → "Login to Join" CTA  
+**Portal** (`/portal/events`): RSVP toggle (going/maybe), meeting link visible  
+Types highlighted: CTF events (crimson), Hackathon (navy), Workshop (green)
+
+### 12.7 Documents (`/portal/documents`)
+- Category filter: All | Study Material | Writeups | Presentations | Projects | Reports
+- Server-side signed URL download (1hr expiry)
+- Upload: MIME-type validated, max 50MB
 - 20/page
 
-### 12.7 Events System
-**Public** (`/events`): published events only, no RSVP → "Login to RSVP" CTA
-**Portal** (`/portal/events`): RSVP toggle (going/maybe/not_going), meeting link visible, attendee list
-Event detail: full Markdown desc, attendee count, RSVP management
-Admin: full CRUD, publish toggle, cover image upload
+### 12.8 Member Profiles
+- Own: edit full_name, bio, program, avatar, github, linkedin, skills
+- Other: read-only, solved challenges list (titles only), recent posts, "Send DM" button
 
-### 12.8 CTF Challenges & Leaderboard
+### 12.9 Public Website Pages
 
-**Challenge Grid** (`/portal/ctf`):
-- Filter by category + difficulty (combinable)
-- Solved cards: emerald `✓ SOLVED` overlay
-- Difficulty colors: `easy`=emerald, `medium`=amber, `hard`=red, `insane`=red+pulse
+**Homepage (`/`):**
+- Navy hero: "IIMS IT Club — Code. Build. Innovate." + IIMS logo + "Part of IIMS College"
+- Stats bar: Members / Events / CTF Solves / Years Active
+- Featured events (3 most recent published)
+- Club highlights / recent news cards
+- IIMS Affiliation strip: Taylor's University logo + IIMS programs list
+- Team/committee section with cards
+- "Join the Club" CTA → `/portal/login`
 
-**Challenge Detail** (`/portal/ctf/[id]`):
-- Markdown description, points, category, difficulty
-- File download if attached (signed URL)
-- "Show Hint" toggle
-- `FlagSubmitForm.tsx`: enforces `IIMS{` prefix client-side for UX
-- POST `/api/ctf/submit` → server SHA256 comparison (Fix 4)
-- Success: Toast "🏴 Flag captured! +[N] points"
-- Wrong: Toast error (no timing difference to prevent timing attacks — always add a 50ms artificial delay)
-- Already solved: static "✓ Already Solved" display
+**About (`/about`):**
+- Mission statement
+- IIMS College affiliation section with logo
+- Links to https://iimscollege.edu.np/it-club/ and https://iimscollege.edu.np/capture-the-flag/
+- Team cards (from admin-managed data)
+- Gallery grid (from `public-gallery` bucket)
 
-**Leaderboard** (`/portal/leaderboard`):
-- Columns: Rank | Avatar | Name | Points | Solved | Last Solve
-- Row 1: gold. Row 2: silver. Row 3: bronze. (CSS classes from Section 4.3)
-- Your row: always emerald left border
-- 20/page
+**Events (`/events`):**
+- Published events grid, filterable by type
+- Navy card headers, crimson CTA buttons
 
-### 12.9 Member Profiles
-**Own** (`/portal/profile`): edit full_name, bio, avatar, github, linkedin, skills
-**Other** (`/portal/members/[id]`): read-only, solved challenge list (titles only), recent posts, "Send DM" button
-
-### 12.10 Public Website
-- **Homepage** `/`: Terminal-style hero with typewriter animation, stats bar, 3 featured events, admin team section, IIMS affiliation strip
-- **About** `/about`: Mission, team cards, gallery, link to https://iimscollege.edu.np/capture-the-flag/
-- **Events** `/events`: Published events grid
-- **Contact** `/contact`: Rate-limited form → `contact_messages` + Resend notification
+**Contact (`/contact`):**
+- Rate-limited form → `contact_messages` + Resend admin notification
+- IIMS contact info in sidebar
 
 ---
 
 ## 13. ADMIN PANEL SPECIFICATION
 
-Route: `/portal/admin` — `admin` or `superadmin` role required (checked server-side in layout.tsx).
+Route: `/portal/admin` — `admin` or `superadmin` role required (server-side check in layout.tsx).
 
 ### 13.1 Tabs (13 Total)
 
 | # | Tab | Key Features |
 |---|---|---|
-| 1 | **Overview** | Live stats cards + pending approvals count |
-| 2 | **Pending** | Fast-access view of `status=pending` members |
-| 3 | **Members** | Paginated (20/pg), filter by status, Approve/Reject/Ban, CSV Export |
-| 4 | **Posts** | Paginated, pin/unpin, delete, create announcement |
+| 1 | **Overview** | Live stat cards + pending count alert |
+| 2 | **Pending** | Fast-access `status=pending` queue + bulk approve |
+| 3 | **Members** | Paginated (20/pg), filter by status/program, Approve/Reject/Ban, CSV Export |
+| 4 | **Posts** | Pin/unpin, delete, create announcement |
 | 5 | **Events** | Create/Edit/Delete (Zod-validated), publish toggle, RSVP list |
-| 6 | **Documents** | Upload, manage, toggle `is_public`, delete |
+| 6 | **Documents** | Upload, delete, toggle `is_public`, category management |
 | 7 | **CTF** | Create/edit challenges (flag auto-hashed on save), activate/deactivate |
-| 8 | **Leaderboard** | Read-only view + manual point adjustment (logged to audit_logs) |
+| 8 | **Leaderboard** | Read-only + manual point adjustment (logged to audit_logs) |
 | 9 | **Gallery** | Upload to `public-gallery`, tag to event, delete |
 | 10 | **Broadcast** | Compose → INSERT notifications for all approved members |
-| 11 | **Contact** | View/mark-read contact form messages |
+| 11 | **Contact** | View/mark-read contact form submissions |
 | 12 | **Audit Logs** | Paginated (30/pg), filter by action type |
 | 13 | **Settings** | Edit `site_settings` key-value pairs |
 
 ### 13.2 Admin Interaction Standards
-
 - All deletes: `ConfirmModal.tsx` — "This cannot be undone"
-- All async buttons: `disabled` + `"PROCESSING..."` + `<Loader2 className="animate-spin" />`
-- Success: Toast `border-[#00FF87]`
-- Error: Toast `border-[#FF3333]`
-- Every admin action: INSERT into `audit_logs` with `{ admin_id, action, target_id, meta }`
-- Pagination: `.range(from, to)` — 20 records per page
+- All async buttons: `disabled` + `"Processing..."` + `<Loader2 className="animate-spin" />`
+- Every admin action: INSERT into `audit_logs`
+- Success/error: Toast notifications
 
-### 13.3 CTF Challenge Creation (Flag Hashing)
+### 13.3 CTF Flag Hashing in Admin
 
 ```typescript
-// In AdminCTFTab.tsx — POST to /api/admin/ctf
-// The raw flag is hashed in the API route, NEVER stored raw
-// API route:
+// /api/admin/ctf — flag hashed here, NEVER stored raw
 const parsed = createChallengeSchema.parse(body)
-const flagHash = hashFlag(parsed.raw_flag)  // SHA256 in lib/crypto.ts
+const flagHash = hashFlag(parsed.raw_flag)
 await supabaseAdmin.from('ctf_challenges').insert({
   ...parsed,
   flag_hash: flagHash,
-  raw_flag: undefined,  // NEVER insert raw_flag
+  raw_flag: undefined,
 })
 ```
 
@@ -1440,24 +1321,24 @@ await supabaseAdmin.from('ctf_challenges').insert({
 
 ## 14. API ROUTES REFERENCE
 
-| Method | Route | Auth | Zod Validated | Description |
+| Method | Route | Auth | Zod | Description |
 |---|---|---|---|---|
-| `POST` | `/api/contact` | Public | ✅ | Rate-limited contact form |
-| `POST` | `/api/auth/register` | Session | ✅ | Update member profile (trigger created row) |
-| `GET` | `/api/admin/members` | Admin | — | List with filter + pagination |
-| `PATCH` | `/api/admin/members` | Admin | ✅ | Update status / role |
+| `POST` | `/api/contact` | Public | ✅ | Rate-limited contact |
+| `POST` | `/api/auth/register` | Session | ✅ | Update profile (trigger created row) |
+| `GET` | `/api/admin/members` | Admin | — | Paginated member list |
+| `PATCH` | `/api/admin/members` | Admin | ✅ | Update status/role |
 | `POST` | `/api/admin/events` | Admin | ✅ | Create event |
 | `PATCH` | `/api/admin/events` | Admin | ✅ | Update event |
 | `DELETE` | `/api/admin/events` | Admin | ✅ | Delete event |
-| `POST` | `/api/admin/ctf` | Admin | ✅ | Create challenge (hash flag) |
+| `POST` | `/api/admin/ctf` | Admin | ✅ | Create challenge + hash flag |
 | `PATCH` | `/api/admin/ctf` | Admin | ✅ | Update challenge |
 | `DELETE` | `/api/admin/ctf` | Admin | ✅ | Delete challenge |
 | `POST` | `/api/admin/broadcast` | Admin | ✅ | Bulk notification |
-| `GET` | `/api/admin/export-csv` | Admin | — | Stream approved members CSV |
+| `GET` | `/api/admin/export-csv` | Admin | — | Stream members CSV |
 | `PATCH` | `/api/admin/settings` | Superadmin | ✅ | Update site_settings |
 | `GET` | `/api/messages` | Member | — | List conversations |
 | `POST` | `/api/messages` | Member | ✅ | Start conversation |
-| `GET` | `/api/messages/[id]` | Member | — | Fetch messages (paginated) |
+| `GET` | `/api/messages/[id]` | Member | — | Fetch messages |
 | `POST` | `/api/messages/[id]` | Member | ✅ | Send message |
 | `GET` | `/api/notifications` | Member | — | List notifications |
 | `PATCH` | `/api/notifications` | Member | ✅ | Mark read |
@@ -1468,12 +1349,12 @@ await supabaseAdmin.from('ctf_challenges').insert({
 
 ## 15. REAL-TIME FEATURES
 
-Enable in **Supabase Dashboard → Database → Replication → Tables**.
+Enable in **Supabase Dashboard → Database → Replication → Supabase Realtime**.
 
 | Table | Events | Hook | Consumer |
 |---|---|---|---|
 | `messages` | `INSERT` | `useRealtimeMessages(convId)` | Chat window |
-| `notifications` | `INSERT` | `useNotifications(memberId)` | Sidebar bell |
+| `notifications` | `INSERT` | `useNotifications(memberId)` | Sidebar bell + topbar |
 | `post_reactions` | `INSERT`, `DELETE` | Inline in `PostCard.tsx` | Like count |
 
 ```typescript
@@ -1509,25 +1390,22 @@ export function useRealtimeMessages(conversationId: string, initial: Message[]) 
 
 ## 16. EMAIL TEMPLATES (Resend)
 
-`from`: `"IIMS Cybersecurity Club <noreply@iimscollege.edu.np>"`
+`from`: `"IIMS IT Club <noreply@iimscollege.edu.np>"`  
+All emails: navy `#1A237E` header, IIMS logo, crimson CTA buttons.
 
 | Email | Trigger | Subject |
 |---|---|---|
-| Magic Link | Login | `[IIMS CyberSec] Your secure login link` |
-| Welcome | Member approved | `Welcome to IIMS Cybersecurity Club 🛡️` |
-| Rejection | Admin rejects | `Your application — IIMS Cybersecurity Club` |
-| Ban | Admin bans | `Account suspended — IIMS Cybersecurity Club` |
-| Event Reminder | 24h before RSVP | `Reminder: [Event] is tomorrow` |
-| Contact Confirm | Form submitted | `We received your message` |
+| Magic Link | Login attempt | `[IIMS IT Club] Your secure login link` |
+| Welcome | Admin approves | `Welcome to IIMS IT Club! 🎉` |
+| Rejection | Admin rejects | `Your application — IIMS IT Club` |
+| Ban | Admin bans | `Account suspended — IIMS IT Club` |
+| Event Reminder | 24h before RSVP | `Reminder: [Event Name] is tomorrow` |
+| Contact Confirm | Form submitted | `We received your message — IIMS IT Club` |
 | Admin Alert | New pending member | `[Action Required] New member application` |
-
-All templates styled with IIMS Maroon (`#8B1A1A`) header and college logo.
 
 ---
 
 ## 17. RATE LIMITING STRATEGY
-
-Using `@upstash/ratelimit` + `@upstash/redis`.
 
 ```typescript
 // lib/ratelimit.ts
@@ -1540,54 +1418,10 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 })
 
-// Different limiters for different endpoints
-export const contactFormLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(3, '1 h'),   // 3 submissions/IP/hour
-  prefix: 'rl:contact',
-})
-
-export const flagSubmitLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(10, '1 m'),   // 10 attempts/IP/minute
-  prefix: 'rl:ctf',
-})
-
-export const registerLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(5, '1 h'),    // 5 registrations/IP/hour
-  prefix: 'rl:register',
-})
-
-export const magicLinkLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(3, '15 m'),   // 3 magic links/IP/15min
-  prefix: 'rl:magiclink',
-})
-```
-
-```typescript
-// Usage in any API route
-import { flagSubmitLimiter } from '@/lib/ratelimit'
-
-const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1'
-const { success, limit, remaining, reset } = await flagSubmitLimiter.limit(ip)
-
-if (!success) {
-  return NextResponse.json(
-    { error: 'Too many requests. Slow down.' },
-    {
-      status: 429,
-      headers: {
-        'X-RateLimit-Limit': limit.toString(),
-        'X-RateLimit-Remaining': remaining.toString(),
-        'X-RateLimit-Reset': reset.toString(),
-      }
-    }
-  )
-}
-// Also add artificial 50ms delay on CTF flag submissions to prevent timing attacks
-await new Promise(r => setTimeout(r, 50))
+export const contactFormLimiter  = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '1 h'),   prefix: 'rl:contact' })
+export const flagSubmitLimiter   = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '1 m'),  prefix: 'rl:ctf' })
+export const registerLimiter     = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '1 h'),   prefix: 'rl:register' })
+export const magicLinkLimiter    = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '15 m'),  prefix: 'rl:magiclink' })
 ```
 
 ---
@@ -1595,37 +1429,29 @@ await new Promise(r => setTimeout(r, 50))
 ## 18. CODING RULES & STANDARDS
 
 ### Security (Non-Negotiable)
-- `lib/supabase-server.ts` uses `SUPABASE_SERVICE_ROLE_KEY` (no `NEXT_PUBLIC_` prefix) + `import 'server-only'`
-- `lib/resend.ts` uses `import 'server-only'`
-- `lib/ratelimit.ts` uses `import 'server-only'`
-- `lib/crypto.ts` uses `import 'server-only'`
-- CTF `flag_hash` column: NEVER in any client-facing SELECT. Always use explicit column lists.
-- All admin routes: `await assertRole('admin')` is the FIRST line before any logic
-- All role checks: `.eq('user_id', session.user.id)` — never `.eq('id', session.user.id)`
-- `club_post` always hardcoded server-side. Never from client payload.
+- `lib/supabase-server.ts`, `lib/resend.ts`, `lib/ratelimit.ts`, `lib/crypto.ts` — all have `import 'server-only'`
+- `SUPABASE_SERVICE_ROLE_KEY` — never prefixed with `NEXT_PUBLIC_`
+- `flag_hash` — never in any client-facing SELECT. Always explicit columns.
+- All admin routes: `await assertRole('admin')` is FIRST line before any logic
+- All auth checks: `.eq('user_id', session.user.id)` — NEVER `.eq('id', ...)`
+- `club_post` always hardcoded server-side — never from client
 
 ### TypeScript
 - No `any`. No `as any`. Use `unknown` and narrow.
-- All Supabase clients receive `Database` generic: `createClient<Database>(...)`
-- All API handlers return `NextResponse<T | { error: string }>`
+- All Supabase clients: `createClient<Database>(...)`
 - Run `supabase gen types typescript` after every schema change
 
-### UI / UX
+### UI/UX
 - Never `window.alert()` / `window.confirm()` — use `Modal.tsx` / `Toast.tsx`
-- Every async button: `disabled` + `"PROCESSING..."` + `<Loader2 className="animate-spin" />`
+- Every async button: `disabled` + `"Processing..."` + `<Loader2 className="animate-spin" />`
 - Every loading state: `<Skeleton />` placeholders
-- Empty states: descriptive message + CTA (never blank)
+- Empty states: descriptive message + CTA
 
 ### Data Fetching
 - Never `.select('*')` — always explicit column lists
 - `.range(from, to)` for all paginated queries (max 20 records)
 - No client-side filtering for > 50 rows
-- Wrap all DB calls in `try/catch` with `if (error) throw error`
 - All server components: parallel fetch via `Promise.all()`
-
-### Forms
-- All inputs validated with Zod (same schema on client and server)
-- Validation errors: inline field-level (not just a global toast)
 
 ---
 
@@ -1633,163 +1459,142 @@ await new Promise(r => setTimeout(r, 50))
 
 | Rule | Implementation |
 |---|---|
-| Paginate all lists | `.range(from, to)` — default 20 records |
-| Index all FK columns | All done in Section 7 schema |
-| Atomic DB operations | Points via trigger, never app-layer math |
-| Image optimization | Next.js `<Image />` with explicit dimensions |
-| Server Components | Default. `'use client'` only when required |
+| Paginate all lists | `.range(from, to)` — 20 records default |
+| Index all FK columns | Done in Section 7 |
+| Atomic DB operations | Points via trigger only |
+| Image optimization | `<Image />` with explicit dimensions |
+| Server Components default | `'use client'` only when required |
 | Parallel data fetch | `Promise.all()` in server components |
 | Public data cache | `next: { revalidate: 60 }` on public routes |
 | Realtime scoping | Subscribe to specific IDs — never whole tables |
-| Type generation | `supabase gen types` after every schema migration |
 | No N+1 queries | Use Supabase embedded select for related data |
 
 ---
 
 ## 20. IMPLEMENTATION PLAN (ORDERED BUILD SEQUENCE)
 
-Follow this exact sequence. Never skip ahead. Each phase is a deployable checkpoint.
+### PHASE 0 — Bootstrap (Day 1)
+- [ ] `npx create-next-app@latest iims-it-club --typescript --tailwind --app`
+- [ ] Install: `@supabase/supabase-js @supabase/ssr zod date-fns lucide-react react-markdown remark-gfm resend @upstash/ratelimit @upstash/redis server-only`
+- [ ] Create `.env.local` (Section 6)
+- [ ] `app/layout.tsx`: Inter + JetBrains Mono via `next/font/google`
+- [ ] `globals.css`: Tailwind directives + custom scrollbar (navy thumb)
+- [ ] `lib/supabase.ts` (browser client with Database generic)
+- [ ] `lib/supabase-server.ts` (service role + import 'server-only')
 
-### PHASE 0 — Project Bootstrap (Day 1)
-- [ ] `npx create-next-app@latest iims-cyber-club --typescript --tailwind --app`
-- [ ] Install dependencies: `supabase`, `@supabase/ssr`, `zod`, `date-fns`, `lucide-react`, `react-markdown`, `remark-gfm`, `resend`, `@upstash/ratelimit`, `@upstash/redis`, `server-only`
-- [ ] Set up `types/database.ts` (initial empty scaffold)
-- [ ] Create `.env.local` with all variables from Section 6
-- [ ] Configure `next/font/google` for JetBrains Mono + Inter in `app/layout.tsx`
-- [ ] Set up `globals.css` with Tailwind directives and custom scrollbar
-- [ ] Create `lib/supabase.ts` (browser client with `Database` generic)
-- [ ] Create `lib/supabase-server.ts` (service role client with `import 'server-only'`)
+### PHASE 1 — Database (Day 1-2)
+- [ ] Run complete SQL schema from Section 7
+- [ ] Verify triggers: `trg_auth_user_created` + `trg_ctf_solve`
+- [ ] Enable RLS on all tables, apply all policies from Section 9
+- [ ] Create 5 storage buckets (Section 8)
+- [ ] `supabase gen types typescript > types/database.ts`
 
-### PHASE 1 — Database Setup (Day 1-2)
-- [ ] Run complete SQL schema from Section 7 in Supabase SQL Editor
-- [ ] Verify all triggers: `trg_auth_user_created` + `trg_ctf_solve`
-- [ ] Enable RLS on all tables
-- [ ] Apply all RLS policies from Section 9
-- [ ] Create all 5 storage buckets from Section 8 with correct visibility
-- [ ] Run `supabase gen types typescript --project-id YOUR_ID > types/database.ts`
-
-### PHASE 2 — Design System Foundation (Day 2)
-- [ ] Create all UI primitives: `Modal.tsx`, `ConfirmModal.tsx`, `Toast.tsx`, `ToastProvider.tsx`
-- [ ] Create `Skeleton.tsx`, `Badge.tsx`, `Avatar.tsx`, `Pagination.tsx`
-- [ ] Create `MarkdownEditor.tsx`, `MarkdownRenderer.tsx`
+### PHASE 2 — Design System (Day 2)
+- [ ] `Modal.tsx`, `ConfirmModal.tsx`, `Toast.tsx`, `ToastProvider.tsx`
+- [ ] `Skeleton.tsx`, `Badge.tsx`, `Avatar.tsx`, `Pagination.tsx`
+- [ ] `MarkdownEditor.tsx`, `MarkdownRenderer.tsx`
 - [ ] Wire `ToastProvider` into `app/layout.tsx`
-- [ ] Create `lib/utils.ts` with `cn()`, `formatDate()`, `truncate()`
+- [ ] `lib/utils.ts`: `cn()`, `formatDate()`, `truncate()`
 
-### PHASE 3 — Authentication & Security Core (Day 3)
-- [ ] Implement `middleware.ts` from Section 10.5 (exact cookie handling)
-- [ ] Create `lib/auth.ts` with `assertRole()` using `.eq('user_id', ...)` pattern
-- [ ] Create `lib/crypto.ts` with `hashFlag()` + `import 'server-only'`
-- [ ] Create `lib/ratelimit.ts` with all 4 limiters from Section 17
-- [ ] Create `lib/validations.ts` with all Zod schemas
-- [ ] Build `/portal/login` page (magic link send form + rate limiting)
-- [ ] Build `/portal/register` page (profile completion)
-- [ ] Build `/portal/pending` page
-- [ ] **VERIFY:** Auth trigger creates members row on new user
-- [ ] **VERIFY:** `assertRole()` correctly uses `user_id`, not `id`
+### PHASE 3 — Auth & Security Core (Day 3)
+- [ ] `middleware.ts` (Section 10.5 — exact cookie handling)
+- [ ] `lib/auth.ts` with `assertRole()` using `.eq('user_id', ...)`
+- [ ] `lib/crypto.ts` with `hashFlag()` + `import 'server-only'`
+- [ ] `lib/ratelimit.ts` (Section 17)
+- [ ] `lib/validations.ts` (all Zod schemas)
+- [ ] `/portal/login`, `/portal/register`, `/portal/pending` pages
+- [ ] **VERIFY:** Auth trigger creates members row
+- [ ] **VERIFY:** `assertRole()` uses `user_id` not `id`
 
-### PHASE 4 — Portal Shell & Dashboard (Day 4)
-- [ ] Build `Sidebar.tsx` with all nav items + notification/message badge placeholders
-- [ ] Build `portal/layout.tsx` auth gate
-- [ ] Build `/portal/dashboard` with parallel server-side data fetch
+### PHASE 4 — Portal Shell (Day 4)
+- [ ] `Sidebar.tsx` (white, IIMS IT Club branding, nav items, badges)
+- [ ] `Topbar.tsx` (white, search, notifications bell, profile)
+- [ ] `portal/layout.tsx` auth gate
+- [ ] `/portal/dashboard` with parallel data fetch
 
-### PHASE 5 — Post Feed (Day 5)
-- [ ] Build `PostCard.tsx` (markdown rendering, reaction toggle, comment expand)
-- [ ] Build `PostComposer.tsx` with `MarkdownEditor.tsx`
-- [ ] Build `/portal/feed` page with pagination
-- [ ] Wire Realtime for post reactions
+### PHASE 5 — Feed (Day 5)
+- [ ] `PostCard.tsx`, `PostComposer.tsx`
+- [ ] `/portal/feed` with pagination
+- [ ] Realtime for post reactions
 
 ### PHASE 6 — CTF System (Day 6-7) ← HIGHEST SECURITY PRIORITY
-- [ ] Build `CTFChallengeCard.tsx`
-- [ ] Build `FlagSubmitForm.tsx` (client-side prefix validation only)
-- [ ] Build `/api/ctf/submit` route with:
-  - `assertRole('member')`
-  - `flagSubmitLimiter` rate limiting
-  - Artificial 50ms delay (anti-timing)
-  - Service role client for `flag_hash` fetch
-  - SHA256 comparison in `lib/crypto.ts`
-  - Insert into `ctf_solves` only (trigger handles points)
-- [ ] Build `/portal/ctf` page + `/portal/ctf/[id]` page
-- [ ] Build `LeaderboardTable.tsx`
-- [ ] Build `/portal/leaderboard` page
-- [ ] **VERIFY:** Flag cannot be extracted via browser console
-- [ ] **VERIFY:** Concurrent flag submissions don't double-award points
+- [ ] `CTFChallengeCard.tsx`, `FlagSubmitForm.tsx`
+- [ ] `/api/ctf/submit` (rate limit + 50ms delay + SHA256 + trigger-only points)
+- [ ] `/portal/ctf` grid + `/portal/ctf/[id]` detail
+- [ ] `LeaderboardTable.tsx`, `/portal/leaderboard`
+- [ ] **VERIFY:** flag_hash unreachable client-side
+- [ ] **VERIFY:** Concurrent submissions don't double-award points
 
 ### PHASE 7 — Direct Messaging (Day 8)
-- [ ] Build `ConversationList.tsx`, `MessageThread.tsx`
-- [ ] Build `/portal/messages` layout
-- [ ] Build `/api/messages` routes
-- [ ] Implement `useRealtimeMessages` hook
-- [ ] Implement `useNotifications` hook + wire sidebar badge
+- [ ] `ConversationList.tsx`, `MessageThread.tsx`
+- [ ] `/portal/messages` + `/api/messages` routes
+- [ ] `useRealtimeMessages` hook
+- [ ] `useNotifications` hook + sidebar badge
 
 ### PHASE 8 — Notifications, Documents, Events (Day 9-10)
-- [ ] Build `/portal/notifications` page + `NotificationItem.tsx`
-- [ ] Build `/portal/documents` page + upload flow
-- [ ] Build `/portal/events` + `/portal/events/[id]` pages + RSVP API
-- [ ] Wire event reminder email scheduling (Vercel cron or Supabase pg_cron)
+- [ ] `/portal/notifications` + `NotificationItem.tsx`
+- [ ] `/portal/documents` + upload flow
+- [ ] `/portal/events` + `/portal/events/[id]` + RSVP API
 
 ### PHASE 9 — Member Profiles (Day 11)
-- [ ] Build `/portal/profile` (edit own)
-- [ ] Build `/portal/members/[id]` (view others)
-- [ ] Avatar upload to `team-avatars` bucket
+- [ ] `/portal/profile` (edit own)
+- [ ] `/portal/members/[id]` (view others)
+- [ ] Avatar upload to `team-avatars`
 
 ### PHASE 10 — Admin Panel (Day 12-14)
-- [ ] Build admin panel tab shell in `/portal/admin/page.tsx`
-- [ ] Build each tab component (13 tabs) from Section 13.1
-- [ ] **VERIFY all admin routes:** Every route has Zod validation + `assertRole('admin')` as first line
-- [ ] **VERIFY:** `flag_hash` never exposed in CTF admin tab
-- [ ] Test CSV export
-- [ ] Test broadcast notification
+- [ ] Admin tab shell at `/portal/admin/page.tsx`
+- [ ] All 13 tab components
+- [ ] **VERIFY:** All admin routes have Zod + `assertRole('admin')` as first line
+- [ ] Test CSV export, broadcast notification, audit logs
 
 ### PHASE 11 — Public Website (Day 15-16)
-- [ ] Build public `Navbar.tsx` with IIMS logo + affiliation
-- [ ] Build `Footer.tsx` with IIMS College link
-- [ ] Build `HeroSection.tsx` with terminal typewriter animation
-- [ ] Build `/` (homepage), `/about`, `/events`, `/contact`
-- [ ] Wire `/api/contact` with `contactFormLimiter`
+- [ ] `Navbar.tsx` (navy, IIMS logo + IT Club)
+- [ ] `Footer.tsx` (navy, IIMS affiliation)
+- [ ] `HeroSection.tsx` (navy hero + IIMS stats)
+- [ ] `IIMSAffiliationStrip.tsx` (Taylor's + IIMS logos)
+- [ ] `/`, `/about`, `/events`, `/contact`
+- [ ] `/api/contact` with rate limiting
 
-### PHASE 12 — Hardening & Launch (Day 17-18)
-- [ ] Complete all items in **Security Checklist** (Section 21)
-- [ ] Run `supabase gen types typescript` one final time
-- [ ] Audit all Supabase SELECT statements for explicit column lists
-- [ ] Test all 4 rate limiters with load
-- [ ] Verify all admin routes reject non-admins
-- [ ] Verify `flag_hash` is unreachable client-side
-- [ ] Test cookie clearing on banned user (no infinite redirect)
-- [ ] Set `NEXT_PUBLIC_SITE_URL` to Vercel production URL
+### PHASE 12 — Hardening & Deploy (Day 17-18)
+- [ ] Complete Security Checklist (Section 21)
+- [ ] Run `supabase gen types` one final time
+- [ ] Audit all SELECTs for explicit column lists
+- [ ] Load test all 4 rate limiters
+- [ ] Verify `flag_hash` unreachable from browser
+- [ ] Test ban cookie clearing (no infinite redirect)
+- [ ] Set `NEXT_PUBLIC_SITE_URL` to Vercel production domain
 - [ ] Deploy to Vercel
 
 ---
 
 ## 21. SECURITY CHECKLIST
 
-Before every deploy, verify each item:
-
 **Authentication & Authorization**
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` does NOT have `NEXT_PUBLIC_` prefix
-- [ ] `lib/supabase-server.ts` has `import 'server-only'` at top
-- [ ] All admin API routes: `assertRole('admin')` is the first line
-- [ ] All role/member checks use `.eq('user_id', session.user.id)` — NEVER `.eq('id', ...)`
-- [ ] Middleware correctly handles ban cookie clearing (no infinite redirect)
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` has NO `NEXT_PUBLIC_` prefix
+- [ ] `lib/supabase-server.ts` has `import 'server-only'`
+- [ ] All admin API routes: `assertRole('admin')` is first line
+- [ ] All role/auth checks use `.eq('user_id', session.user.id)` — never `.eq('id', ...)`
+- [ ] Banned user cookie clearing works (no infinite redirect)
 
 **CTF Security**
-- [ ] Column is named `flag_hash`, not `flag`
-- [ ] `flag_hash` column NOT in any client-facing SELECT (zero occurrences of `flag_hash` in any `/portal/` page or `'use client'` component)
+- [ ] Column named `flag_hash` not `flag`
+- [ ] `flag_hash` NOT in any `'use client'` component or portal page SELECT
 - [ ] `/api/ctf/submit` uses service role client for flag fetch
-- [ ] CTF solve trigger (`trg_ctf_solve`) is active in Supabase
-- [ ] 50ms artificial delay on flag submission (anti-timing attack)
-- [ ] Rate limiting active on `/api/ctf/submit`
+- [ ] `trg_ctf_solve` trigger is active in Supabase
+- [ ] 50ms artificial delay on flag submission
+- [ ] Rate limiting on `/api/ctf/submit`
 
 **Database**
-- [ ] RLS enabled on ALL tables (verify in Supabase Dashboard → Authentication → Policies)
-- [ ] Auth trigger (`trg_auth_user_created`) is active
-- [ ] `club_post` CHECK constraint in place (no self-promotion via API)
-- [ ] `members.points` never written by application code (trigger only)
+- [ ] RLS enabled on ALL tables
+- [ ] `trg_auth_user_created` trigger active
+- [ ] `club_post` CHECK constraint in place
+- [ ] `members.points` never written by application code
 
 **Storage**
 - [ ] `club-documents` bucket is PRIVATE
 - [ ] `ctf-files` bucket is PRIVATE
-- [ ] Signed URL generation is server-side only
-- [ ] File MIME type validated server-side in upload route
+- [ ] Signed URL generation server-side only
+- [ ] File MIME type validated server-side
 
 **Rate Limiting**
 - [ ] `/api/contact` — `contactFormLimiter` active
@@ -1798,15 +1603,15 @@ Before every deploy, verify each item:
 - [ ] `/portal/login` — `magicLinkLimiter` active
 
 **Data Safety**
-- [ ] Zero occurrences of `.select('*')` on growing tables
-- [ ] All admin mutations validated with Zod
-- [ ] `supabase gen types` has been run after last schema change
-- [ ] Zero `any` TypeScript types in codebase
+- [ ] Zero `.select('*')` on growing tables
+- [ ] All admin mutations Zod-validated
+- [ ] `supabase gen types` run after last schema change
+- [ ] Zero `any` TypeScript types
 
 **Infrastructure**
-- [ ] `NEXT_PUBLIC_SITE_URL` = actual Vercel production domain
-- [ ] Magic Link redirect URL whitelisted in Supabase Auth settings
-- [ ] `RESEND_FROM_EMAIL` uses `iimscollege.edu.np` domain
+- [ ] `NEXT_PUBLIC_SITE_URL` = actual Vercel domain
+- [ ] Magic Link redirect URL whitelisted in Supabase Auth
+- [ ] `RESEND_FROM_EMAIL` uses `iimscollege.edu.np`
 - [ ] No `console.log` with sensitive data
 
 ---
@@ -1815,33 +1620,38 @@ Before every deploy, verify each item:
 
 | ✅ DO | ❌ DON'T |
 |---|---|
+| Use IIMS Navy `#1A237E` for primary surfaces | Use dark/black backgrounds as primary |
+| Use IIMS Crimson `#E53935` for CTAs | Use generic blue or green as primary CTA |
+| White card surfaces, clean borders | Dark card surfaces as default |
+| JetBrains Mono ONLY for code/CTF | JetBrains Mono as primary UI font |
+| Show IIMS logo + affiliation on all public pages | Omit IIMS College branding |
+| Link footer to https://iimscollege.edu.np/ | Omit institutional affiliation |
 | `import 'server-only'` in all server libs | Let server code leak to client bundle |
 | `.eq('user_id', session.user.id)` | `.eq('id', session.user.id)` — wrong field! |
-| Use `assertRole()` as first line in every admin route | Check roles inline or after other logic |
-| Use Zod on EVERY admin mutation | Pass raw `req.json()` to Supabase |
-| Store `flag_hash` (SHA256) only | Store or transmit raw CTF flags |
-| Use service role client for flag comparison | Use user's anon client to fetch flag_hash |
-| Let DB trigger update `members.points` | Write points from application code |
-| `trg_auth_user_created` trigger creates member row | Rollback in application code |
-| Hardcode `club_post: 'General Member'` server-side | Trust `club_post` from client payload |
-| Add 50ms delay to flag submission | Return immediate timing-based responses |
-| Rate-limit ALL public endpoints | Leave registration/CTF endpoints open |
-| Clear ALL `sb-*` cookies on ban (path: '/') | Set maxAge:0 without matching options |
-| Use explicit column lists in every SELECT | Use `.select('*')` on any table |
-| Use `createClient<Database>(...)` generic | Use `as any` to bypass TypeScript |
-| Use `bg-[#0A0A0F]` for surfaces | Use `bg-white`, `bg-gray-*` |
-| Use `Toast.tsx` for alerts | Use `window.alert()` |
-| Use `ConfirmModal.tsx` for deletes | Use `window.confirm()` |
-| Show `<Skeleton />` while loading | Leave blank white space |
-| Show `disabled + PROCESSING... + Loader2` | Leave buttons active during async ops |
-| Use `next/font/google` for fonts | Use `<link>` tags in HTML |
-| Use `<Image />` from Next.js | Use raw `<img>` tags |
-| Use Lucide React icons | Use emojis as UI elements |
-| Write all files as `.tsx` / `.ts` | Create `.js` or `.jsx` files |
-| Run `supabase gen types` after schema changes | Keep stale type definitions |
-| Include IIMS logo + affiliation in all public pages | Omit college branding from public site |
-| Link footer to https://iimscollege.edu.np/ | Omit institutional affiliation |
+| `assertRole('admin')` as first line in admin routes | Check roles after other logic |
+| Zod validate EVERY admin mutation | Pass raw `req.json()` to Supabase |
+| Store `flag_hash` (SHA256 only) | Store or transmit raw CTF flags |
+| Use service role to fetch `flag_hash` | Use user's anon client to fetch flag |
+| DB trigger updates `members.points` | Write points from application code |
+| DB trigger creates `members` row on auth | Multi-step app-layer rollback |
+| Hardcode `club_post: 'General Member'` server-side | Trust `club_post` from client |
+| 50ms delay on flag submission | Return immediate timing-based response |
+| Rate-limit ALL public endpoints | Leave register/CTF/contact open |
+| Clear ALL `sb-*` cookies on ban (path: '/') | Clear cookies without matching path |
+| Explicit column lists in every SELECT | `.select('*')` on any table |
+| `createClient<Database>(...)` with generic | `as any` to bypass TypeScript |
+| `<Image />` from Next.js | Raw `<img>` tags |
+| `Toast.tsx` for notifications | `window.alert()` |
+| `ConfirmModal.tsx` for destructive actions | `window.confirm()` |
+| `<Skeleton />` while loading | Blank white space while loading |
+| `disabled + "Processing..." + Loader2` on async | Active button during async ops |
+| `next/font/google` for fonts | `<link>` tags in HTML |
+| Lucide React icons only | Mixed icon libraries or emoji as icons |
+| `.tsx` / `.ts` files only | `.js` or `.jsx` files |
+| Run `supabase gen types` after schema changes | Stale type definitions |
+| Programs: BCS / BBUS / BIHM / MBA | Generic "Computer Science" labels |
 
 ---
 
-*This file is the definitive source of truth for the IIMS Cybersecurity Club portal. Version 3.0.0 — Security-Hardened. Every AI session must read this in full before generating any code.*
+*CONTEXT.md v4.0 — IIMS IT Club Portal. Production-Ready + Security-Hardened + IIMS College Official Theme.*  
+*Read this in full before writing any code. Last updated: February 2026.*
