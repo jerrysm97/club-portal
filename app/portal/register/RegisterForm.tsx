@@ -28,8 +28,8 @@ export default function RegisterForm() {
 
     const programs = [
         { value: 'BCS', label: 'BSc (Hons) Computing' },
-        { value: 'BBUS', label: 'BBA' },
-        { value: 'BIHM', label: 'BHM' },
+        { value: 'BBUS', label: 'BBUS' },
+        { value: 'BIHM', label: 'BIHM' },
         { value: 'MBA', label: 'MBA' },
         { value: 'Other', label: 'Other' },
     ]

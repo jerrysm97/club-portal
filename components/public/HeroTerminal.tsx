@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 
 const LINES = [
-    'Initializing ICEHC...',
-    '> Ethical hacking. Real skills.',
-    '> CTF competitions. Certifications.',
-    "> Join Nepal's next cybersecurity generation.",
+    '$ whoami  -> ICEHC Member — IIMS College',
+    '$ cat vision.txt  -> premier hub for cybersecurity excellence',
+    '$ ls objectives/  -> 01_skill_dev 02_ethics 03_career 04_research',
+    '$ ./apply.sh  -> Status: ACCEPTING MEMBERS ✓',
 ]
 
 export default function HeroTerminal() {
@@ -36,11 +36,11 @@ export default function HeroTerminal() {
     }, [lineIndex, charIndex])
 
     return (
-        <div className="font-mono">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-[#F0F0FF] leading-tight min-h-[1.2em]">
+        <div className="font-mono min-h-[120px]">
+            <p className="text-sm md:text-base text-[#E6EDF3] leading-relaxed min-h-[1.2em]">
                 {displayText}
-                <span className="text-[#00FF87] animate-blink">|</span>
-            </h1>
+                <span className="text-[#00FF41] animate-pulse">▌</span>
+            </p>
         </div>
     )
 }

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Shield, ArrowRight, Mail, Lock, AlertTriangle, Loader2, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
+import { BRAND } from '@/lib/brand'
 
 export default function LoginForm() {
     const searchParams = useSearchParams()
@@ -17,7 +18,7 @@ export default function LoginForm() {
 
     const reasonMessages: Record<string, string> = {
         rejected: 'Your membership application was not approved at this time.',
-        banned: 'Your account has been suspended. Contact itclub@iimscollege.edu.np for details.',
+        banned: `Your account has been suspended. Contact ${BRAND.clubEmail} for details.`,
         access_denied: 'Access denied. Please contact a club administrator.',
     }
 
@@ -67,7 +68,7 @@ export default function LoginForm() {
                         <Shield className="h-7 w-7 text-white" />
                     </div>
                     <div className="text-center">
-                        <h2 className="font-bold text-[#1A237E] text-xl tracking-tight">IIMS IT Club</h2>
+                        <h2 className="font-bold text-[#1A237E] text-xl tracking-tight">{BRAND.clubShort}</h2>
                         <span className="text-xs text-[#757575] font-medium tracking-wide uppercase">Member Portal</span>
                     </div>
                 </div>
@@ -185,7 +186,7 @@ export default function LoginForm() {
                 {/* Footer */}
                 <div className="mt-8 text-center space-y-2">
                     <p className="text-[#757575] text-sm font-medium">
-                        The Official IT Club of{' '}
+                        Official cybersecurity club of{' '}
                         <a
                             href="https://iimscollege.edu.np/"
                             target="_blank"

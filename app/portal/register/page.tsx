@@ -1,8 +1,9 @@
 // app/portal/register/page.tsx — Registration page (no auth required)
 import RegisterForm from './RegisterForm'
 import Link from 'next/link'
+import { BRAND } from '@/lib/brand'
 
-export const metadata = { title: 'Register | IIMS IT Club' }
+export const metadata = { title: `Register | ${BRAND.clubShort}` }
 
 export default function RegisterPage() {
     return (
@@ -13,7 +14,7 @@ export default function RegisterPage() {
                         {/* Decorative background element */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
                         <div className="relative z-10">
-                            <h1 className="text-2xl md:text-3xl font-bold mb-2">Join IIMS IT Club</h1>
+                            <h1 className="text-2xl md:text-3xl font-bold mb-2">Join {BRAND.clubShort}</h1>
                             <p className="text-[#E8EAF6] text-sm md:text-base opacity-90">
                                 Create your account and provide academic details to apply for membership.
                             </p>
@@ -25,7 +26,7 @@ export default function RegisterPage() {
                 </div>
                 {/* Footer */}
                 <p className="mt-8 text-center text-xs text-[#9E9E9E] font-medium">
-                    IIMS IT Club • Membership Portal v4.0
+                    {BRAND.clubShort} • Membership Portal v4.0
                 </p>
             </div>
         </div>

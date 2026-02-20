@@ -52,7 +52,7 @@ export default async function CTFPage() {
     const userRank = (rankCount || 0) + 1
 
     return (
-        <div className="min-h-screen -m-6 md:-m-10 p-6 md:p-10 bg-[#1E1E2E]">
+        <div className="min-h-screen -m-6 md:-m-10 p-6 md:p-10 bg-[#0D1117]">
             <CTFClient
                 challenges={formattedChallenges}
                 leaderboard={leaderboard || []}

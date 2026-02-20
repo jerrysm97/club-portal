@@ -1,6 +1,7 @@
 // components/public/Footer.tsx — IIMS IT Club Official Footer (v4.0)
 import Link from 'next/link'
 import { GraduationCap, Mail, ExternalLink } from 'lucide-react'
+import { BRAND } from '@/lib/brand'
 
 const QUICK_LINKS = [
     { href: '/', label: 'Home' },
@@ -11,10 +12,10 @@ const QUICK_LINKS = [
 ]
 
 const EXTERNAL_LINKS = [
-    { href: 'https://iimscollege.edu.np/it-club/', label: 'IIMS IT Club Page' },
-    { href: 'https://iimscollege.edu.np/capture-the-flag/', label: 'CTF Program' },
-    { href: 'https://iimscollege.edu.np/iims-hackathon/', label: 'IIMS Hackathon' },
-    { href: 'https://iimscollege.edu.np/', label: 'IIMS College' },
+    { href: BRAND.itClubURL, label: 'IIMS IT Club Page' },
+    { href: BRAND.ctfPageURL, label: 'Capture The Flag Program' },
+    { href: BRAND.collegeURL, label: 'IIMS College' },
+    { href: BRAND.taylorsURL, label: "Taylor's University" },
 ]
 
 export default function Footer() {
@@ -29,19 +30,19 @@ export default function Footer() {
                                 <GraduationCap className="h-5 w-5 text-white" />
                             </div>
                             <div>
-                                <span className="font-bold text-white text-base block leading-tight">IIMS IT Club</span>
+                                <span className="font-bold text-white text-base block leading-tight">{BRAND.clubShort}</span>
                                 <span className="text-white/50 text-xs block">Kathmandu, Nepal</span>
                             </div>
                         </div>
                         <p className="text-white/70 text-sm leading-relaxed mb-4">
-                            Code. Build. Innovate. — The official IT Club of IIMS College, empowering the next generation of tech leaders.
+                            {BRAND.heroTagline} — {BRAND.clubFullName}
                         </p>
                         <a
-                            href="mailto:itclub@iimscollege.edu.np"
+                            href={`mailto:${BRAND.clubEmail}`}
                             className="flex items-center gap-2 text-white/60 text-sm hover:text-white transition-colors"
                         >
                             <Mail className="h-3.5 w-3.5 flex-shrink-0" />
-                            itclub@iimscollege.edu.np
+                            {BRAND.clubEmail}
                         </a>
                     </div>
 
@@ -95,7 +96,7 @@ export default function Footer() {
                 {/* Bottom bar */}
                 <div className="mt-10 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
                     <p className="text-white/40 text-xs text-center md:text-left">
-                        © 2026 IIMS IT Club. An official club of{' '}
+                        © 2026 {BRAND.clubShort}. An official club of{' '}
                         <a
                             href="https://iimscollege.edu.np/"
                             target="_blank"

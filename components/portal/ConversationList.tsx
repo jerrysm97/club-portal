@@ -1,11 +1,13 @@
 // components/portal/ConversationList.tsx — IIMS IT Club Comms List (v4.0)
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import Avatar from '@/components/ui/Avatar'
 import { useParams } from 'next/navigation'
 import { cn, formatDate } from '@/lib/utils'
-import { MessageSquare, Search, Filter } from 'lucide-react'
+import { MessageSquare, Search, Filter, UserPlus, Loader2 } from 'lucide-react'
 
 interface ConversationListProps {
     conversations: {
@@ -17,9 +19,67 @@ interface ConversationListProps {
     currentMemberId: string
 }
 
+interface SearchResult {
+    id: string
+    full_name: string
+    avatar_url: string | null
+    club_post: string
+    role: string
+}
+
 export default function ConversationList({ conversations, currentMemberId }: ConversationListProps) {
     const params = useParams()
+    const router = useRouter()
     const activeOtherId = params.id as string
+    const [query, setQuery] = useState('')
+    const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+    const [searching, setSearching] = useState(false)
+    const debounceRef = useRef<NodeJS.Timeout | null>(null)
+
+    // Debounced member search
+    useEffect(() => {
+        if (debounceRef.current) clearTimeout(debounceRef.current)
+
+        if (!query.trim()) {
+            setSearchResults([])
+            setSearching(false)
+            return
+        }
+
+        setSearching(true)
+        debounceRef.current = setTimeout(async () => {
+            try {
+                const res = await fetch(`/api/members/search?q=${encodeURIComponent(query.trim())}`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setSearchResults(data.members || [])
+                }
+            } catch (err) {
+                console.error('Search failed:', err)
+            } finally {
+                setSearching(false)
+            }
+        }, 300)
+
+        return () => {
+            if (debounceRef.current) clearTimeout(debounceRef.current)
+        }
+    }, [query])
+
+    function handleSelectMember(memberId: string) {
+        setQuery('')
+        setSearchResults([])
+        router.push(`/portal/messages/${memberId}`)
+    }
+
+    // Filter existing conversations by search query
+    const filteredConversations = query.trim()
+        ? conversations.filter(c =>
+            c.otherMember.name.toLowerCase().includes(query.toLowerCase())
+        )
+        : conversations
+
+    const isSearchMode = query.trim().length > 0
 
     return (
         <div className="w-full h-full flex flex-col">
@@ -40,15 +100,74 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                     <input
                         type="text"
                         placeholder="Search members..."
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
                         className="w-full bg-[#F5F5F5] border border-transparent rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:bg-white focus:border-[#1A237E]/30 focus:ring-4 focus:ring-[#1A237E]/10 transition-all outline-none text-[#212121] placeholder:text-[#9E9E9E]"
                     />
+                    {searching && (
+                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#1A237E] animate-spin" />
+                    )}
                 </div>
             </div>
 
             {/* List Content */}
             <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#F8F9FA]/50">
-                {conversations.length > 0 ? (
-                    conversations.map(({ otherMember, lastMessage, unreadCount }) => {
+                {/* Search Results — new members to message */}
+                {isSearchMode && searchResults.length > 0 && (
+                    <div className="border-b border-[#E0E0E0]">
+                        <div className="px-5 pt-4 pb-2">
+                            <span className="text-[9px] font-bold text-[#9E9E9E] uppercase tracking-widest flex items-center gap-1.5">
+                                <UserPlus className="h-3 w-3" /> New Conversation
+                            </span>
+                        </div>
+                        {searchResults.map(member => {
+                            // Skip if already in conversations
+                            const existsInConversations = conversations.some(c => c.otherMember.id === member.id)
+                            if (existsInConversations) return null
+
+                            return (
+                                <button
+                                    key={member.id}
+                                    onClick={() => handleSelectMember(member.id)}
+                                    className="block w-full p-4 md:p-5 transition-all relative group border-b border-[#E0E0E0]/50 hover:bg-white border-l-4 border-l-transparent hover:border-l-[#E53935] text-left"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative shrink-0">
+                                            <Avatar
+                                                src={member.avatar_url}
+                                                name={member.full_name}
+                                                className="w-11 h-11 md:w-12 md:h-12 ring-2 ring-white shadow-sm"
+                                            />
+                                            <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 bg-[#E53935] border-2 border-white rounded-full flex items-center justify-center">
+                                                <UserPlus className="h-2.5 w-2.5 text-white" />
+                                            </span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-sm font-bold text-[#212121] truncate">
+                                                {member.full_name}
+                                            </h4>
+                                            <span className="text-[10px] font-bold text-[#E53935] uppercase tracking-wider">
+                                                {member.club_post || 'Member'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </button>
+                            )
+                        })}
+                    </div>
+                )}
+
+                {/* Existing Conversations */}
+                {isSearchMode && filteredConversations.length > 0 && (
+                    <div className="px-5 pt-4 pb-2">
+                        <span className="text-[9px] font-bold text-[#9E9E9E] uppercase tracking-widest">
+                            Existing Conversations
+                        </span>
+                    </div>
+                )}
+
+                {(isSearchMode ? filteredConversations : conversations).length > 0 ? (
+                    (isSearchMode ? filteredConversations : conversations).map(({ otherMember, lastMessage, unreadCount }) => {
                         const isActive = activeOtherId === otherMember.id
 
                         return (
@@ -109,12 +228,24 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                         )
                     })
                 ) : (
-                    <div className="p-10 text-center animate-fade-up flex flex-col items-center justify-center h-full">
-                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-sm border border-[#E0E0E0]">
-                            <MessageSquare className="h-6 w-6 text-[#9E9E9E]" />
+                    !isSearchMode && (
+                        <div className="p-10 text-center animate-fade-up flex flex-col items-center justify-center h-full">
+                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-sm border border-[#E0E0E0]">
+                                <MessageSquare className="h-6 w-6 text-[#9E9E9E]" />
+                            </div>
+                            <p className="text-[#424242] font-bold text-sm uppercase tracking-widest">Inbox Zero</p>
+                            <p className="text-[#9E9E9E] text-xs font-medium mt-1">Search for a member to start a conversation.</p>
                         </div>
-                        <p className="text-[#424242] font-bold text-sm uppercase tracking-widest">Inbox Zero</p>
-                        <p className="text-[#9E9E9E] text-xs font-medium mt-1">Select a member to start.</p>
+                    )
+                )}
+
+                {isSearchMode && searchResults.length === 0 && filteredConversations.length === 0 && !searching && (
+                    <div className="p-10 text-center animate-fade-up flex flex-col items-center justify-center">
+                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-sm border border-[#E0E0E0]">
+                            <Search className="h-6 w-6 text-[#9E9E9E]" />
+                        </div>
+                        <p className="text-[#424242] font-bold text-sm uppercase tracking-widest">No Results</p>
+                        <p className="text-[#9E9E9E] text-xs font-medium mt-1">No members found matching &ldquo;{query}&rdquo;</p>
                     </div>
                 )}
             </div>

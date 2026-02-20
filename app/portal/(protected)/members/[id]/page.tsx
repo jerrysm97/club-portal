@@ -1,9 +1,10 @@
-// app/portal/members/[id]/page.tsx — IIMS IT Club Member View (v4.0)
+// app/portal/members/[id]/page.tsx — IIMS IT Club Member View
 import { createServerClient } from '@/lib/supabase-server'
 import { redirect, notFound } from 'next/navigation'
 import { Mail, Github, Linkedin, Calendar, ShieldCheck, Trophy, Target, Zap, MessageSquare, MapPin, Terminal, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import Avatar from '@/components/ui/Avatar'
+import EndorseSkillButton from '@/components/portal/profile/EndorseSkillButton'
 import { cn } from '@/lib/utils'
 import { getSession } from '@/lib/auth'
 
@@ -11,7 +12,10 @@ type Member = any
 
 export const revalidate = 60
 
-export default async function MemberViewPage({ params }: { params: { id: string } }) {
+export default async function MemberViewPage(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params
+    const { id } = params
+
     const session = await getSession()
     if (!session) redirect('/portal/login')
 
@@ -24,7 +28,7 @@ export default async function MemberViewPage({ params }: { params: { id: string 
 
     const { data } = await supabase
         .from('members')
-        .select('*')
+        .select('*, skill_endorsements(*)')
         .eq('id', params.id)
         .maybeSingle()
 
@@ -61,14 +65,14 @@ export default async function MemberViewPage({ params }: { params: { id: string 
                             />
                         </div>
                         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-6 py-2.5 bg-[#E53935] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-black/20 whitespace-nowrap">
-                            Level {(Math.floor((member.points || 0) / 100)) + 1} Member
+                            Points Level {Math.floor((member.points || 0) / 100) + 1}
                         </div>
                     </div>
 
                     <div className="flex-1 space-y-5">
                         <div className="space-y-3">
                             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 text-white font-bold text-[10px] uppercase tracking-widest border border-white/20 shadow-sm backdrop-blur-sm">
-                                <ShieldCheck className="h-3.5 w-3.5 text-[#E53935]" /> ID: {member.student_id || 'CLASSIFIED'}
+                                <ShieldCheck className="h-3.5 w-3.5 text-[#E53935]" /> Student ID: {member.student_id || 'Not Provided'}
                             </div>
                             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
                                 {member.full_name || member.email}
@@ -80,7 +84,7 @@ export default async function MemberViewPage({ params }: { params: { id: string 
 
                         <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-2">
                             <span className="px-4 py-2 rounded-xl bg-[#283593]/50 text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 border border-[#3949AB]/50 backdrop-blur-sm">
-                                <Calendar className="h-4 w-4 opacity-70" /> Activated {new Date(member.created_at).getFullYear()}
+                                <Calendar className="h-4 w-4 opacity-70" /> Joined {member.created_at ? new Date(member.created_at).getFullYear() : new Date().getFullYear()}
                             </span>
                             <span className="px-4 py-2 rounded-xl bg-[#283593]/50 text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 border border-[#3949AB]/50 backdrop-blur-sm">
                                 <MapPin className="h-4 w-4 opacity-70" /> IIMS Campus
@@ -113,10 +117,10 @@ export default async function MemberViewPage({ params }: { params: { id: string 
                             <Target className="h-40 w-40 text-[#1A237E]" />
                         </div>
                         <h3 className="text-sm font-bold text-[#1A237E] uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <Terminal className="h-5 w-5 pt-0.5" /> Core Biography
+                            <Terminal className="h-5 w-5 pt-0.5" /> Biography
                         </h3>
                         <p className="text-[#757575] font-medium text-lg leading-relaxed whitespace-pre-wrap relative z-10">
-                            {member.bio || 'This member has not verified their introduction yet. Profile intelligence lies dormant.'}
+                            {member.bio || 'This member has not provided a biography yet.'}
                         </p>
                     </div>
 
@@ -128,9 +132,13 @@ export default async function MemberViewPage({ params }: { params: { id: string 
                         <div className="flex flex-wrap gap-3">
                             {member.skills && member.skills.length > 0 ? (
                                 member.skills.map((skill: string) => (
-                                    <span key={skill} className="px-5 py-2.5 rounded-xl bg-[#F8F9FA] text-[#212121] border border-[#E0E0E0] text-[10px] font-bold uppercase tracking-widest hover:bg-[#E8EAF6] hover:text-[#1A237E] hover:border-[#C5CAE9] transition-all cursor-default">
-                                        {skill}
-                                    </span>
+                                    <EndorseSkillButton
+                                        key={skill}
+                                        targetUserId={member.id}
+                                        currentUserId={session.user.id}
+                                        endorsements={member.skill_endorsements || []}
+                                        skill={skill}
+                                    />
                                 ))
                             ) : (
                                 <div className="py-12 text-center w-full bg-[#F8F9FA] rounded-2xl border border-dashed border-[#E0E0E0]">
@@ -144,20 +152,20 @@ export default async function MemberViewPage({ params }: { params: { id: string 
                 {/* Sidebar Intel */}
                 <div className="space-y-8">
                     <div className="bg-white rounded-[2rem] p-8 md:p-10 border border-[#E0E0E0] shadow-sm space-y-10">
-                        <h3 className="text-xs font-bold text-[#1A237E] uppercase tracking-widest mb-2">Comms Relay</h3>
+                        <h3 className="text-xs font-bold text-[#1A237E] uppercase tracking-widest mb-2">Contact Info</h3>
 
                         <div className="space-y-6">
-                            <ContactRow icon={<Mail className="h-5 w-5" />} label="Primary Frequency" value={member.email} />
+                            <ContactRow icon={<Mail className="h-5 w-5" />} label="Email Address" value={member.email} />
                             <ContactRow
                                 icon={<Github className="h-5 w-5" />}
-                                label="Code Vault"
-                                value={member.github_url ? member.github_url.split('/').pop()! : 'Not Linked'}
+                                label="GitHub Profile"
+                                value={member.github_url ? new URL(member.github_url).pathname.split('/').pop() || 'Linked' : 'Not Linked'}
                                 link={member.github_url}
                             />
                             <ContactRow
                                 icon={<Linkedin className="h-5 w-5" />}
-                                label="Professional Network"
-                                value={member.linkedin_url ? member.linkedin_url.split('/').pop()! : 'Not Linked'}
+                                label="LinkedIn"
+                                value={member.linkedin_url ? new URL(member.linkedin_url).pathname.split('/').pop() || 'Linked' : 'Not Linked'}
                                 link={member.linkedin_url}
                             />
                         </div>
@@ -182,9 +190,9 @@ export default async function MemberViewPage({ params }: { params: { id: string 
                             <div className="p-3 bg-[#E8EAF6] text-[#1A237E] rounded-xl">
                                 <Trophy className="h-6 w-6" />
                             </div>
-                            <h4 className="font-bold text-lg leading-tight relative z-10">Honors &<br />Commendations</h4>
+                            <h4 className="font-bold text-lg leading-tight relative z-10">Achievements</h4>
                         </div>
-                        <p className="text-[#757575] text-sm font-medium leading-relaxed relative z-10">View specific tournament certificates, CTF writeup awards, and unit commendations.</p>
+                        <p className="text-[#757575] text-sm font-medium leading-relaxed relative z-10">View tournament certificates, CTF writeup awards, and special honors.</p>
                     </div>
                 </div>
             </div>

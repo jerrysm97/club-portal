@@ -5,15 +5,21 @@ import Link from 'next/link'
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer'
 import { Calendar, MapPin, Clock, Users, ArrowLeft, ExternalLink, ShieldCheck, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
-import { getSession } from '@/lib/auth'
+import { getSession, getMember } from '@/lib/auth'
 
 type Event = any
 
 export const revalidate = 60
 
-export default async function PortalEventDetailPage({ params }: { params: { id: string } }) {
+export default async function PortalEventDetailPage(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params
+    const { id } = params
+
     const session = await getSession()
     if (!session) redirect('/portal/login')
+
+    const member = await getMember(session.user.id)
+    if (!member) redirect('/portal/pending')
 
     const supabase = createServerClient()
 
@@ -21,8 +27,8 @@ export default async function PortalEventDetailPage({ params }: { params: { id: 
     const { data: eventData } = await supabase
         .from('public_events')
         .select('*')
-        .eq('id', params.id)
-        .maybeSingle()
+        .eq('id', id)
+        .single()
 
     if (!eventData) return notFound()
     const event = eventData as any

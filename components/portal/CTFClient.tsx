@@ -38,7 +38,7 @@ export default function CTFClient({ challenges, leaderboard, userPoints, userRan
         <div className="max-w-7xl mx-auto space-y-10 animate-fade-up">
             {/* Dashboard Stats */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-[#1E1E2E] rounded-3xl p-8 md:p-10 text-white shadow-xl relative overflow-hidden group border border-[#1A237E]/20">
+                <div className="lg:col-span-2 bg-[#161B22] rounded-3xl p-8 md:p-10 text-white shadow-xl relative overflow-hidden group border border-[#30363D]">
                     <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
                     <div className="absolute top-0 right-0 w-96 h-96 bg-[#1A237E]/20 rounded-full blur-3xl -translate-y-32 translate-x-32" />
 
@@ -69,7 +69,7 @@ export default function CTFClient({ challenges, leaderboard, userPoints, userRan
                     </div>
                 </div>
 
-                <div className="bg-[#1E1E2E] rounded-3xl p-8 shadow-xl flex flex-col justify-between group border border-white/5 relative overflow-hidden">
+                <div className="bg-[#161B22] rounded-3xl p-8 shadow-xl flex flex-col justify-between group border border-[#30363D] relative overflow-hidden">
                     <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#E53935]/10 to-transparent pointer-events-none" />
 
                     <div className="relative z-10 space-y-5">
@@ -103,7 +103,7 @@ export default function CTFClient({ challenges, leaderboard, userPoints, userRan
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Challenge Feed */}
                 <div className="lg:col-span-3 space-y-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-[#1E1E2E] p-4 rounded-2xl border border-white/5 shadow-sm">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-[#161B22] p-4 rounded-2xl border border-[#30363D] shadow-sm">
                         <div className="flex flex-wrap gap-2">
                             {CATEGORIES.map(cat => (
                                 <button
@@ -139,7 +139,7 @@ export default function CTFClient({ challenges, leaderboard, userPoints, userRan
                         ))}
 
                         {filteredChallenges.length === 0 && (
-                            <div className="col-span-full py-24 rounded-3xl border border-dashed border-white/10 bg-[#1E1E2E] text-center shadow-inner">
+                            <div className="col-span-full py-24 rounded-3xl border border-dashed border-[#30363D] bg-[#161B22] text-center shadow-inner">
                                 <div className="h-16 w-16 bg-black/30 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-white/5">
                                     <Target className="h-8 w-8 text-gray-600" />
                                 </div>
@@ -152,7 +152,7 @@ export default function CTFClient({ challenges, leaderboard, userPoints, userRan
 
                 {/* Honor Board */}
                 <div className="space-y-6">
-                    <div className="bg-[#1E1E2E] rounded-3xl p-6 md:p-8 border border-white/5 shadow-xl sticky top-24">
+                    <div className="bg-[#161B22] rounded-3xl p-6 md:p-8 border border-[#30363D] shadow-xl sticky top-24">
                         <h3 className="font-bold text-white flex items-center gap-2 mb-6 uppercase tracking-widest text-xs font-mono">
                             <Trophy className="h-4 w-4 text-[#FFEB3B]" /> Hall of Fame
                         </h3>

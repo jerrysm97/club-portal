@@ -6,6 +6,7 @@
 'use client'
 
 import type { Post } from '@/lib/types'
+import { Pin } from 'lucide-react'
 
 type PostCardProps = {
     post: Post
@@ -41,9 +42,7 @@ export default function PostCard({
                 <h3 className="text-lg font-semibold text-slate-900">{post.title}</h3>
                 {post.pinned && (
                     <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2L12.9 8.3L20 9.3L15 14.1L16.2 21L10 17.7L3.8 21L5 14.1L0 9.3L7.1 8.3L10 2Z" />
-                        </svg>
+                        <Pin className="w-3 h-3 fill-amber-700" />
                         Pinned
                     </span>
                 )}

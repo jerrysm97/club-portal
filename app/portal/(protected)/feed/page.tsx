@@ -103,7 +103,7 @@ export default async function FeedPage({
                         Community <span className="text-[#E53935]">Discussions</span>
                     </h1>
                     <p className="text-[#757575] font-medium text-sm mt-2 max-w-xl">
-                        Share ideas, resources, and stay up to date with the latest IIMS IT Club announcements.
+                        Share ideas, resources, and stay up to date with the latest ICEHC announcements.
                     </p>
                 </div>
             </div>

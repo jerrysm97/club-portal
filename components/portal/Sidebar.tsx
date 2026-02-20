@@ -16,12 +16,14 @@ import {
     Bell,
     MessageSquare,
     User,
+    Users,
     ShieldCheck,
     LogOut,
     Trophy,
     GraduationCap
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BRAND } from '@/lib/brand'
 
 interface SidebarProps {
     member: Member
@@ -35,6 +37,7 @@ const navItems = [
     { href: '/portal/ctf', icon: Terminal, label: 'CTF Arena' },
     { href: '/portal/resources', icon: FileText, label: 'Documents' },
     { href: '/portal/messages', icon: MessageSquare, label: 'Messages' },
+    { href: '/portal/members', icon: Users, label: 'Members' },
     { href: '/portal/leaderboard', icon: Trophy, label: 'Leaderboard' },
     { href: '/portal/profile', icon: User, label: 'Profile' },
 ]
@@ -61,7 +64,7 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
                         <GraduationCap className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                        <span className="font-bold text-[#212121] text-sm block leading-tight">IIMS IT Club</span>
+                        <span className="font-bold text-[#212121] text-sm block leading-tight">{BRAND.clubShort}</span>
                         <span className="text-[#9E9E9E] text-[10px] block leading-tight">Member Portal</span>
                     </div>
                 </div>

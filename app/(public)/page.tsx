@@ -9,6 +9,7 @@ import HeroSection from '@/components/public/HeroSection'
 import EventsSection from '@/components/public/EventsSection'
 import TeamSection from '@/components/public/TeamSection'
 import StatsSection from '@/components/public/StatsSection'
+import { BRAND } from '@/lib/brand'
 
 export const revalidate = 60
 
@@ -143,7 +144,7 @@ export default async function HomePage() {
                                 Built for Every <span className="text-[#1A237E]">IIMS Student</span>
                             </h2>
                             <p className="text-[#757575] text-lg leading-relaxed mb-8">
-                                Whether you are studying BCS, BBUS, BIHM, or MBA — the IT Club is your launchpad for hands-on technology experience beyond the classroom.
+                                Whether you are studying BCS, BBUS, BIHM, or MBA — ICEHC is your launchpad for hands-on cybersecurity and digital defense experience beyond the classroom.
                             </p>
                             <ul className="space-y-3 mb-10">
                                 {BENEFITS.map((b) => (
@@ -157,7 +158,7 @@ export default async function HomePage() {
                                 href="/portal/login"
                                 className="inline-flex items-center gap-2 bg-[#E53935] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#C62828] transition-all text-sm active:scale-95"
                             >
-                                Join the Club
+                                Join ICEHC
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
@@ -182,7 +183,7 @@ export default async function HomePage() {
                             </div>
 
                             <p className="text-[#757575] text-sm leading-relaxed mb-6">
-                                IIMS College is one of Nepal&apos;s leading international institutions, partnered with Taylor&apos;s University, Malaysia. The IIMS IT Club is an official club of the college.
+                                IIMS College is one of Nepal&apos;s leading international institutions, partnered with Taylor&apos;s University, Malaysia. {BRAND.clubFullName} is an official club of the college.
                             </p>
 
                             <div className="space-y-3 mb-6">
@@ -238,7 +239,7 @@ export default async function HomePage() {
                         Ready to <span className="text-[#E53935]">Build</span> Something?
                     </h2>
                     <p className="text-white/60 text-lg mb-10 leading-relaxed">
-                        Join the IIMS IT Club and be part of a community that codes, competes, and creates. Membership is open to all IIMS College students.
+                        Join {BRAND.clubShort} and be part of a community that hacks ethically, defends relentlessly, and builds practical security skills. Membership is open to all IIMS College students.
                     </p>
                     <Link
                         href="/portal/login"
