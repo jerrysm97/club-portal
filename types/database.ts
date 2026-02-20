@@ -1,3 +1,7 @@
+// types/database.ts — IIMS IT Club Portal — v4.0
+// Matches CONTEXT.md §7 schema exactly.
+// Run `supabase gen types typescript > types/database.ts` after any schema change.
+
 export type Json =
   | string
   | number
@@ -7,314 +11,591 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.1"
-  }
   public: {
     Tables: {
-      comments: {
-        Row: {
-          author_id: string | null
-          content: string
-          created_at: string | null
-          id: string
-          post_id: string | null
-        }
-        Insert: {
-          author_id?: string | null
-          content: string
-          created_at?: string | null
-          id?: string
-          post_id?: string | null
-        }
-        Update: {
-          author_id?: string | null
-          content?: string
-          created_at?: string | null
-          id?: string
-          post_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comments_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comments_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      contact_messages: {
-        Row: {
-          created_at: string | null
-          email: string
-          id: string
-          is_read: boolean | null
-          message: string
-          name: string
-          subject: string
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          id?: string
-          is_read?: boolean | null
-          message: string
-          name: string
-          subject: string
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          id?: string
-          is_read?: boolean | null
-          message?: string
-          name?: string
-          subject?: string
-        }
-        Relationships: []
-      }
-      documents: {
-        Row: {
-          created_at: string | null
-          file_type: string | null
-          file_url: string
-          id: string
-          title: string
-          uploaded_by: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          file_type?: string | null
-          file_url: string
-          id?: string
-          title: string
-          uploaded_by?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          file_type?: string | null
-          file_url?: string
-          id?: string
-          title?: string
-          uploaded_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documents_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       members: {
         Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string | null
-          email: string
           id: string
-          name: string | null
-          role: string | null
-          status: string | null
+          user_id: string
+          full_name: string
+          email: string
+          student_id: string | null
+          program: 'BCS' | 'BBUS' | 'BIHM' | 'MBA' | 'Other' | null
+          intake: string | null
+          role: 'member' | 'admin' | 'superadmin'
+          status: 'pending' | 'approved' | 'rejected' | 'banned'
+          club_post: 'General Member' | 'Web Development' | 'Cybersecurity' | 'AI & Machine Learning' | 'Mobile Development' | 'Cloud & DevOps' | 'Data Science' | 'Open Source' | 'Graphic Design'
+          bio: string | null
+          avatar_url: string | null
+          github_url: string | null
+          linkedin_url: string | null
+          skills: string[]
+          points: number
+          joined_at: string
+          approved_at: string | null
+          approved_by: string | null
+          ban_reason: string | null
+          reject_reason: string | null
         }
         Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          email: string
           id?: string
-          name?: string | null
-          role?: string | null
-          status?: string | null
+          user_id: string
+          full_name: string
+          email: string
+          student_id?: string | null
+          program?: 'BCS' | 'BBUS' | 'BIHM' | 'MBA' | 'Other' | null
+          intake?: string | null
+          role?: 'member' | 'admin' | 'superadmin'
+          status?: 'pending' | 'approved' | 'rejected' | 'banned'
+          club_post?: 'General Member' | 'Web Development' | 'Cybersecurity' | 'AI & Machine Learning' | 'Mobile Development' | 'Cloud & DevOps' | 'Data Science' | 'Open Source' | 'Graphic Design'
+          bio?: string | null
+          avatar_url?: string | null
+          github_url?: string | null
+          linkedin_url?: string | null
+          skills?: string[]
+          points?: number
+          joined_at?: string
+          approved_at?: string | null
+          approved_by?: string | null
+          ban_reason?: string | null
+          reject_reason?: string | null
         }
         Update: {
-          avatar_url?: string | null
+          full_name?: string
+          student_id?: string | null
+          program?: 'BCS' | 'BBUS' | 'BIHM' | 'MBA' | 'Other' | null
+          intake?: string | null
+          role?: 'member' | 'admin' | 'superadmin'
+          status?: 'pending' | 'approved' | 'rejected' | 'banned'
+          club_post?: 'General Member' | 'Web Development' | 'Cybersecurity' | 'AI & Machine Learning' | 'Mobile Development' | 'Cloud & DevOps' | 'Data Science' | 'Open Source' | 'Graphic Design'
           bio?: string | null
-          created_at?: string | null
-          email?: string
-          id?: string
-          name?: string | null
-          role?: string | null
-          status?: string | null
+          avatar_url?: string | null
+          github_url?: string | null
+          linkedin_url?: string | null
+          skills?: string[]
+          approved_at?: string | null
+          approved_by?: string | null
+          ban_reason?: string | null
+          reject_reason?: string | null
         }
         Relationships: []
       }
       posts: {
         Row: {
-          author_id: string | null
-          content: string
-          created_at: string | null
           id: string
-          is_public: boolean | null
-          pinned: boolean | null
-          title: string
+          author_id: string
+          title: string | null
+          content: string
+          type: 'post' | 'announcement' | 'resource' | 'project'
+          is_pinned: boolean
+          created_at: string
+          updated_at: string
         }
         Insert: {
-          author_id?: string | null
-          content: string
-          created_at?: string | null
           id?: string
-          is_public?: boolean | null
-          pinned?: boolean | null
-          title: string
+          author_id: string
+          title?: string | null
+          content: string
+          type?: 'post' | 'announcement' | 'resource' | 'project'
+          is_pinned?: boolean
+          created_at?: string
+          updated_at?: string
         }
         Update: {
-          author_id?: string | null
+          title?: string | null
           content?: string
-          created_at?: string | null
-          id?: string
-          is_public?: boolean | null
-          pinned?: boolean | null
-          title?: string
+          type?: 'post' | 'announcement' | 'resource' | 'project'
+          is_pinned?: boolean
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "posts_author_id_fkey"
-            columns: ["author_id"]
+            foreignKeyName: 'posts_author_id_fkey'
+            columns: ['author_id']
             isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      post_reactions: {
+        Row: {
+          id: string
+          post_id: string
+          member_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          member_id: string
+          created_at?: string
+        }
+        Update: Record<string, never>
+        Relationships: [
+          {
+            foreignKeyName: 'post_reactions_post_id_fkey'
+            columns: ['post_id']
+            isOneToOne: false
+            referencedRelation: 'posts'
+            referencedColumns: ['id']
           },
+          {
+            foreignKeyName: 'post_reactions_member_id_fkey'
+            columns: ['member_id']
+            isOneToOne: false
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      post_comments: {
+        Row: {
+          id: string
+          post_id: string
+          author_id: string
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          author_id: string
+          content: string
+          created_at?: string
+        }
+        Update: {
+          content?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'post_comments_post_id_fkey'
+            columns: ['post_id']
+            isOneToOne: false
+            referencedRelation: 'posts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'post_comments_author_id_fkey'
+            columns: ['author_id']
+            isOneToOne: false
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      conversations: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          member_id: string
+          last_read_at: string
+        }
+        Insert: {
+          conversation_id: string
+          member_id: string
+          last_read_at?: string
+        }
+        Update: {
+          last_read_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'conversation_participants_conversation_id_fkey'
+            columns: ['conversation_id']
+            isOneToOne: false
+            referencedRelation: 'conversations'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'conversation_participants_member_id_fkey'
+            columns: ['member_id']
+            isOneToOne: false
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          is_deleted: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          is_deleted?: boolean
+          created_at?: string
+        }
+        Update: {
+          is_deleted?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'messages_conversation_id_fkey'
+            columns: ['conversation_id']
+            isOneToOne: false
+            referencedRelation: 'conversations'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'messages_sender_id_fkey'
+            columns: ['sender_id']
+            isOneToOne: false
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      notifications: {
+        Row: {
+          id: string
+          recipient_id: string
+          sender_id: string | null
+          type: 'new_message' | 'new_post' | 'post_reaction' | 'post_comment' | 'event_reminder' | 'member_approved' | 'member_rejected' | 'ctf_new_challenge' | 'ctf_solved' | 'announcement'
+          title: string
+          body: string | null
+          link: string | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          recipient_id: string
+          sender_id?: string | null
+          type: 'new_message' | 'new_post' | 'post_reaction' | 'post_comment' | 'event_reminder' | 'member_approved' | 'member_rejected' | 'ctf_new_challenge' | 'ctf_solved' | 'announcement'
+          title: string
+          body?: string | null
+          link?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          is_read?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_recipient_id_fkey'
+            columns: ['recipient_id']
+            isOneToOne: false
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      documents: {
+        Row: {
+          id: string
+          uploader_id: string
+          title: string
+          description: string | null
+          file_url: string
+          file_size: number
+          file_type: string | null
+          category: 'general' | 'study-material' | 'writeup' | 'presentation' | 'report' | 'project' | 'other'
+          is_public: boolean
+          download_count: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          uploader_id: string
+          title: string
+          description?: string | null
+          file_url: string
+          file_size: number
+          file_type?: string | null
+          category?: 'general' | 'study-material' | 'writeup' | 'presentation' | 'report' | 'project' | 'other'
+          is_public?: boolean
+          download_count?: number
+          created_at?: string
+        }
+        Update: {
+          title?: string
+          description?: string | null
+          category?: 'general' | 'study-material' | 'writeup' | 'presentation' | 'report' | 'project' | 'other'
+          is_public?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'documents_uploader_id_fkey'
+            columns: ['uploader_id']
+            isOneToOne: false
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
         ]
       }
       public_events: {
         Row: {
-          created_at: string | null
-          description: string | null
-          event_date: string
           id: string
-          image_url: string | null
-          location: string | null
-          status: string | null
+          created_by: string | null
           title: string
-          type: string | null
+          slug: string
+          description: string
+          short_desc: string | null
+          event_date: string
+          end_date: string | null
+          location: string | null
+          meeting_link: string | null
+          cover_image_url: string | null
+          type: 'workshop' | 'ctf' | 'hackathon' | 'seminar' | 'meetup' | 'competition' | 'other'
+          max_attendees: number | null
+          is_published: boolean
+          created_at: string
         }
         Insert: {
-          created_at?: string | null
-          description?: string | null
-          event_date: string
           id?: string
-          image_url?: string | null
-          location?: string | null
-          status?: string | null
+          created_by?: string | null
           title: string
-          type?: string | null
+          slug: string
+          description: string
+          short_desc?: string | null
+          event_date: string
+          end_date?: string | null
+          location?: string | null
+          meeting_link?: string | null
+          cover_image_url?: string | null
+          type?: 'workshop' | 'ctf' | 'hackathon' | 'seminar' | 'meetup' | 'competition' | 'other'
+          max_attendees?: number | null
+          is_published?: boolean
+          created_at?: string
         }
         Update: {
-          created_at?: string | null
-          description?: string | null
-          event_date?: string
-          id?: string
-          image_url?: string | null
-          location?: string | null
-          status?: string | null
           title?: string
-          type?: string | null
+          slug?: string
+          description?: string
+          short_desc?: string | null
+          event_date?: string
+          end_date?: string | null
+          location?: string | null
+          meeting_link?: string | null
+          cover_image_url?: string | null
+          type?: 'workshop' | 'ctf' | 'hackathon' | 'seminar' | 'meetup' | 'competition' | 'other'
+          max_attendees?: number | null
+          is_published?: boolean
         }
         Relationships: []
       }
-      public_gallery: {
+      event_rsvps: {
         Row: {
-          caption: string | null
-          created_at: string | null
           id: string
-          image_url: string
-          sort_order: number | null
+          event_id: string
+          member_id: string
+          status: 'going' | 'maybe' | 'not_going'
+          created_at: string
         }
         Insert: {
-          caption?: string | null
-          created_at?: string | null
           id?: string
-          image_url: string
-          sort_order?: number | null
+          event_id: string
+          member_id: string
+          status?: 'going' | 'maybe' | 'not_going'
+          created_at?: string
+        }
+        Update: {
+          status?: 'going' | 'maybe' | 'not_going'
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'event_rsvps_event_id_fkey'
+            columns: ['event_id']
+            isOneToOne: false
+            referencedRelation: 'public_events'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'event_rsvps_member_id_fkey'
+            columns: ['member_id']
+            isOneToOne: false
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      ctf_challenges: {
+        Row: {
+          id: string
+          created_by: string | null
+          title: string
+          description: string
+          category: 'web' | 'forensics' | 'crypto' | 'pwn' | 'reversing' | 'osint' | 'misc'
+          difficulty: 'easy' | 'medium' | 'hard' | 'insane'
+          points: number
+          flag_hash: string  // SHA-256 hex digest ONLY — NEVER expose client-side
+          flag_format: string | null
+          hint: string | null
+          file_url: string | null
+          is_active: boolean
+          solves_count: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          created_by?: string | null
+          title: string
+          description: string
+          category: 'web' | 'forensics' | 'crypto' | 'pwn' | 'reversing' | 'osint' | 'misc'
+          difficulty: 'easy' | 'medium' | 'hard' | 'insane'
+          points: number
+          flag_hash: string
+          flag_format?: string | null
+          hint?: string | null
+          file_url?: string | null
+          is_active?: boolean
+          solves_count?: number
+          created_at?: string
+        }
+        Update: {
+          title?: string
+          description?: string
+          category?: 'web' | 'forensics' | 'crypto' | 'pwn' | 'reversing' | 'osint' | 'misc'
+          difficulty?: 'easy' | 'medium' | 'hard' | 'insane'
+          points?: number
+          flag_hash?: string
+          flag_format?: string | null
+          hint?: string | null
+          file_url?: string | null
+          is_active?: boolean
+        }
+        Relationships: []
+      }
+      ctf_solves: {
+        Row: {
+          id: string
+          challenge_id: string
+          member_id: string
+          solved_at: string
+        }
+        Insert: {
+          id?: string
+          challenge_id: string
+          member_id: string
+          solved_at?: string
+        }
+        Update: Record<string, never>
+        Relationships: [
+          {
+            foreignKeyName: 'ctf_solves_challenge_id_fkey'
+            columns: ['challenge_id']
+            isOneToOne: false
+            referencedRelation: 'ctf_challenges'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'ctf_solves_member_id_fkey'
+            columns: ['member_id']
+            isOneToOne: false
+            referencedRelation: 'members'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      gallery_images: {
+        Row: {
+          id: string
+          uploader_id: string | null
+          url: string
+          caption: string | null
+          event_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          uploader_id?: string | null
+          url: string
+          caption?: string | null
+          event_id?: string | null
+          created_at?: string
         }
         Update: {
           caption?: string | null
-          created_at?: string | null
-          id?: string
-          image_url?: string
-          sort_order?: number | null
         }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          subject: string
+          message: string
+          ip_hash: string | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          subject: string
+          message: string
+          ip_hash?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          is_read?: boolean
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          id: string
+          admin_id: string | null
+          action: string
+          target_id: string | null
+          meta: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          admin_id?: string | null
+          action: string
+          target_id?: string | null
+          meta?: Json
+          created_at?: string
+        }
+        Update: Record<string, never>
         Relationships: []
       }
       site_settings: {
         Row: {
-          about_text: string | null
-          contact_email: string | null
-          facebook_url: string | null
-          github_url: string | null
-          id: string
-          instagram_url: string | null
-          stat_competitions: string | null
-          stat_events: string | null
-          stat_members: string | null
-          stat_partners: string | null
-          updated_at: string | null
+          key: string
+          value: string
+          updated_by: string | null
+          updated_at: string
         }
         Insert: {
-          about_text?: string | null
-          contact_email?: string | null
-          facebook_url?: string | null
-          github_url?: string | null
-          id?: string
-          instagram_url?: string | null
-          stat_competitions?: string | null
-          stat_events?: string | null
-          stat_members?: string | null
-          stat_partners?: string | null
-          updated_at?: string | null
+          key: string
+          value: string
+          updated_by?: string | null
+          updated_at?: string
         }
         Update: {
-          about_text?: string | null
-          contact_email?: string | null
-          facebook_url?: string | null
-          github_url?: string | null
-          id?: string
-          instagram_url?: string | null
-          stat_competitions?: string | null
-          stat_events?: string | null
-          stat_members?: string | null
-          stat_partners?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      team_members: {
-        Row: {
-          created_at: string | null
-          id: string
-          image_url: string | null
-          name: string
-          role: string
-          sort_order: number | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          image_url?: string | null
-          name: string
-          role: string
-          sort_order?: number | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          image_url?: string | null
-          name?: string
-          role?: string
-          sort_order?: number | null
+          value?: string
+          updated_by?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -333,126 +614,3 @@ export type Database = {
     }
   }
 }
-
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
-
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
-
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
-
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
-
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
-
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const

@@ -1,119 +1,69 @@
-// middleware.ts — Route protection per CONTEXT §10.2
-// Protects all /portal/* routes except login, signup, and pending.
-// Uses service role to check member status server-side.
-
-import { createServerClient } from '@supabase/ssr'
+// middleware.ts — IIMS IT Club Portal (CONTEXT.md §10.5 — exact spec)
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 
-// Routes inside /portal that don't require auth
-const PUBLIC_PORTAL_PATHS = ['/portal/login', '/portal/signup', '/portal/pending', '/portal/register']
+export async function middleware(request: NextRequest) {
+    const response = NextResponse.next({ request: { headers: request.headers } })
 
-export async function middleware(request: NextRequest): Promise<NextResponse> {
-    const { pathname } = request.nextUrl
-
-    // Only run on portal routes
-    if (!pathname.startsWith('/portal')) {
-        return NextResponse.next()
-    }
-
-    // Allow public portal paths through
-    if (PUBLIC_PORTAL_PATHS.some(p => pathname.startsWith(p))) {
-        return NextResponse.next()
-    }
-
-    // ── Step 1: Build response object (needed for cookie forwarding) ──
-    let response = NextResponse.next({
-        request: { headers: request.headers },
-    })
-
-    // ── Step 2: Check session with anon client ──
+    // ── Anon client for session check (cookie-aware) ──
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
-                getAll() {
-                    return request.cookies.getAll()
-                },
-                setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-                    response = NextResponse.next({ request: { headers: request.headers } })
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        response.cookies.set(name, value, options)
-                    )
+                get: (name) => request.cookies.get(name)?.value,
+                set: (name, value, options) => { response.cookies.set({ name, value, ...options }) },
+                remove: (name, options) => {
+                    response.cookies.set({ name, value: '', ...options, maxAge: 0, path: '/' })
                 },
             },
         }
     )
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
+    const path = request.nextUrl.pathname
 
-    if (authError || !user) {
-        return NextResponse.redirect(new URL('/portal/login', request.url))
+    // Only protect /portal/* (except login, register, pending)
+    const isProtected = path.startsWith('/portal') &&
+        !['/portal/login', '/portal/pending', '/portal/register'].some(p => path.startsWith(p))
+
+    if (!isProtected) return response
+    if (!session) return NextResponse.redirect(new URL('/portal/login', request.url))
+
+    // ── Check member status (uses user_id FK — FIX #2) ──
+    const { data: member } = await supabase
+        .from('members')
+        .select('status, role')
+        .eq('user_id', session.user.id)  // ✅ user_id (auth FK), NEVER .eq('id', ...)
+        .single()
+
+    // No member row → pending (DB trigger should have created it)
+    if (!member || member.status === 'pending') {
+        return NextResponse.redirect(new URL('/portal/pending', request.url))
     }
 
-    // ── Step 3: Check member status with admin client (bypasses RLS) ──
-    try {
-        const adminClient = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!,
-            {
-                cookies: {
-                    getAll() { return [] },
-                    setAll() { },
-                },
-            }
-        )
-
-        const { data: member, error } = await adminClient
-            .from('members')
-            .select('role, status')
-            .eq('id', user.id)
-            .single()
-
-        if (error || !member) {
-            // If no member row exists yet, allow access to /portal/pending (Step 2 handles this)
-            // or redirect if they are trying to access protected content
-            if (!pathname.startsWith('/portal/pending') && !pathname.startsWith('/portal/register')) {
-                return NextResponse.redirect(new URL('/portal/pending', request.url))
-            }
-            return response
-        }
-
-        // ── Step 4: Handle member status ──
-        if (member.status === 'pending' && !['admin', 'superadmin'].includes(member.role || '')) {
-            return NextResponse.redirect(new URL('/portal/pending', request.url))
-        }
-
-        if (member.status === 'rejected' || member.status === 'banned') {
-            // Must sign out server-side to clear the session cookie before redirecting
-            const signOutResponse = NextResponse.redirect(
-                new URL('/portal/login?error=access_denied', request.url)
-            )
-            // Clear the Supabase auth cookies
-            request.cookies.getAll().forEach(cookie => {
-                if (cookie.name.startsWith('sb-')) {
-                    signOutResponse.cookies.set(cookie.name, '', { maxAge: 0, path: '/' })
-                }
-            })
-            return signOutResponse
-        }
-
-        // ── Step 5: Admin-only route guard ──
-        if (pathname.startsWith('/portal/admin')) {
-            if (!['admin', 'superadmin'].includes(member.role)) {
-                return NextResponse.redirect(new URL('/portal/dashboard', request.url))
-            }
-        }
-
-        return response
-    } catch (err) {
-        console.error('[middleware] DB error:', err)
-        return NextResponse.redirect(new URL('/portal/login?error=server_error', request.url))
+    if (member.status === 'rejected') {
+        return NextResponse.redirect(new URL('/portal/login?reason=rejected', request.url))
     }
+
+    if (member.status === 'banned') {
+        // FIX #9: Clear ALL sb-* cookies using path: '/' to prevent infinite redirect
+        const banRes = NextResponse.redirect(new URL('/portal/login?reason=banned', request.url))
+        request.cookies.getAll().forEach(cookie => {
+            if (cookie.name.startsWith('sb-')) {
+                banRes.cookies.set({ name: cookie.name, value: '', maxAge: 0, path: '/' })
+            }
+        })
+        return banRes
+    }
+
+    // Admin-only route guard
+    if (path.startsWith('/portal/admin') && !['admin', 'superadmin'].includes(member.role)) {
+        return NextResponse.redirect(new URL('/portal/dashboard', request.url))
+    }
+
+    return response
 }
 
-export const config = {
-    matcher: ['/portal/:path*'],
-}
+export const config = { matcher: ['/portal/:path*'] }

@@ -1,11 +1,11 @@
-// app/(public)/events/page.tsx — Events Page: DB only, no mock data
+// app/(public)/events/page.tsx — IIMS IT Club Events Page (v4.0)
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import EventGrid from '@/components/public/EventGrid'
 
 export const metadata: Metadata = {
-    title: 'Events — ICEHC',
-    description: 'Upcoming workshops, CTF competitions, seminars, and hackathons by ICEHC at IIMS College.',
+    title: 'Events — IIMS IT Club',
+    description: 'Upcoming workshops, CTF competitions, seminars, and hackathons by IIMS IT Club at IIMS College, Kathmandu.',
 }
 
 export const revalidate = 60
@@ -26,16 +26,20 @@ export default async function EventsPage() {
     }))
 
     return (
-        <div className="bg-black min-h-screen pt-24">
+        <div className="bg-[#F8F9FA] min-h-screen pt-24">
             <div className="max-w-7xl mx-auto px-6 pb-20">
-                <p className="font-mono text-[#00FF87] text-sm mb-2">// upcoming_events.log</p>
-                <h1 className="font-mono font-bold text-[#F0F0FF] text-3xl md:text-4xl mb-4">
-                    Events
-                    <span className="block h-1 w-16 bg-[#00FF87] mt-3 rounded-full" />
-                </h1>
-                <p className="text-[#8888AA] text-sm font-sans mb-12">
-                    Workshops, CTF competitions, seminars, and hackathons.
-                </p>
+                {/* Page Header */}
+                <div className="mb-12">
+                    <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
+                        IIMS IT Club
+                    </span>
+                    <h1 className="font-bold text-[#212121] text-3xl md:text-4xl mb-3">
+                        Events & Activities
+                    </h1>
+                    <p className="text-[#757575] text-base max-w-xl">
+                        Workshops, CTF competitions, seminars, and hackathons — all open to IIMS students.
+                    </p>
+                </div>
 
                 <EventGrid events={events} />
             </div>

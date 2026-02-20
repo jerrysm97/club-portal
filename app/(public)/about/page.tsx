@@ -1,147 +1,102 @@
-// app/(public)/about/page.tsx — ICEHC About Page: Hero + Objectives + Team Grid + Sustainability
+// app/(public)/about/page.tsx — IIMS IT Club About Page (v4.0)
 import Link from 'next/link'
-import { Terminal, ShieldCheck, Award, FlaskConical, BookOpen, FileText, GraduationCap, ExternalLink } from 'lucide-react'
+import { Code2, Shield, Brain, Globe, BookOpen, FileText, GraduationCap, ExternalLink, ArrowRight } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'About ICEHC — IIMS Cybersecurity & Ethical Hacking Club',
-    description: 'Learn about the founding team, mission, and objectives of ICEHC at IIMS College, Kathmandu.',
+    title: 'About — IIMS IT Club',
+    description: 'Learn about the mission, focus areas, and founding team of the IIMS IT Club at IIMS College, Kathmandu.',
 }
 
-const OBJECTIVES = [
+const FOCUS_AREAS = [
     {
-        title: 'Practical Skill Development',
-        desc: 'Hands-on training in Kali Linux, Burp Suite, Wireshark; Penetration Testing and Network Defence methodologies.',
-        icon: Terminal,
+        title: 'Web & Software Development',
+        desc: 'Hands-on training with industry-standard frameworks — React, Next.js, Node.js, and databases. We build real projects from scratch.',
+        icon: Code2,
+        color: 'text-[#1A237E]',
+        bg: 'bg-[#1A237E]/8',
     },
     {
-        title: 'Ethical Hacking Awareness',
-        desc: 'Promoting "White Hat" hacking principles; educating on digital hygiene, phishing defence, and scam prevention (aligning with the "Scan the Scammers" initiative).',
-        icon: ShieldCheck,
+        title: 'Cybersecurity & CTF',
+        desc: 'Ethical hacking, penetration testing, and Capture The Flag competitions aligned with the IIMS College CTF program.',
+        icon: Shield,
+        color: 'text-[#E53935]',
+        bg: 'bg-[#E53935]/8',
     },
     {
-        title: 'Career Readiness',
-        desc: 'Preparing members for CEH, CompTIA Security+ certifications and cybersecurity careers through CTF competitions and expert guest sessions.',
-        icon: Award,
+        title: 'AI & Machine Learning',
+        desc: 'Applied AI/ML: building neural networks, NLP models, and data science projects tailored for business and technical programs.',
+        icon: Brain,
+        color: 'text-[#2E7D32]',
+        bg: 'bg-[#2E7D32]/8',
     },
     {
-        title: 'Innovation & Research',
-        desc: 'Encouraging students to build and test their own security tools and write research papers on emerging vulnerabilities.',
-        icon: FlaskConical,
+        title: 'Open Source & DevOps',
+        desc: 'Contributing to open source projects, cloud infrastructure, Docker, CI/CD pipelines, and Infrastructure as Code.',
+        icon: Globe,
+        color: 'text-[#0277BD]',
+        bg: 'bg-[#0277BD]/8',
     },
 ]
 
 const ALL_MEMBERS = [
-    { name: 'Sujal Mainali', role: 'President', program: 'BCS 2026 Jan Intake', initials: 'SM', tier: 'gold' as const },
-    { name: 'Deepika Kumari Yadav', role: 'Vice President', program: 'BCS 2026 Jan Intake', initials: 'DY', tier: 'cyan' as const },
-    { name: 'Raskin Shrestha', role: 'Secretary', program: 'BSC 2026 Jan Intake', initials: 'RS', tier: 'green' as const },
-    { name: 'Barsha Shrestha', role: 'Joint Secretary', program: 'BSC 2026 Jan Intake', initials: 'BS', tier: 'green' as const },
-    { name: 'Namika Prajapati', role: 'Treasurer', program: 'BCS 2026 Jan Intake', initials: 'NP', tier: 'green' as const },
-    { name: 'Sabina Neupane', role: 'Event Coordinator', program: 'BCS 2026 Jan Intake', initials: 'SN', tier: 'green' as const },
-    { name: 'Samrachana Lama', role: 'Marketing Lead', program: 'BCS 2026 Jan Intake', initials: 'SL', tier: 'green' as const },
-    { name: 'Radha Rawat', role: 'IT Head', program: 'BSC 2026 Jan Intake', initials: 'RR', tier: 'cyan' as const },
-    { name: 'Karuna Bishkarma', role: 'Executive Head', program: 'BCS 2026 Jan Intake', initials: 'KB', tier: 'cyan' as const },
+    { name: 'Sujal Mainali', role: 'President', program: 'BCS 2026 Jan Intake', initials: 'SM', highlight: true },
+    { name: 'Deepika Kumari Yadav', role: 'Vice President', program: 'BCS 2026 Jan Intake', initials: 'DY', highlight: false },
+    { name: 'Raskin Shrestha', role: 'Secretary', program: 'BSC 2026 Jan Intake', initials: 'RS', highlight: false },
+    { name: 'Barsha Shrestha', role: 'Joint Secretary', program: 'BSC 2026 Jan Intake', initials: 'BS', highlight: false },
+    { name: 'Namika Prajapati', role: 'Treasurer', program: 'BCS 2026 Jan Intake', initials: 'NP', highlight: false },
+    { name: 'Sabina Neupane', role: 'Event Coordinator', program: 'BCS 2026 Jan Intake', initials: 'SN', highlight: false },
+    { name: 'Samrachana Lama', role: 'Marketing Lead', program: 'BCS 2026 Jan Intake', initials: 'SL', highlight: false },
+    { name: 'Radha Rawat', role: 'IT Head', program: 'BSC 2026 Jan Intake', initials: 'RR', highlight: false },
+    { name: 'Karuna Bishkarma', role: 'Executive Head', program: 'BCS 2026 Jan Intake', initials: 'KB', highlight: false },
 ]
 
 const SUSTAINABILITY = [
-    { title: 'Knowledge Transfer', desc: 'Mentorship Pipeline — 2nd and 3rd-year students train 1st-year members in specific tools.', icon: BookOpen },
-    { title: 'Documentation', desc: 'Club Wiki on GitHub/Notion documenting every workshop, session, and resource.', icon: FileText },
-    { title: 'Faculty Integration', desc: 'Club activities integrated with the IIMS academic calendar for maximum participation.', icon: GraduationCap },
+    { title: 'Knowledge Transfer', desc: 'Mentorship pipeline — 2nd and 3rd-year students train 1st-year members in specific tools and workflows.', icon: BookOpen },
+    { title: 'Documentation', desc: 'Club wiki documenting every workshop, session, resource, and CTF writeup for future members.', icon: FileText },
+    { title: 'Faculty Integration', desc: 'Club activities integrated with the IIMS academic calendar for maximum student participation.', icon: GraduationCap },
 ]
-
-const BADGE_STYLES = {
-    gold: {
-        badge: 'text-[#D4AF37] bg-[#D4AF37]/10 border-[#D4AF37]/40',
-        border: 'border-[#D4AF37]/40',
-        avatar: 'bg-[#D4AF37]/10 text-[#D4AF37]',
-    },
-    cyan: {
-        badge: 'text-[#00D4FF] bg-[#00D4FF]/10 border-[#00D4FF]/30',
-        border: 'border-[#2D2D44]',
-        avatar: 'bg-[#0D1B2A] text-[#00D4FF]',
-    },
-    green: {
-        badge: 'text-[#00FF87] bg-[#00FF87]/10 border-[#00FF87]/30',
-        border: 'border-[#2D2D44]',
-        avatar: 'bg-[#0D1B2A] text-[#00FF87]',
-    },
-}
 
 export default function AboutPage() {
     return (
-        <div className="bg-black min-h-screen pt-24">
-            {/* ═══ Section A — Page Hero ═══ */}
+        <div className="bg-[#F8F9FA] min-h-screen pt-24">
+            {/* Page Hero */}
             <section className="max-w-7xl mx-auto px-6 pb-16">
-                <p className="font-mono text-[#00FF87] text-sm mb-2">// about_icehc.md</p>
-                <h1 className="font-mono font-bold text-[#F0F0FF] text-3xl md:text-4xl mb-4">
-                    About ICEHC
-                    <span className="block h-1 w-16 bg-[#00FF87] mt-3 rounded-full" />
+                <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
+                    IIMS IT Club
+                </span>
+                <h1 className="font-bold text-[#212121] text-3xl md:text-4xl mb-4">
+                    About the Club
                 </h1>
-                <p className="text-[#8888AA] font-mono text-sm mb-6">
-                    IIMS Cybersecurity & Ethical Hacking Club — Est. 2025
+                <p className="text-[#757575] text-base mb-6 font-medium">
+                    Established 2025 · IIMS College, Kathmandu, Nepal
                 </p>
-                <p className="text-[#8888AA] text-base font-sans leading-relaxed max-w-3xl">
-                    To establish IIMS College as a premier hub for cybersecurity excellence in Nepal.
-                    We envision a community where students bridge the gap between theoretical computer
-                    science and real-world defense strategies, fostering a culture of ethical
-                    responsibility, digital safety, and proactive threat mitigation.
+                <p className="text-[#424242] text-lg leading-relaxed max-w-3xl">
+                    The IIMS IT Club is the official technology club of IIMS College, Kathmandu. Our mission is to empower students across all programs — BCS, BBUS, BIHM, and MBA — with practical technology skills, real-world project experience, and a collaborative community that bridges the gap between academia and industry.
                 </p>
             </section>
 
-            {/* ═══ Section B — Full Objectives ═══ */}
-            <section className="bg-black py-16 border-t border-[#1E1E2E]">
+            {/* Focus Areas */}
+            <section className="bg-white py-16 border-y border-[#E0E0E0]">
                 <div className="max-w-7xl mx-auto px-6">
-                    <p className="font-mono text-[#00FF87] text-sm mb-2">// objectives --verbose</p>
-                    <h2 className="font-mono font-bold text-[#F0F0FF] text-2xl md:text-3xl mb-12">
-                        Our Objectives
-                    </h2>
-
-                    <div className="space-y-8">
-                        {OBJECTIVES.map(({ title, desc, icon: Icon }, i) => (
-                            <div
-                                key={title}
-                                className={`flex flex-col md:flex-row items-start gap-6 ${i % 2 !== 0 ? 'md:flex-row-reverse' : ''
-                                    }`}
-                            >
-                                <div className="flex-shrink-0">
-                                    <div className="h-20 w-20 rounded-xl bg-[#00FF87]/10 flex items-center justify-center">
-                                        <Icon className="h-10 w-10 text-[#00FF87]" />
-                                    </div>
-                                </div>
-                                <div className="flex-1 bg-[#0A0A0F] border border-[#2D2D44] rounded-lg p-6">
-                                    <h3 className="font-mono font-bold text-[#F0F0FF] text-base mb-3">{title}</h3>
-                                    <p className="text-[#8888AA] text-sm font-sans leading-relaxed">{desc}</p>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="text-center mb-12">
+                        <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
+                            What We Focus On
+                        </span>
+                        <h2 className="font-bold text-[#212121] text-2xl md:text-3xl">
+                            Four Core <span className="text-[#1A237E]">Focus Areas</span>
+                        </h2>
                     </div>
-                </div>
-            </section>
-
-            {/* ═══ Section C — All 9 Founding Members ═══ */}
-            <section className="bg-black py-16 border-t border-[#1E1E2E]">
-                <div className="max-w-7xl mx-auto px-6">
-                    <p className="font-mono text-[#00FF87] text-sm mb-2">// core_team --list-all</p>
-                    <h2 className="font-mono font-bold text-[#F0F0FF] text-2xl md:text-3xl mb-12">
-                        Founding Members
-                    </h2>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {ALL_MEMBERS.map(({ name, role, program, initials, tier }) => {
-                            const style = BADGE_STYLES[tier]
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {FOCUS_AREAS.map((area) => {
+                            const Icon = area.icon
                             return (
-                                <div
-                                    key={name}
-                                    className={`bg-[#0A0A0F] border rounded-lg p-6 text-center hover:bg-[#12121A] transition-all duration-200 ${style.border}`}
-                                >
-                                    <div className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 font-mono font-bold text-lg ${style.avatar}`}>
-                                        {initials}
+                                <div key={area.title} className="bg-white border border-[#E0E0E0] rounded-xl p-6 shadow-sm hover:shadow-md hover:border-[#1A237E]/20 transition-all group">
+                                    <div className={`h-12 w-12 rounded-xl ${area.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                                        <Icon className={`h-6 w-6 ${area.color}`} />
                                     </div>
-                                    <h3 className="font-mono font-bold text-[#F0F0FF] text-sm mb-1">{name}</h3>
-                                    <span className={`font-mono text-xs px-2 py-0.5 rounded-full border inline-block mb-2 ${style.badge}`}>
-                                        {role}
-                                    </span>
-                                    <p className="text-[#8888AA] text-xs font-sans">{program}</p>
+                                    <h3 className="font-bold text-[#212121] mb-2 text-sm">{area.title}</h3>
+                                    <p className="text-[#757575] text-sm leading-relaxed">{area.desc}</p>
                                 </div>
                             )
                         })}
@@ -149,36 +104,68 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* ═══ Section D — Sustainability & Links ═══ */}
-            <section className="bg-black py-16 border-t border-[#1E1E2E]">
+            {/* Founding Members */}
+            <section className="py-16">
                 <div className="max-w-7xl mx-auto px-6">
-                    <p className="font-mono text-[#00FF87] text-sm mb-2">// sustainability.conf</p>
-                    <h2 className="font-mono font-bold text-[#F0F0FF] text-2xl md:text-3xl mb-12">
-                        Sustainability Plan
-                    </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                        {SUSTAINABILITY.map(({ title, desc, icon: Icon }) => (
+                    <div className="mb-10">
+                        <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
+                            Our People
+                        </span>
+                        <h2 className="font-bold text-[#212121] text-2xl md:text-3xl">
+                            Founding <span className="text-[#1A237E]">Members</span>
+                        </h2>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {ALL_MEMBERS.map(({ name, role, program, initials, highlight }) => (
                             <div
-                                key={title}
-                                className="bg-[#0A0A0F] border border-[#2D2D44] rounded-lg p-6 hover:bg-[#12121A] hover:border-[#00FF87]/30 transition-all duration-200"
+                                key={name}
+                                className={`bg-white border rounded-xl p-5 text-center hover:shadow-md transition-all ${highlight ? 'border-[#1A237E]/30 ring-1 ring-[#1A237E]/20' : 'border-[#E0E0E0]'}`}
                             >
-                                <div className="h-10 w-10 rounded-md bg-[#00FF87]/10 flex items-center justify-center mb-4">
-                                    <Icon className="h-5 w-5 text-[#00FF87]" />
+                                <div className={`h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-base ${highlight ? 'bg-[#1A237E] text-white' : 'bg-[#F0F4FF] text-[#1A237E]'}`}>
+                                    {initials}
                                 </div>
-                                <h3 className="font-mono font-bold text-[#F0F0FF] text-sm mb-2">{title}</h3>
-                                <p className="text-[#8888AA] text-sm font-sans leading-relaxed">{desc}</p>
+                                <h3 className="font-semibold text-[#212121] text-sm mb-1">{name}</h3>
+                                <span className={`text-xs px-2 py-0.5 rounded-full inline-block mb-1 font-medium ${highlight ? 'bg-[#1A237E]/10 text-[#1A237E]' : 'bg-[#E8EAF6] text-[#1A237E]'}`}>
+                                    {role}
+                                </span>
+                                <p className="text-[#9E9E9E] text-xs">{program}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Sustainability */}
+            <section className="bg-white py-16 border-t border-[#E0E0E0]">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="mb-10">
+                        <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-3 block">
+                            Long-Term Vision
+                        </span>
+                        <h2 className="font-bold text-[#212121] text-2xl md:text-3xl">
+                            Sustainability <span className="text-[#1A237E]">Plan</span>
+                        </h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        {SUSTAINABILITY.map(({ title, desc, icon: Icon }) => (
+                            <div key={title} className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl p-6">
+                                <div className="h-10 w-10 rounded-lg bg-[#1A237E]/10 flex items-center justify-center mb-4">
+                                    <Icon className="h-5 w-5 text-[#1A237E]" />
+                                </div>
+                                <h3 className="font-bold text-[#212121] text-sm mb-2">{title}</h3>
+                                <p className="text-[#757575] text-sm leading-relaxed">{desc}</p>
                             </div>
                         ))}
                     </div>
 
                     {/* External Links */}
-                    <div className="bg-[#0D1B2A] border border-[#2D2D44] rounded-lg p-6">
-                        <h3 className="font-mono font-bold text-[#F0F0FF] text-sm mb-4">IIMS Resources</h3>
-                        <div className="flex flex-wrap gap-4">
+                    <div className="bg-[#F0F4FF] border border-[#C5CAE9] rounded-xl p-6">
+                        <h3 className="font-bold text-[#1A237E] text-sm mb-4">IIMS Resources</h3>
+                        <div className="flex flex-wrap gap-3">
                             {[
-                                { href: 'https://iimscollege.edu.np/capture-the-flag/', label: 'IIMS CTF Page' },
-                                { href: 'https://iimscollege.edu.np/it-club/', label: 'IIMS IT Club' },
+                                { href: 'https://iimscollege.edu.np/it-club/', label: 'IIMS IT Club Page' },
+                                { href: 'https://iimscollege.edu.np/capture-the-flag/', label: 'CTF Program' },
+                                { href: 'https://iimscollege.edu.np/iims-hackathon/', label: 'IIMS Hackathon' },
                                 { href: 'https://iimscollege.edu.np/', label: 'IIMS College' },
                             ].map(({ href, label }) => (
                                 <a
@@ -186,7 +173,7 @@ export default function AboutPage() {
                                     href={href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 border border-[#2D2D44] text-[#00D4FF] font-mono text-sm px-4 py-2 rounded-md hover:bg-[#12121A] hover:border-[#00D4FF]/30 transition-all"
+                                    className="inline-flex items-center gap-2 border border-[#9FA8DA] text-[#1A237E] text-sm px-4 py-2 rounded-lg hover:bg-[#1A237E] hover:text-white hover:border-[#1A237E] transition-all font-medium"
                                 >
                                     <ExternalLink className="h-3.5 w-3.5" />
                                     {label}
@@ -194,6 +181,21 @@ export default function AboutPage() {
                             ))}
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* CTA */}
+            <section className="py-16 bg-[#F8F9FA] border-t border-[#E0E0E0]">
+                <div className="max-w-2xl mx-auto px-6 text-center">
+                    <h2 className="font-bold text-[#212121] text-2xl mb-4">Interested in Joining?</h2>
+                    <p className="text-[#757575] mb-8">Membership is open to all IIMS College students. Apply through the Member Portal.</p>
+                    <Link
+                        href="/portal/login"
+                        className="inline-flex items-center gap-2 bg-[#E53935] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#C62828] transition-all text-sm"
+                    >
+                        Apply for Membership
+                        <ArrowRight className="h-4 w-4" />
+                    </Link>
                 </div>
             </section>
         </div>

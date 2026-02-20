@@ -1,45 +1,44 @@
-/* app/globals.css — IIMS Stealth Terminal Design System */
+/* app/globals.css — IIMS IT Club Portal (v4.0) */
+/* IIMS College Official Theme: light, professional, navy/crimson */
 @import "tailwindcss";
 
-/* ─── Custom Scrollbar (dark) ─── */
+/* ─── Custom Scrollbar (navy thumb — IIMS brand) ─── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0A0F;
+  background: #F5F5F5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2D2D44;
+  background: #9FA8DA;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8888AA;
+  background: #1A237E;
 }
 
-/* ─── Selection ─── */
+/* ─── Selection (IIMS Navy) ─── */
 ::selection {
-  background: rgba(0, 255, 135, 0.2);
-  color: #F0F0FF;
+  background: rgba(26, 35, 126, 0.15);
+  color: #1A237E;
 }
 
-/* ─── Body ─── */
+/* ─── Body — Light IIMS theme ─── */
 body {
-  background-color: #000000;
-  color: #F0F0FF;
+  background-color: #F8F9FA;
+  color: #212121;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Terminal Grid ─── */
-.terminal-grid {
-  background-image:
-    linear-gradient(rgba(0, 255, 135, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 135, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+/* ─── Focus ring (IIMS Navy) ─── */
+*:focus-visible {
+  outline: 2px solid #1A237E;
+  outline-offset: 2px;
 }
 
 /* ─── Fade Up Animation ─── */
@@ -91,22 +90,11 @@ body {
   animation: slideIn 0.3s ease-out forwards;
 }
 
-/* ─── Blink cursor ─── */
-@keyframes blink {
-
-  0%,
-  50% {
-    opacity: 1;
-  }
-
-  51%,
-  100% {
-    opacity: 0;
-  }
-}
-
-.animate-blink {
-  animation: blink 1s step-end infinite;
+/* ─── CTF Terminal (dark styling ONLY for CTF/code sections) ─── */
+.ctf-terminal {
+  background: #1E1E2E;
+  color: #CDD6F4;
+  font-family: var(--font-mono);
 }
 
 /* ─── Smooth scroll ─── */
@@ -114,8 +102,8 @@ html {
   scroll-behavior: smooth;
 }
 
-/* ─── Focus ring (terminal green) ─── */
-*:focus-visible {
-  outline: 2px solid #00FF87;
-  outline-offset: 2px;
+/* ─── Code Block ─── */
+pre,
+code {
+  font-family: var(--font-mono);
 }

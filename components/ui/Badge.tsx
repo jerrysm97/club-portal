@@ -1,20 +1,22 @@
-// components/ui/Badge.tsx — IIMS Collegiate status badges
+// components/ui/Badge.tsx — IIMS IT Club v4.0 status badges
 import { cn } from '@/lib/utils'
 
 interface BadgeProps {
-    variant?: 'default' | 'success' | 'warning' | 'danger' | 'maroon' | 'info' | 'outline'
+    variant?: 'navy' | 'crimson' | 'success' | 'warning' | 'danger' | 'info' | 'outline' | 'default'
     children: React.ReactNode
     className?: string
 }
 
+// Colors per CONTEXT.md §4.2
 const variants: Record<string, string> = {
-    default: 'bg-[#F3F4F6] text-[#374151]',
-    success: 'bg-[#D1FAE5] text-[#065F46]',
-    warning: 'bg-[#FEF3C7] text-[#92400E]',
-    danger: 'bg-[#FEE2E2] text-[#991B1B]',
-    maroon: 'bg-[#58151C] text-white',
-    info: 'bg-[#DBEAFE] text-[#1E40AF]',
-    outline: 'border border-[#E5E7EB] text-[#374151] bg-transparent',
+    navy: 'text-[#1A237E] bg-[#E8EAF6] border border-[#1A237E]/20',
+    crimson: 'text-[#E53935] bg-[#FFEBEE] border border-[#E53935]/20',
+    success: 'text-[#2E7D32] bg-[#E8F5E9] border border-[#2E7D32]/20',
+    warning: 'text-[#F57F17] bg-[#FFF8E1] border border-[#F57F17]/20',
+    danger: 'text-[#B71C1C] bg-[#FFEBEE] border border-[#B71C1C]/20',
+    info: 'text-[#0277BD] bg-[#E1F5FE] border border-[#0277BD]/20',
+    outline: 'border border-[#E0E0E0] text-[#757575] bg-transparent',
+    default: 'text-[#757575] bg-[#F5F5F5] border border-[#E0E0E0]',
 }
 
 export default function Badge({ variant = 'default', children, className }: BadgeProps) {
@@ -43,10 +45,9 @@ export function MemberStatusBadge({ status }: { status: string }) {
 }
 
 export function RoleBadge({ role }: { role: string }) {
-    const map: Record<string, 'maroon' | 'danger' | 'info' | 'default'> = {
-        superadmin: 'maroon',
-        admin: 'danger',
-        bod: 'info',
+    const map: Record<string, 'navy' | 'crimson' | 'info' | 'default'> = {
+        superadmin: 'navy',
+        admin: 'crimson',
         member: 'default',
     }
     return <Badge variant={map[role] ?? 'default'}>{role}</Badge>
