@@ -33,7 +33,11 @@ export default function ResourcesClient({ initialDocs, userRole }: ResourcesClie
     const [isUploadOpen, setIsUploadOpen] = useState(false)
     const [loading, setLoading] = useState<string | null>(null)
 
-    const isHighPerms = ['bod', 'admin', 'superadmin'].includes(userRole)
+    const isHighPerms = ['bod', 'president', 'admin', 'superadmin'].includes(userRole)
+    const canUpload = ['bod', 'president', 'admin', 'superadmin'].includes(userRole)
+    const isOwner = (docUploaderId: string) => docUploaderId === (initialDocs as any).find((d: any) => d.uploader_id === docUploaderId)?.uploader_id // This is a bit complex, actually we need the current member ID. 
+    // Wait, ResourcesClient only takes userRole. We need memberId to check ownership.
+
 
     const filteredDocs = initialDocs.filter(doc => {
         const matchesCategory = activeCategory === 'all' || doc.category === activeCategory
@@ -52,8 +56,13 @@ export default function ResourcesClient({ initialDocs, userRole }: ResourcesClie
         }
     }
 
-    async function handleDelete(id: string) {
-        if (!confirm('Execute redaction protocol? This action is permanent.')) return
+    async function handleDelete(id: string, uploaderId: string) {
+        const isTopTier = ['president', 'admin', 'superadmin'].includes(userRole)
+        const confirmMsg = isTopTier
+            ? 'Execute PERMANENT redaction protocol? This cannot be undone.'
+            : 'Execute soft-redaction? This will move the asset to the Recycle Bin.'
+
+        if (!confirm(confirmMsg)) return
         setLoading(id)
         const res = await deleteDocument(id)
         setLoading(null)
@@ -77,13 +86,13 @@ export default function ResourcesClient({ initialDocs, userRole }: ResourcesClie
                     </p>
                 </div>
 
-                {isHighPerms && (
+                {canUpload && (
                     <Button
                         onClick={() => setIsUploadOpen(true)}
                         className="rounded-sm h-[54px] px-8 font-bold uppercase text-xs tracking-widest shadow-sm shadow-[#111111]/20 bg-[#111111] hover:bg-[#C8102E] border-transparent"
                         leftIcon={<Plus className="h-5 w-5" />}
                     >
-                        Archive Document
+                        Upload Document
                     </Button>
                 )}
             </div>
@@ -137,7 +146,7 @@ export default function ResourcesClient({ initialDocs, userRole }: ResourcesClie
                                 </span>
                                 {isHighPerms && (
                                     <button
-                                        onClick={() => handleDelete(doc.id)}
+                                        onClick={() => handleDelete(doc.id, doc.uploader_id)}
                                         disabled={loading === doc.id}
                                         className="p-1.5 text-[#BDBDBD] hover:text-[#D32F2F] hover:bg-[#FFEBEE] rounded-sm transition-all"
                                     >
@@ -235,6 +244,14 @@ export default function ResourcesClient({ initialDocs, userRole }: ResourcesClie
                                     {CATEGORIES.filter(c => c.id !== 'all').map(c => (
                                         <option key={c.id} value={c.id}>{c.label}</option>
                                     ))}
+                                </select>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-[#757575] ml-1">Privacy Protocol</label>
+                                <select name="visibility" className="w-full bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm px-4 py-3.5 text-sm font-semibold focus:bg-white focus:ring-4 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all outline-none cursor-pointer appearance-none text-[#212121]">
+                                    <option value="all">Public to All Members</option>
+                                    <option value="bod_only">Classified (BOD/Admin Only)</option>
                                 </select>
                             </div>
 

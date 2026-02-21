@@ -5,7 +5,8 @@ import Link from 'next/link'
 import Avatar from '@/components/ui/Avatar'
 import { ArrowLeft, Clock, ShieldCheck, Heart, MessageSquare } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
-import { getSession } from '@/lib/auth'
+import { getSession, getMember } from '@/lib/auth'
+import CommentForm from '@/components/portal/CommentForm'
 
 
 
@@ -15,6 +16,9 @@ export default async function SinglePostPage(props: { params: Promise<{ id: stri
 
     const session = await getSession()
     if (!session) redirect('/portal/login')
+
+    const member = await getMember(session.user.id)
+    if (!member) redirect('/portal/pending')
 
     const supabase = createServerClient()
 
@@ -98,6 +102,12 @@ export default async function SinglePostPage(props: { params: Promise<{ id: stri
             <div className="bg-white border border-[#E0E0E0] rounded-[2rem] shadow-sm p-8 md:p-10">
                 <h3 className="text-xl font-bold text-[#212121] mb-8">Discussions</h3>
 
+                <CommentForm
+                    postId={id}
+                    userAvatar={member.avatar_url || undefined}
+                    userName={member.full_name || undefined}
+                />
+
                 <div className="space-y-6">
                     {post.post_comments?.length > 0 ? (
                         post.post_comments.map((comment: any) => {
@@ -108,6 +118,7 @@ export default async function SinglePostPage(props: { params: Promise<{ id: stri
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="font-bold text-sm text-[#212121]">{commentAuthor?.full_name}</span>
+                                            <span className="text-[9px] font-bold text-[#E53935] uppercase tracking-widest">{commentAuthor?.club_post || commentAuthor?.role}</span>
                                             <span className="text-[10px] text-[#9E9E9E]">• {formatDate(comment.created_at)}</span>
                                         </div>
                                         <p className="text-[#424242] text-sm leading-relaxed">{comment.content}</p>

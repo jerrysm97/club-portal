@@ -88,8 +88,8 @@ export default async function ProtectedPortalLayout({
             </div>
 
             {/* Background design elements across portal */}
-            <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#111111]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none -z-10" />
-            <div className="fixed bottom-0 left-64 w-[500px] h-[500px] bg-[#E53935]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none -z-10" />
+            <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#111111]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none -z-10 transform-gpu" />
+            <div className="fixed bottom-0 left-64 w-[500px] h-[500px] bg-[#E53935]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none -z-10 transform-gpu" />
         </div>
     )
 }

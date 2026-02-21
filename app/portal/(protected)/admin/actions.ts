@@ -80,14 +80,6 @@ export async function deletePost(id: string) {
 
 // Resource Management
 export async function deleteResource(id: string) {
-    const supabase = createAdminSupabaseClient()
-    const { error } = await supabase
-        .from('documents' as any)
-        .delete()
-        .eq('id', id)
-
-    if (error) return { error: error.message }
-    revalidatePath('/portal/admin')
-    revalidatePath('/portal/resources')
-    return { success: true }
+    const { deleteDocument } = await import('../resources/actions')
+    return deleteDocument(id)
 }
