@@ -2,7 +2,12 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
-import HeroTerminal from '@/components/public/HeroTerminal'
+import dynamic from 'next/dynamic'
+
+const HeroTerminal = dynamic(() => import('@/components/public/HeroTerminal'), {
+    ssr: false,
+    loading: () => <div className="h-64 w-full bg-[#0D1117] animate-pulse rounded-xl border border-[#30363D]" />
+})
 
 export default function HeroSection() {
     return (
@@ -14,7 +19,7 @@ export default function HeroSection() {
             }} />
 
             {/* Gradient glow */}
-            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#E53935]/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#E53935]/10 rounded-full blur-[120px] pointer-events-none transform-gpu" />
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 pt-28 pb-20 grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
                 <div className="lg:col-span-3">

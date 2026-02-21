@@ -24,12 +24,14 @@ export default function HomePage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
                             href="/join"
+                            prefetch={false}
                             className="w-full sm:w-auto px-8 py-3 bg-[#C8102E] text-white font-bold text-sm tracking-wide rounded-sm hover:bg-[#A30D25] transition-colors"
                         >
                             Join the Club
                         </Link>
                         <Link
                             href="/about"
+                            prefetch={false}
                             className="w-full sm:w-auto px-8 py-3 bg-white text-[#111111] border border-[#111111] font-bold text-sm tracking-wide rounded-sm hover:bg-[#F5F5F5] transition-colors"
                         >
                             Learn More
