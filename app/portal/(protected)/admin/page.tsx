@@ -66,7 +66,7 @@ export default function AdminPage() {
         return (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-100px)] animate-pulse">
                 <div className="h-16 w-16 bg-[#F8F9FA] rounded-[2rem] flex items-center justify-center mb-6 shadow-sm border border-[#E0E0E0]">
-                    <Loader2 className="h-8 w-8 text-[#1A237E] animate-spin" />
+                    <Loader2 className="h-8 w-8 text-[#111111] animate-spin" />
                 </div>
                 <p className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">Loading Admin Data</p>
             </div>
@@ -79,7 +79,7 @@ export default function AdminPage() {
                 <AlertTriangle className="h-12 w-12 text-[#E53935] mb-6" />
                 <h2 className="text-2xl font-bold text-[#212121] mb-2">Connection Error</h2>
                 <p className="text-[#757575] max-w-sm mb-8 font-medium">{error}</p>
-                <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[#1A237E] text-white rounded-xl font-bold tracking-widest text-xs uppercase shadow-md shadow-[#1A237E]/20 hover:bg-[#283593] transition-colors">
+                <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[#111111] text-white rounded-sm font-bold tracking-widest text-xs uppercase shadow-sm shadow-[#111111]/20 hover:bg-[#C8102E] transition-colors">
                     Retry Connection
                 </button>
             </div>
@@ -93,7 +93,7 @@ export default function AdminPage() {
             <main className="flex-1 overflow-y-auto p-8 md:p-12 custom-scrollbar animate-fade-up">
                 <header className="mb-10 flex items-center justify-between">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#E53935]/10 text-[#D32F2F] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#FFCDD2]">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-[#E53935]/10 text-[#D32F2F] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#FFCDD2]">
                             <ShieldCheck className="h-3.5 w-3.5" /> Administration
                         </div>
                         <h1 className="text-4xl font-bold text-[#212121] capitalize leading-tight">

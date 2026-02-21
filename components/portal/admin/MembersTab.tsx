@@ -31,6 +31,8 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
         const form = new FormData(e.currentTarget)
         const role = form.get('role') as string
         const club_post = form.get('club_post') as string
+        const is_public_profile = form.get('is_public_profile') === 'on'
+        const display_order = parseInt(form.get('display_order') as string, 10) || 999
 
         try {
             const res = await fetch('/api/admin/members', {
@@ -40,6 +42,8 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                     id: designatingMember.id,
                     role,
                     club_post,
+                    is_public_profile,
+                    display_order,
                     status: designatingMember.status // preserve status
                 })
             })
@@ -107,7 +111,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
+                                            "px-3.5 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-widest border",
                                             member.role === 'admin' || member.role === 'superadmin'
                                                 ? "bg-[#FFEBEE] text-[#D32F2F] border-[#FFCDD2] shadow-sm"
                                                 : "bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB]"
@@ -117,7 +121,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
+                                            "px-3.5 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-widest border",
                                             member.status === 'approved' ? "bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]" :
                                                 member.status === 'pending' ? "bg-[#FFF8E1] text-[#F57F17] border-[#FFECB3] animate-pulse" :
                                                     "bg-[#F5F5F5] text-[#757575] border-[#E0E0E0]"
@@ -131,7 +135,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                                 <button
                                                     onClick={() => handleStatus(member.id, 'approved')}
                                                     disabled={!!isLoading}
-                                                    className="p-2.5 bg-[#E8F5E9] hover:bg-[#4CAF50] text-[#2E7D32] hover:text-white rounded-xl transition-all shadow-sm border border-[#C8E6C9]"
+                                                    className="p-2.5 bg-[#E8F5E9] hover:bg-[#4CAF50] text-[#2E7D32] hover:text-white rounded-sm transition-all shadow-sm border border-[#C8E6C9]"
                                                     title="Authorize Protocol"
                                                 >
                                                     <UserCheck className="h-4 w-4" />
@@ -141,7 +145,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                                 <button
                                                     onClick={() => setDesignatingMember(member)}
                                                     disabled={!!isLoading}
-                                                    className="p-2.5 bg-[#E3F2FD] hover:bg-[#1976D2] text-[#1976D2] hover:text-white rounded-xl transition-all shadow-sm border border-[#BBDEFB]"
+                                                    className="p-2.5 bg-[#E3F2FD] hover:bg-[#1976D2] text-[#1976D2] hover:text-white rounded-sm transition-all shadow-sm border border-[#BBDEFB]"
                                                     title="Manage Designation"
                                                 >
                                                     <Settings className="h-4 w-4" />
@@ -150,7 +154,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                             <button
                                                 onClick={() => handleDelete(member.id)}
                                                 disabled={!!isLoading}
-                                                className="p-2.5 bg-white hover:bg-[#212121] text-[#9E9E9E] hover:text-white rounded-xl transition-all shadow-sm border border-[#E0E0E0]"
+                                                className="p-2.5 bg-white hover:bg-[#212121] text-[#9E9E9E] hover:text-white rounded-sm transition-all shadow-sm border border-[#E0E0E0]"
                                                 title="Purge Record"
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -167,7 +171,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
             {/* Designation Modal */}
             {designatingMember && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B0F19]/80 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-[#E0E0E0] animate-scale-up">
+                    <div className="bg-white rounded-sm w-full max-w-md overflow-hidden shadow-sm border border-[#E0E0E0] animate-scale-up">
                         <div className="p-6 border-b border-[#EEEEEE]">
                             <h3 className="text-xl font-bold border-b-2 border-[#E53935] inline-block pb-1">Manage Designation</h3>
                             <p className="text-sm text-[#757575] mt-2">Adjusting clearances for {designatingMember.full_name}</p>
@@ -178,7 +182,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                 <select
                                     name="role"
                                     defaultValue={designatingMember.role}
-                                    className="w-full bg-[#F5F5F5] border border-[#E0E0E0] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#1A237E] focus:ring-1 focus:ring-[#1A237E] transition-all"
+                                    className="w-full bg-[#F5F5F5] border border-[#E0E0E0] rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-[#111111] focus:ring-1 focus:ring-[#111111] transition-all"
                                 >
                                     <option value="member">Member</option>
                                     <option value="bod">Board of Directors (BOD)</option>
@@ -191,7 +195,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                 <select
                                     name="club_post"
                                     defaultValue={designatingMember.club_post}
-                                    className="w-full bg-[#F5F5F5] border border-[#E0E0E0] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#1A237E] focus:ring-1 focus:ring-[#1A237E] transition-all"
+                                    className="w-full bg-[#F5F5F5] border border-[#E0E0E0] rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-[#111111] focus:ring-1 focus:ring-[#111111] transition-all"
                                 >
                                     {CLUB_POSTS.map(post => {
                                         if (post === 'President' && currentUser?.role !== 'superadmin') return null;
@@ -199,18 +203,43 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                     })}
                                 </select>
                             </div>
+
+                            <div className="flex items-center gap-4 mt-4 bg-[#F8F9FA] p-4 rounded-sm border border-[#E0E0E0]">
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        name="is_public_profile"
+                                        id="is_public_profile"
+                                        defaultChecked={designatingMember.is_public_profile || false}
+                                        className="h-4 w-4 text-[#111111] rounded border-[#E0E0E0] focus:ring-[#111111]"
+                                    />
+                                    <label htmlFor="is_public_profile" className="text-xs font-bold text-[#212121]">Publicly Visible Profile</label>
+                                </div>
+                                <div className="flex items-center gap-3 ml-auto">
+                                    <label htmlFor="display_order" className="text-xs font-bold text-[#757575] uppercase tracking-widest">Order</label>
+                                    <input
+                                        type="number"
+                                        name="display_order"
+                                        id="display_order"
+                                        defaultValue={designatingMember.display_order || 999}
+                                        min="1"
+                                        className="w-20 bg-white border border-[#E0E0E0] rounded-sm px-3 py-2 text-sm text-center focus:outline-none focus:border-[#111111] focus:ring-1 focus:ring-[#111111]"
+                                    />
+                                </div>
+                            </div>
+
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={() => setDesignatingMember(null)}
-                                    className="flex-1 px-4 py-3 bg-[#F5F5F5] hover:bg-[#E0E0E0] text-[#757575] rounded-xl font-bold tracking-widest text-xs uppercase transition-all"
+                                    className="flex-1 px-4 py-3 bg-[#F5F5F5] hover:bg-[#E0E0E0] text-[#757575] rounded-sm font-bold tracking-widest text-xs uppercase transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={!!isLoading}
-                                    className="flex-1 px-4 py-3 bg-[#1A237E] hover:bg-[#283593] text-white rounded-xl font-bold tracking-widest text-xs uppercase shadow-md shadow-[#1A237E]/20 transition-all disabled:opacity-50"
+                                    className="flex-1 px-4 py-3 bg-[#111111] hover:bg-[#C8102E] text-white rounded-sm font-bold tracking-widest text-xs uppercase shadow-sm shadow-[#111111]/20 transition-all disabled:opacity-50"
                                 >
                                     {isLoading === designatingMember.id ? 'Updating...' : 'Confirm'}
                                 </button>

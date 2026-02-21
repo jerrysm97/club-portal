@@ -87,25 +87,25 @@ export default function ConversationList({ conversations, currentMemberId }: Con
             <div className="p-5 md:p-6 border-b border-[#E0E0E0] bg-white">
                 <div className="flex items-center justify-between mb-5">
                     <h2 className="text-[#212121] font-bold text-sm flex items-center gap-2 uppercase tracking-widest">
-                        <MessageSquare className="h-4 w-4 text-[#1A237E]" />
+                        <MessageSquare className="h-4 w-4 text-[#111111]" />
                         Direct Messages
                     </h2>
-                    <button className="p-2 rounded-xl bg-[#F8F9FA] text-[#757575] hover:text-[#1A237E] hover:bg-[#E8EAF6] transition-colors border border-transparent hover:border-[#E8EAF6]">
+                    <button className="p-2 rounded-sm bg-[#F8F9FA] text-[#757575] hover:text-[#111111] hover:bg-[#FAFAFA] transition-colors border border-transparent hover:border-[#FAFAFA]">
                         <Filter className="h-3.5 w-3.5" />
                     </button>
                 </div>
 
                 <div className="relative group">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9E9E9E] group-focus-within:text-[#1A237E] transition-colors" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9E9E9E] group-focus-within:text-[#111111] transition-colors" />
                     <input
                         type="text"
                         placeholder="Search members..."
                         value={query}
                         onChange={e => setQuery(e.target.value)}
-                        className="w-full bg-[#F5F5F5] border border-transparent rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:bg-white focus:border-[#1A237E]/30 focus:ring-4 focus:ring-[#1A237E]/10 transition-all outline-none text-[#212121] placeholder:text-[#9E9E9E]"
+                        className="w-full bg-[#F5F5F5] border border-transparent rounded-sm py-2.5 pl-10 pr-4 text-xs font-semibold focus:bg-white focus:border-[#111111]/30 focus:ring-4 focus:ring-[#111111]/10 transition-all outline-none text-[#212121] placeholder:text-[#9E9E9E]"
                     />
                     {searching && (
-                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#1A237E] animate-spin" />
+                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#111111] animate-spin" />
                     )}
                 </div>
             </div>
@@ -177,7 +177,7 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                                 className={cn(
                                     "block p-4 md:p-5 transition-all relative group border-b border-[#E0E0E0]/50",
                                     isActive
-                                        ? "bg-white shadow-sm z-10 scale-[1.01] border-l-4 border-l-[#1A237E]"
+                                        ? "bg-white shadow-sm z-10 scale-[1.01] border-l-4 border-l-[#111111]"
                                         : "hover:bg-white border-l-4 border-l-transparent"
                                 )}
                             >
@@ -188,7 +188,7 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                                             name={otherMember.name}
                                             className={cn(
                                                 "w-11 h-11 md:w-12 md:h-12 ring-2 transition-all shadow-sm",
-                                                isActive ? "ring-[#1A237E]/20" : "ring-white"
+                                                isActive ? "ring-[#111111]/20" : "ring-white"
                                             )}
                                         />
                                         {unreadCount > 0 && (
@@ -200,7 +200,7 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                                         <div className="flex justify-between items-baseline mb-0.5">
                                             <h4 className={cn(
                                                 "text-sm font-bold truncate transition-colors",
-                                                isActive ? "text-[#1A237E]" : "text-[#212121]"
+                                                isActive ? "text-[#111111]" : "text-[#212121]"
                                             )}>
                                                 {otherMember.name}
                                             </h4>
@@ -230,7 +230,7 @@ export default function ConversationList({ conversations, currentMemberId }: Con
                 ) : (
                     !isSearchMode && (
                         <div className="p-10 text-center animate-fade-up flex flex-col items-center justify-center h-full">
-                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-sm border border-[#E0E0E0]">
+                            <div className="w-14 h-14 bg-white rounded-sm flex items-center justify-center mb-5 shadow-sm border border-[#E0E0E0]">
                                 <MessageSquare className="h-6 w-6 text-[#9E9E9E]" />
                             </div>
                             <p className="text-[#424242] font-bold text-sm uppercase tracking-widest">Inbox Zero</p>
@@ -241,7 +241,7 @@ export default function ConversationList({ conversations, currentMemberId }: Con
 
                 {isSearchMode && searchResults.length === 0 && filteredConversations.length === 0 && !searching && (
                     <div className="p-10 text-center animate-fade-up flex flex-col items-center justify-center">
-                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-5 shadow-sm border border-[#E0E0E0]">
+                        <div className="w-14 h-14 bg-white rounded-sm flex items-center justify-center mb-5 shadow-sm border border-[#E0E0E0]">
                             <Search className="h-6 w-6 text-[#9E9E9E]" />
                         </div>
                         <p className="text-[#424242] font-bold text-sm uppercase tracking-widest">No Results</p>

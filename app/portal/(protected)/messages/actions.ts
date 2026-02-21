@@ -15,8 +15,8 @@ async function getOrCreateConversation(supabase: any, memberId1: string, memberI
     // 1. Find if a conversation already exists
     // We look for conversations where both members are participants.
     // An elegant way is to find conversation_ids for member1, and intersect with member2.
-    const { data: p1 } = await supabase.from('conversation_participants').select('conversation_id').eq('member_id', memberId1)
-    const { data: p2 } = await supabase.from('conversation_participants').select('conversation_id').eq('member_id', memberId2)
+    const { data: p1 } = await (supabase.from('conversation_participants' as any) as any).select('conversation_id').eq('member_id', memberId1)
+    const { data: p2 } = await (supabase.from('conversation_participants' as any) as any).select('conversation_id').eq('member_id', memberId2)
 
     const c1 = new Set(p1?.map((p: any) => p.conversation_id) || [])
     const c2 = p2?.map((p: any) => p.conversation_id) || []
@@ -29,8 +29,8 @@ async function getOrCreateConversation(supabase: any, memberId1: string, memberI
     }
 
     // 2. If it doesn't exist, create it
-    const { data: newConv, error: convError } = await supabase
-        .from('conversations')
+    const { data: newConv, error: convError } = await (supabase
+        .from('conversations' as any) as any)
         .insert({})
         .select('id')
         .single()
@@ -41,7 +41,7 @@ async function getOrCreateConversation(supabase: any, memberId1: string, memberI
     }
 
     // 3. Add participants
-    await supabase.from('conversation_participants').insert([
+    await (supabase.from('conversation_participants' as any) as any).insert([
         { conversation_id: newConv.id, member_id: memberId1 },
         { conversation_id: newConv.id, member_id: memberId2 }
     ])
@@ -49,11 +49,11 @@ async function getOrCreateConversation(supabase: any, memberId1: string, memberI
     return newConv.id
 }
 
-export async function sendMessage(receiverId: string, content: string) {
+export async function sendMessage(receiverId: string, content: string, attachmentUrl?: string, attachmentType?: string) {
     const session = await getSession()
     if (!session) return { error: 'Unauthorized uplink' }
 
-    if (!content.trim()) return { error: 'Empty transmission payload' }
+    if (!content.trim() && !attachmentUrl) return { error: 'Empty transmission payload' }
 
     const member = await getMember(session.user.id)
     if (!member) return { error: 'Operative identity not found' }
@@ -67,10 +67,12 @@ export async function sendMessage(receiverId: string, content: string) {
     if (!conversationId) return { error: 'Failed to establish secure channel' }
 
     // 2. Insert message
-    const { error } = await supabase.from('messages').insert({
+    const { error } = await (supabase.from('messages' as any) as any).insert({
         conversation_id: conversationId,
         sender_id: member.id,
-        content: content.trim()
+        content: content.trim() || 'File transmission',
+        attachment_url: attachmentUrl || null,
+        attachment_type: attachmentType || null
     })
 
     if (error) {
@@ -79,7 +81,7 @@ export async function sendMessage(receiverId: string, content: string) {
     }
 
     // 3. Update conversation last_updated (Optional but good practice)
-    await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', conversationId)
+    await (supabase.from('conversations' as any) as any).update({ updated_at: new Date().toISOString() }).eq('id', conversationId)
 
     revalidatePath(`/portal/messages/${receiverId}`)
     revalidatePath('/portal/messages')
@@ -95,8 +97,8 @@ export async function markAsRead(conversationId: string) {
 
     const supabase = createServerClient()
 
-    await supabase
-        .from('conversation_participants')
+    await (supabase
+        .from('conversation_participants' as any) as any)
         .update({ last_read_at: new Date().toISOString() })
         .eq('conversation_id', conversationId)
         .eq('member_id', member.id)

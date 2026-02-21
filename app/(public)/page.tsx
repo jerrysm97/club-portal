@@ -1,255 +1,115 @@
-// app/(public)/page.tsx — IIMS IT Club Homepage (v4.0)
 import Link from 'next/link'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import {
-    Code2, Shield, Brain, Globe, Users, Calendar, Trophy, Target,
-    ArrowRight, CheckCircle2, ChevronRight, GraduationCap, Star
-} from 'lucide-react'
-import HeroSection from '@/components/public/HeroSection'
-import EventsSection from '@/components/public/EventsSection'
-import TeamSection from '@/components/public/TeamSection'
-import StatsSection from '@/components/public/StatsSection'
-import { BRAND } from '@/lib/brand'
 
 export const revalidate = 60
 
-const FOCUS_AREAS = [
-    {
-        icon: Code2,
-        title: 'Web Development',
-        desc: 'Full-stack web development with modern frameworks — React, Next.js, Node.js, and more.',
-        color: 'text-[#1A237E]',
-        bg: 'bg-[#1A237E]/8',
-    },
-    {
-        icon: Shield,
-        title: 'Cybersecurity & CTF',
-        desc: 'Ethical hacking, penetration testing, and Capture The Flag competitions aligned with IIMS CTF program.',
-        color: 'text-[#E53935]',
-        bg: 'bg-[#E53935]/8',
-    },
-    {
-        icon: Brain,
-        title: 'AI & Machine Learning',
-        desc: 'Practical AI/ML projects, NLP, and data science workshops tailored for IIMS students.',
-        color: 'text-[#2E7D32]',
-        bg: 'bg-[#2E7D32]/8',
-    },
-    {
-        icon: Globe,
-        title: 'Open Source & DevOps',
-        desc: 'Contributing to open source, cloud platforms, CI/CD pipelines, and infrastructure as code.',
-        color: 'text-[#0277BD]',
-        bg: 'bg-[#0277BD]/8',
-    },
+const MISSION_CARDS = [
+    { title: 'Practical Skills', desc: 'Hands-on experience with modern security tools and defensive practices.' },
+    { title: 'Ethical Awareness', desc: 'Fostering a culture of responsibility and lawful technology use.' },
+    { title: 'Career Readiness', desc: 'Preparing students for the demands of the global cybersecurity industry.' },
+    { title: 'Innovation & Research', desc: 'Exploring emerging threats and proactive mitigation strategies.' },
 ]
 
-const BENEFITS = [
-    'Access to exclusive workshop and CTF resources',
-    'Network with industry professionals and IIMS alumni',
-    'Build real projects for your portfolio',
-    'Participate in IIMS Hackathon and CTF competitions',
-    'Mentorship from senior students and faculty',
-    'Certificate of participation for all events',
-]
-
-export default async function HomePage() {
-    const supabase = await createServerSupabaseClient()
-
-    const [eventsResult, teamResult] = await Promise.all([
-        (async () => {
-            try {
-                const { data } = await supabase
-                    .from('public_events')
-                    .select('id, title, type, event_date, location, cover_image_url, is_published')
-                    .eq('is_published', true)
-                    .order('event_date', { ascending: true })
-                    .limit(4)
-                return data ?? []
-            } catch {
-                return []
-            }
-        })(),
-        (async () => {
-            try {
-                const { data } = await supabase
-                    .from('members')
-                    .select('id, full_name, club_post, avatar_url, role')
-                    .eq('status', 'approved')
-                    .in('role', ['admin', 'superadmin'])
-                    .order('joined_at', { ascending: true })
-                    .limit(8)
-                return (data ?? []).map((m: any) => ({ ...m, image_url: m.avatar_url }))
-            } catch {
-                return []
-            }
-        })(),
-    ])
-
+export default function HomePage() {
     return (
-        <>
-            {/* Hero */}
-            <HeroSection />
-
-            {/* Stats Bar */}
-            <StatsSection />
-
-            {/* Focus Areas */}
-            <section className="py-24 bg-white">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-4 block">
-                            What We Do
-                        </span>
-                        <h2 className="text-4xl md:text-5xl font-bold text-[#212121] mb-4">
-                            Four Focus <span className="text-[#1A237E]">Areas</span>
-                        </h2>
-                        <p className="text-[#757575] max-w-xl mx-auto text-lg leading-relaxed">
-                            From cybersecurity to AI, we cover the full spectrum of modern technology — something for every IIMS student.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {FOCUS_AREAS.map((area) => {
-                            const Icon = area.icon
-                            return (
-                                <div
-                                    key={area.title}
-                                    className="bg-white border border-[#E0E0E0] rounded-xl p-6 shadow-sm hover:shadow-md hover:border-[#1A237E]/20 transition-all duration-200 group"
-                                >
-                                    <div className={`h-12 w-12 rounded-xl ${area.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                                        <Icon className={`h-6 w-6 ${area.color}`} />
-                                    </div>
-                                    <h3 className="font-bold text-[#212121] mb-2">{area.title}</h3>
-                                    <p className="text-[#757575] text-sm leading-relaxed">{area.desc}</p>
-                                </div>
-                            )
-                        })}
+        <div className="bg-white">
+            {/* Hero Section */}
+            <section className="pt-32 pb-20 md:pt-40 md:pb-24 border-b border-[#F5F5F5]">
+                <div className="max-w-7xl mx-auto px-6 text-center">
+                    <h1 className="text-4xl md:text-6xl font-bold text-[#111111] mb-6 tracking-tight leading-tight max-w-4xl mx-auto">
+                        IIMS Cybersecurity & Ethical Hacking Club
+                    </h1>
+                    <p className="text-[#4A4A4A] text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+                        Bridging theory and real-world defense at IIMS College, Nepal. We equip students with the technical acumen to secure the digital frontier.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <Link
+                            href="/join"
+                            className="w-full sm:w-auto px-8 py-3 bg-[#C8102E] text-white font-bold text-sm tracking-wide rounded-sm hover:bg-[#A30D25] transition-colors"
+                        >
+                            Join the Club
+                        </Link>
+                        <Link
+                            href="/about"
+                            className="w-full sm:w-auto px-8 py-3 bg-white text-[#111111] border border-[#111111] font-bold text-sm tracking-wide rounded-sm hover:bg-[#F5F5F5] transition-colors"
+                        >
+                            Learn More
+                        </Link>
                     </div>
                 </div>
             </section>
 
-            {/* Events */}
-            <EventsSection events={eventsResult as any[]} />
+            {/* Stats Bar */}
+            <section className="border-b border-[#F5F5F5] bg-[#FAFAFA]">
+                <div className="max-w-7xl mx-auto px-6 py-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-[#E5E5E5]">
+                        <div className="pt-4 md:pt-0">
+                            <span className="block text-3xl font-bold text-[#111111] mb-1 tracking-tight">9</span>
+                            <span className="text-[#4A4A4A] text-sm font-medium tracking-wide">Founding Members</span>
+                        </div>
+                        <div className="pt-4 md:pt-0">
+                            <span className="block text-3xl font-bold text-[#111111] mb-1 tracking-tight">6</span>
+                            <span className="text-[#4A4A4A] text-sm font-medium tracking-wide">Planned Events</span>
+                        </div>
+                        <div className="pt-4 md:pt-0">
+                            <span className="block text-3xl font-bold text-[#111111] mb-1 tracking-tight">2025</span>
+                            <span className="text-[#4A4A4A] text-sm font-medium tracking-wide">Established</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            {/* Why Join */}
-            <section className="py-24 bg-[#F8F9FA]">
+            {/* About Split-Section */}
+            <section className="py-24 border-b border-[#F5F5F5]">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div>
-                            <span className="text-[#E53935] text-xs font-semibold uppercase tracking-widest mb-4 block">
-                                Why Join Us
-                            </span>
-                            <h2 className="text-4xl md:text-5xl font-bold text-[#212121] mb-6">
-                                Built for Every <span className="text-[#1A237E]">IIMS Student</span>
+                            <h2 className="text-3xl font-bold text-[#111111] mb-6 tracking-tight">
+                                Our Vision
                             </h2>
-                            <p className="text-[#757575] text-lg leading-relaxed mb-8">
-                                Whether you are studying BCS, BBUS, BIHM, or MBA — ICEHC is your launchpad for hands-on cybersecurity and digital defense experience beyond the classroom.
+                            <p className="text-[#4A4A4A] text-base leading-relaxed mb-6">
+                                At ICEHC, we believe that true cybersecurity starts with an ethical foundation. Our vision is to cultivate a proactive mindset among emerging technologists, equipping them to identify vulnerabilities before they are exploited.
                             </p>
-                            <ul className="space-y-3 mb-10">
-                                {BENEFITS.map((b) => (
-                                    <li key={b} className="flex items-start gap-3">
-                                        <CheckCircle2 className="h-5 w-5 text-[#2E7D32] mt-0.5 flex-shrink-0" />
-                                        <span className="text-[#424242] text-sm">{b}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/portal/login"
-                                className="inline-flex items-center gap-2 bg-[#E53935] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#C62828] transition-all text-sm active:scale-95"
+                            <p className="text-[#4A4A4A] text-base leading-relaxed">
+                                We focus on hands-on threat intelligence, digital safety, and responsible disclosure, moving beyond theoretical classroom concepts to actionable, real-world defense mechanisms.
+                            </p>
+                        </div>
+
+                        {/* Visual Anchor (No Images) */}
+                        <div className="relative aspect-square md:aspect-video lg:aspect-square bg-[#FAFAFA] border border-[#E5E5E5] p-8 flex items-end justify-end overflow-hidden">
+                            {/* Geometric decorative elements */}
+                            <div className="absolute top-0 right-0 w-3/4 h-3/4 bg-[#111111] translate-x-12 -translate-y-12"></div>
+                            <div className="absolute bottom-12 left-12 w-32 h-32 border-[12px] border-[#C8102E]"></div>
+                            <div className="absolute top-1/2 left-0 w-full h-px bg-[#E5E5E5]"></div>
+                            <div className="absolute top-0 left-1/2 w-px h-full bg-[#E5E5E5]"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Mission Grid */}
+            <section className="py-24 bg-[#FAFAFA]">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="mb-16">
+                        <h2 className="text-3xl font-bold text-[#111111] mb-4 tracking-tight">Core Pillars</h2>
+                        <div className="w-16 h-1 bg-[#C8102E]"></div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {MISSION_CARDS.map((card, idx) => (
+                            <div
+                                key={idx}
+                                className="bg-white p-8 border border-[#E5E5E5] group hover:border-[#111111] transition-colors"
                             >
-                                Join ICEHC
-                                <ArrowRight className="h-4 w-4" />
-                            </Link>
-                        </div>
-
-                        {/* IIMS Affiliation Card */}
-                        <div className="bg-white border border-[#E0E0E0] rounded-2xl p-8 shadow-sm">
-                            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-[#E0E0E0]">
-                                <div className="h-12 w-12 rounded-xl bg-[#1A237E] flex items-center justify-center">
-                                    <GraduationCap className="h-6 w-6 text-white" />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-[#212121]">IIMS College</p>
-                                    <a
-                                        href="https://iimscollege.edu.np/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-[#0277BD] text-xs hover:underline"
-                                    >
-                                        iimscollege.edu.np
-                                    </a>
-                                </div>
+                                <div className="text-[#4A4A4A] font-mono text-sm mb-4 opacity-50 block">{(idx + 1).toString().padStart(2, '0')}</div>
+                                <h3 className="text-xl font-bold text-[#111111] mb-3">{card.title}</h3>
+                                <p className="text-[#4A4A4A] leading-relaxed text-sm">
+                                    {card.desc}
+                                </p>
                             </div>
-
-                            <p className="text-[#757575] text-sm leading-relaxed mb-6">
-                                IIMS College is one of Nepal&apos;s leading international institutions, partnered with Taylor&apos;s University, Malaysia. {BRAND.clubFullName} is an official club of the college.
-                            </p>
-
-                            <div className="space-y-3 mb-6">
-                                {[
-                                    { label: 'BCS Hons', desc: 'Bachelor of Computer Science' },
-                                    { label: 'BBUS Hons', desc: 'Bachelor of Business' },
-                                    { label: 'BIHM Hons', desc: 'International Hospitality Management' },
-                                    { label: 'MBA', desc: 'Master of Business Administration' },
-                                ].map((p) => (
-                                    <div key={p.label} className="flex items-center gap-3">
-                                        <span className="bg-[#1A237E]/10 text-[#1A237E] text-xs font-bold px-2 py-0.5 rounded-full">{p.label}</span>
-                                        <span className="text-[#757575] text-xs">{p.desc}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <a
-                                    href="https://iimscollege.edu.np/it-club/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#1A237E] border border-[#1A237E]/30 rounded-lg px-3 py-2 hover:bg-[#1A237E]/8 transition-colors"
-                                >
-                                    IT Club Page
-                                    <ChevronRight className="h-3.5 w-3.5" />
-                                </a>
-                                <a
-                                    href="https://iimscollege.edu.np/capture-the-flag/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#E53935] border border-[#E53935]/30 rounded-lg px-3 py-2 hover:bg-[#E53935]/8 transition-colors"
-                                >
-                                    CTF Program
-                                    <ChevronRight className="h-3.5 w-3.5" />
-                                </a>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
-
-            {/* Team */}
-            <TeamSection team={teamResult as any[]} />
-
-            {/* Final CTA */}
-            <section className="py-20 bg-[#1A237E]">
-                <div className="max-w-3xl mx-auto px-6 text-center">
-                    <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-2 mb-8">
-                        <Star className="h-4 w-4 text-[#F9A825]" />
-                        <span className="text-white/80 text-xs font-semibold uppercase tracking-wide">Open to All IIMS Students</span>
-                    </div>
-                    <h2 className="font-bold text-4xl md:text-5xl text-white mb-6">
-                        Ready to <span className="text-[#E53935]">Build</span> Something?
-                    </h2>
-                    <p className="text-white/60 text-lg mb-10 leading-relaxed">
-                        Join {BRAND.clubShort} and be part of a community that hacks ethically, defends relentlessly, and builds practical security skills. Membership is open to all IIMS College students.
-                    </p>
-                    <Link
-                        href="/portal/login"
-                        className="inline-flex items-center gap-2 bg-[#E53935] text-white font-bold px-8 py-4 rounded-xl hover:bg-[#C62828] transition-all text-base hover:scale-[1.02] active:scale-95 shadow-xl shadow-red-900/30"
-                    >
-                        Apply for Membership
-                        <ArrowRight className="h-5 w-5" />
-                    </Link>
-                </div>
-            </section>
-        </>
+        </div>
     )
 }

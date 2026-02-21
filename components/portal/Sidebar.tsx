@@ -28,6 +28,7 @@ import { BRAND } from '@/lib/brand'
 interface SidebarProps {
     member: Member
     unreadNotifications: number
+    unreadMessages?: number
 }
 
 const navItems = [
@@ -42,7 +43,7 @@ const navItems = [
     { href: '/portal/profile', icon: User, label: 'Profile' },
 ]
 
-export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
+export default function Sidebar({ member, unreadNotifications, unreadMessages = 0 }: SidebarProps) {
     const pathname = usePathname()
     const router = useRouter()
 
@@ -60,7 +61,7 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
             {/* Brand Header */}
             <div className="h-16 flex items-center px-5 border-b border-[#E0E0E0]">
                 <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-[#1A237E] flex items-center justify-center shadow-sm">
+                    <div className="h-9 w-9 rounded-sm bg-[#111111] flex items-center justify-center shadow-sm">
                         <GraduationCap className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -72,12 +73,12 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
 
             {/* Identity Summary */}
             <div className="px-4 py-4 border-b border-[#E0E0E0]">
-                <Link href="/portal/profile" className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#F5F5F5] transition-colors group">
+                <Link href="/portal/profile" className="flex items-center gap-3 p-3 rounded-sm hover:bg-[#F5F5F5] transition-colors group">
                     <Avatar
                         src={member.avatar_url}
                         name={member.name}
                         size="sm"
-                        className="ring-2 ring-[#E0E0E0] group-hover:ring-[#1A237E]/30 transition-all flex-shrink-0"
+                        className="ring-2 ring-[#E0E0E0] group-hover:ring-[#111111]/30 transition-all flex-shrink-0"
                     />
                     <div className="min-w-0">
                         <p className="text-[#212121] text-sm font-semibold truncate">{member.name}</p>
@@ -99,7 +100,7 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
                             key={href}
                             href={href}
                             className={cn(
-                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all',
+                                'flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm transition-all',
                                 active
                                     ? 'bg-[#E53935]/8 text-[#E53935] font-medium'
                                     : 'text-[#757575] hover:text-[#212121] hover:bg-[#F5F5F5]'
@@ -107,6 +108,11 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
                         >
                             <Icon className="h-4 w-4 flex-shrink-0" />
                             <span className="flex-1">{label}</span>
+                            {href === '/portal/messages' && unreadMessages > 0 && (
+                                <span className="bg-[#E53935] text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                                    {unreadMessages > 99 ? '99+' : unreadMessages}
+                                </span>
+                            )}
                         </Link>
                     )
                 })}
@@ -115,7 +121,7 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
                 <Link
                     href="/portal/notifications"
                     className={cn(
-                        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all',
+                        'flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm transition-all',
                         pathname.startsWith('/portal/notifications')
                             ? 'bg-[#E53935]/8 text-[#E53935] font-medium'
                             : 'text-[#757575] hover:text-[#212121] hover:bg-[#F5F5F5]'
@@ -137,10 +143,10 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
                         <Link
                             href="/portal/admin"
                             className={cn(
-                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all',
+                                'flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm transition-all',
                                 pathname.startsWith('/portal/admin')
-                                    ? 'bg-[#1A237E] text-white font-medium'
-                                    : 'text-[#1A237E] hover:bg-[#1A237E]/8'
+                                    ? 'bg-[#111111] text-white font-medium'
+                                    : 'text-[#111111] hover:bg-[#111111]/8'
                             )}
                         >
                             <ShieldCheck className="h-4 w-4 flex-shrink-0" />
@@ -154,7 +160,7 @@ export default function Sidebar({ member, unreadNotifications }: SidebarProps) {
             <div className="p-3 border-t border-[#E0E0E0]">
                 <button
                     onClick={handleSignOut}
-                    className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#9E9E9E] hover:bg-[#FFEBEE] hover:text-[#B71C1C] transition-all"
+                    className="flex w-full items-center gap-3 px-3 py-2.5 rounded-sm text-sm text-[#9E9E9E] hover:bg-[#FFEBEE] hover:text-[#B71C1C] transition-all"
                 >
                     <LogOut className="h-4 w-4 flex-shrink-0" />
                     <span>Sign Out</span>

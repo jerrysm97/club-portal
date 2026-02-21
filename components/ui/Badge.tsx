@@ -9,7 +9,7 @@ interface BadgeProps {
 
 // Colors per CONTEXT.md §4.2
 const variants: Record<string, string> = {
-    navy: 'text-[#1A237E] bg-[#E8EAF6] border border-[#1A237E]/20',
+    navy: 'text-[#111111] bg-[#FAFAFA] border border-[#111111]/20',
     crimson: 'text-[#E53935] bg-[#FFEBEE] border border-[#E53935]/20',
     success: 'text-[#2E7D32] bg-[#E8F5E9] border border-[#2E7D32]/20',
     warning: 'text-[#F57F17] bg-[#FFF8E1] border border-[#F57F17]/20',

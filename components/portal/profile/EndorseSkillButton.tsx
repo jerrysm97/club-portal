@@ -50,10 +50,10 @@ export default function EndorseSkillButton({ targetUserId, skill, endorsements, 
             onClick={toggleEndorsement}
             disabled={isLoading || readOnly}
             className={cn(
-                "group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all",
+                "group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-sm border text-[10px] font-bold uppercase tracking-widest transition-all",
                 hasEndorsed
                     ? "bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB] shadow-sm hover:bg-[#BBDEFB]"
-                    : "bg-[#F8F9FA] text-[#212121] border-[#E0E0E0] hover:bg-[#E8EAF6] hover:text-[#1A237E] hover:border-[#C5CAE9]",
+                    : "bg-[#F8F9FA] text-[#212121] border-[#E0E0E0] hover:bg-[#FAFAFA] hover:text-[#111111] hover:border-[#E5E5E5]",
                 readOnly && "cursor-default opacity-90 hover:transform-none select-text",
                 !readOnly && "hover:scale-105"
             )}
@@ -63,7 +63,7 @@ export default function EndorseSkillButton({ targetUserId, skill, endorsements, 
             ) : hasEndorsed ? (
                 <CheckCircle2 className="w-3.5 h-3.5" />
             ) : !readOnly ? (
-                <Plus className="w-3.5 h-3.5 text-[#9E9E9E] group-hover:text-[#1A237E]" />
+                <Plus className="w-3.5 h-3.5 text-[#9E9E9E] group-hover:text-[#111111]" />
             ) : null}
 
             <span>{skill}</span>

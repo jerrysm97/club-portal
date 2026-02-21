@@ -40,7 +40,7 @@ export default function NotificationsList({ initialNotifications }: { initialNot
             <div className="flex justify-end">
                 <button
                     onClick={handleMarkAllRead}
-                    className="text-[10px] font-bold uppercase tracking-widest text-[#1A237E] hover:text-[#1976D2] transition-colors flex items-center gap-2"
+                    className="text-[10px] font-bold uppercase tracking-widest text-[#111111] hover:text-[#1976D2] transition-colors flex items-center gap-2"
                 >
                     <Check className="h-4 w-4" /> Finalize All Alerts
                 </button>
@@ -53,14 +53,14 @@ export default function NotificationsList({ initialNotifications }: { initialNot
                             key={notification.id}
                             onClick={() => !notification.is_read && handleMarkRead(notification.id)}
                             className={cn(
-                                "group relative p-6 rounded-3xl border transition-all cursor-pointer flex gap-5 items-center",
+                                "group relative p-6 rounded-sm border transition-all cursor-pointer flex gap-5 items-center",
                                 notification.is_read
                                     ? "bg-white border-[#EEEEEE] opacity-70"
-                                    : "bg-white border-[#E0E0E0] shadow-md shadow-black/5 hover:border-[#1A237E]/20"
+                                    : "bg-white border-[#E0E0E0] shadow-sm shadow-black/5 hover:border-[#111111]/20"
                             )}
                         >
                             <div className={cn(
-                                "p-3 md:p-4 rounded-2xl flex-shrink-0 transition-transform group-hover:scale-105 border",
+                                "p-3 md:p-4 rounded-sm flex-shrink-0 transition-transform group-hover:scale-105 border",
                                 notification.is_read ? "bg-[#F8F9FA] border-[#EEEEEE]" : "bg-[#F8F9FA] shadow-sm border-[#E0E0E0]"
                             )}>
                                 {getIcon(notification.type)}
@@ -84,7 +84,7 @@ export default function NotificationsList({ initialNotifications }: { initialNot
                                 {notification.link && (
                                     <Link
                                         href={notification.link}
-                                        className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#1A237E] hover:text-[#E53935] transition-all group/link"
+                                        className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#111111] hover:text-[#E53935] transition-all group/link"
                                     >
                                         View Details <ChevronRight className="h-3 w-3 group-hover/link:translate-x-1 transition-transform" />
                                     </Link>
@@ -97,8 +97,8 @@ export default function NotificationsList({ initialNotifications }: { initialNot
                         </div>
                     ))
                 ) : (
-                    <div className="py-24 rounded-3xl border border-dashed border-[#E0E0E0] bg-[#F8F9FA] text-center shadow-sm">
-                        <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
+                    <div className="py-24 rounded-sm border border-dashed border-[#E0E0E0] bg-[#F8F9FA] text-center shadow-sm">
+                        <div className="h-16 w-16 bg-white rounded-sm flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
                             <Bell className="h-8 w-8 text-[#BDBDBD]" />
                         </div>
                         <p className="text-[#424242] font-bold text-lg uppercase tracking-widest">Inbox Zero</p>

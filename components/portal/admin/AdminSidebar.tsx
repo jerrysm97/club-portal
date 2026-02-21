@@ -35,9 +35,9 @@ export default function AdminSidebar({ activeTab, onTabChange, currentUser }: Ad
     }
 
     return (
-        <aside className="w-72 bg-[#1A237E] h-[calc(100vh-64px)] overflow-y-auto hidden lg:flex flex-col border-r border-[#283593] shadow-2xl z-40">
+        <aside className="w-72 bg-[#111111] h-[calc(100vh-64px)] overflow-y-auto hidden lg:flex flex-col border-r border-[#C8102E] shadow-sm z-40">
             <div className="p-8">
-                <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#E53935]/10 border border-[#E53935]/20 mb-8 backdrop-blur-sm">
+                <div className="flex items-center gap-3 px-4 py-3 rounded-sm bg-[#E53935]/10 border border-[#E53935]/20 mb-8 backdrop-blur-sm">
                     <ShieldAlert className="h-5 w-5 text-[#E53935]" />
                     <span className="text-[10px] font-bold text-white uppercase tracking-widest">Admin Panel</span>
                 </div>
@@ -50,10 +50,10 @@ export default function AdminSidebar({ activeTab, onTabChange, currentUser }: Ad
                                 key={tab.id}
                                 onClick={() => onTabChange(tab.id as AdminTab)}
                                 className={cn(
-                                    "w-full flex items-center gap-4 px-5 py-4 rounded-xl text-sm transition-all group relative",
+                                    "w-full flex items-center gap-4 px-5 py-4 rounded-sm text-sm transition-all group relative",
                                     active
-                                        ? "bg-white text-[#1A237E] font-bold shadow-lg shadow-black/10 translate-x-1"
-                                        : "text-[#C5CAE9] font-medium hover:bg-white/10 hover:text-white"
+                                        ? "bg-white text-[#111111] font-bold shadow-sm shadow-black/10 translate-x-1"
+                                        : "text-[#E5E5E5] font-medium hover:bg-white/10 hover:text-white"
                                 )}
                             >
                                 <tab.icon className={cn("h-5 w-5 transition-transform", active ? "scale-110" : "group-hover:scale-110")} />

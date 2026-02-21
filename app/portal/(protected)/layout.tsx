@@ -28,7 +28,7 @@ export default async function ProtectedPortalLayout({
         }
     }
     if (member.status === 'rejected') redirect('/portal/login?reason=rejected')
-    if (member.status === 'banned') redirect('/portal/login?reason=banned')
+    if ((member.status as any) === 'banned') redirect('/portal/login?reason=banned')
 
     // ── Step 3: Fetch unread count efficiently ──
     const supabase = createServerClient()
@@ -38,6 +38,33 @@ export default async function ProtectedPortalLayout({
         .eq('user_id', session.user.id) // using user_id per DB schema
         .eq('is_read', false)
 
+    // ── Fetch Unread Messages ──
+    const { data: participations } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id, last_read_at')
+        .eq('member_id', member.id)
+
+    let unreadMessagesCount = 0
+    if (participations && participations.length > 0) {
+        const conversationIds = (participations as any[]).map(p => p.conversation_id)
+        const { data: recentMsgs } = await supabase
+            .from('messages')
+            .select('conversation_id, created_at, sender_id')
+            .in('conversation_id', conversationIds)
+            .neq('sender_id', member.id)
+            .order('created_at', { ascending: false })
+
+        const processedConvos = new Set()
+        for (const msg of ((recentMsgs as any[]) || [])) {
+            if (processedConvos.has(msg.conversation_id)) continue
+            processedConvos.add(msg.conversation_id)
+            const part = (participations as any[]).find(p => p.conversation_id === msg.conversation_id)
+            if (part && new Date(msg.created_at) > new Date(part.last_read_at || 0)) {
+                unreadMessagesCount++
+            }
+        }
+    }
+
     // ── Step 4: Render Shell ──
     return (
         <div className="flex min-h-screen bg-[#F8F9FA]">
@@ -45,14 +72,15 @@ export default async function ProtectedPortalLayout({
             <Sidebar
                 member={member}
                 unreadNotifications={unreadNotifications ?? 0}
+                unreadMessages={unreadMessagesCount}
             />
 
             <div className="flex-1 flex flex-col md:ml-64 min-h-screen relative overflow-hidden">
                 {/* Mobile Navbar */}
-                <PortalNavbar member={member} />
+                <PortalNavbar member={member} unreadMessages={unreadMessagesCount} />
 
                 {/* Main Content Area */}
-                <main className="flex-1 p-6 md:p-10 relative z-10 transition-all duration-300">
+                <main className="flex-1 p-6 pb-24 md:p-10 relative z-10 transition-all duration-300">
                     <div className="max-w-6xl mx-auto mt-2 md:mt-0">
                         {children}
                     </div>
@@ -60,7 +88,7 @@ export default async function ProtectedPortalLayout({
             </div>
 
             {/* Background design elements across portal */}
-            <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#1A237E]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none -z-10" />
+            <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#111111]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none -z-10" />
             <div className="fixed bottom-0 left-64 w-[500px] h-[500px] bg-[#E53935]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none -z-10" />
         </div>
     )

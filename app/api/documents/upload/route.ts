@@ -46,17 +46,26 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'File and title are required' }, { status: 400 })
     }
 
-    // Determine file type
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'pdf'
-    const fileType = ext === 'docx' ? 'docx' : ext === 'doc' ? 'doc' : 'pdf'
+    // 10MB limit enforcement
+    if (file.size > 10 * 1024 * 1024) {
+        return NextResponse.json({ error: 'File exceeds 10MB maximum limit.' }, { status: 400 })
+    }
 
-    // Create unique filename
-    const fileName = `${session.user.id}/${Date.now()}.${ext}`
+    // MIME type whitelist enforcement
+    const ext = file.name.split('.').pop()?.toLowerCase() || ''
+    const allowedExts = ['pdf', 'docx', 'png', 'jpg']
+    if (!allowedExts.includes(ext)) {
+        return NextResponse.json({ error: 'Invalid file format. Allowed: .pdf, .docx, .png, .jpg' }, { status: 400 })
+    }
+    const fileType = ext === 'jpg' ? 'jpeg' : ext
+
+    // Create unique filename under the 'resources' namespace
+    const fileName = `resources/${session.user.id}/${Date.now()}.${ext}`
 
     // Upload to storage
     const buffer = Buffer.from(await file.arrayBuffer())
     const { error: uploadError } = await supabaseAdmin.storage
-        .from('documents')
+        .from('portal_documents')
         .upload(fileName, buffer, {
             contentType: file.type,
             upsert: false,
@@ -68,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     // Get public URL
     const { data: urlData } = supabaseAdmin.storage
-        .from('documents')
+        .from('portal_documents')
         .getPublicUrl(fileName)
 
     // Insert into database (service role bypasses RLS)
@@ -83,7 +92,7 @@ export async function POST(req: NextRequest) {
 
     if (insertError) {
         // Clean up uploaded file if DB insert fails
-        await supabaseAdmin.storage.from('documents').remove([fileName])
+        await supabaseAdmin.storage.from('portal_documents').remove([fileName])
         return NextResponse.json({ error: insertError.message }, { status: 500 })
     }
 

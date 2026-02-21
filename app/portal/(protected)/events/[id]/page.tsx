@@ -9,7 +9,7 @@ import { getSession, getMember } from '@/lib/auth'
 
 type Event = any
 
-export const revalidate = 60
+
 
 export default async function PortalEventDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params
@@ -45,7 +45,7 @@ export default async function PortalEventDetailPage(props: { params: Promise<{ i
     return (
         <div className="max-w-6xl mx-auto space-y-8 animate-fade-up pb-12">
             {/* Navigation */}
-            <Link href="/portal/events" className="inline-flex items-center gap-2 text-[#757575] hover:text-[#1A237E] font-bold text-xs uppercase tracking-widest transition-all group">
+            <Link href="/portal/events" className="inline-flex items-center gap-2 text-[#757575] hover:text-[#111111] font-bold text-xs uppercase tracking-widest transition-all group">
                 <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
                 Return to Registry
             </Link>
@@ -54,7 +54,7 @@ export default async function PortalEventDetailPage(props: { params: Promise<{ i
                 {/* Main Content Area */}
                 <div className="lg:col-span-2 space-y-8">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#E3F2FD] text-[#1976D2] font-bold text-[10px] uppercase tracking-widest mb-4 border border-[#BBDEFB]">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-[#E3F2FD] text-[#1976D2] font-bold text-[10px] uppercase tracking-widest mb-4 border border-[#BBDEFB]">
                             Event Category: {event.type}
                         </div>
                         <h1 className="text-4xl md:text-5xl font-bold text-[#212121] leading-tight">
@@ -63,7 +63,7 @@ export default async function PortalEventDetailPage(props: { params: Promise<{ i
                     </div>
 
                     {event.image_url && (
-                        <div className="relative rounded-3xl overflow-hidden border border-[#E0E0E0] shadow-xl aspect-video group">
+                        <div className="relative rounded-sm overflow-hidden border border-[#E0E0E0] shadow-sm aspect-video group">
                             <img
                                 src={event.image_url}
                                 alt={event.title}
@@ -73,14 +73,14 @@ export default async function PortalEventDetailPage(props: { params: Promise<{ i
                         </div>
                     )}
 
-                    <div className="bg-white rounded-3xl p-8 md:p-10 border border-[#E0E0E0] shadow-sm prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-[#212121] prose-p:text-[#757575] prose-p:font-medium prose-strong:text-[#212121] prose-a:text-[#1A237E]">
+                    <div className="bg-white rounded-sm p-8 md:p-10 border border-[#E0E0E0] shadow-sm prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-[#212121] prose-p:text-[#757575] prose-p:font-medium prose-strong:text-[#212121] prose-a:text-[#111111]">
                         <MarkdownRenderer content={event.description || ''} />
                     </div>
                 </div>
 
                 {/* Intelligence Sidebar */}
                 <div className="space-y-6">
-                    <div className="bg-[#1A237E] rounded-3xl p-8 text-white shadow-xl relative overflow-hidden group">
+                    <div className="bg-[#111111] rounded-sm p-8 text-white shadow-sm relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[4rem] group-hover:scale-110 transition-transform" />
 
                         <h3 className="font-bold text-xl mb-8 flex items-center gap-3">
@@ -105,7 +105,7 @@ export default async function PortalEventDetailPage(props: { params: Promise<{ i
                                     href={event.meeting_link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-3 w-full py-4 bg-[#E53935] text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-[#D32F2F] transition-all hover:scale-[1.02] shadow-lg shadow-black/20"
+                                    className="flex items-center justify-center gap-3 w-full py-4 bg-[#E53935] text-white font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-[#D32F2F] transition-all hover:scale-[1.02] shadow-sm shadow-black/20"
                                 >
                                     Meeting Link <ExternalLink className="h-4 w-4" />
                                 </a>
@@ -115,7 +115,7 @@ export default async function PortalEventDetailPage(props: { params: Promise<{ i
 
                     <div className="bg-[#F8F9FA] rounded-[2rem] p-6 border border-[#E0E0E0] flex items-center justify-between group cursor-pointer hover:bg-white transition-all shadow-sm">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 rounded-xl bg-white text-[#1A237E] shadow-sm group-hover:bg-[#1A237E] group-hover:text-white transition-all border border-[#E0E0E0] group-hover:border-[#1A237E]">
+                            <div className="p-3 rounded-sm bg-white text-[#111111] shadow-sm group-hover:bg-[#111111] group-hover:text-white transition-all border border-[#E0E0E0] group-hover:border-[#111111]">
                                 <Users className="h-5 w-5" />
                             </div>
                             <div>
@@ -134,11 +134,11 @@ export default async function PortalEventDetailPage(props: { params: Promise<{ i
 function IntelRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
     return (
         <div className="flex items-start gap-4">
-            <div className="mt-1 text-[#C5CAE9]">
+            <div className="mt-1 text-[#E5E5E5]">
                 {icon}
             </div>
             <div>
-                <span className="block text-[9px] font-bold text-[#C5CAE9]/80 uppercase tracking-widest mb-1">{label}</span>
+                <span className="block text-[9px] font-bold text-[#E5E5E5]/80 uppercase tracking-widest mb-1">{label}</span>
                 <span className="block text-sm font-bold text-white tracking-wide">{value}</span>
             </div>
         </div>

@@ -37,17 +37,17 @@ export default async function PendingPage() {
             <div className="w-full max-w-md relative animate-fade-up">
                 {/* Brand header */}
                 <div className="flex items-center gap-3 mb-8 justify-center">
-                    <div className="h-12 w-12 rounded-xl bg-[#1A237E] flex items-center justify-center shadow-md">
+                    <div className="h-12 w-12 rounded-sm bg-[#111111] flex items-center justify-center shadow-sm">
                         <Shield className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                        <h2 className="font-bold text-[#1A237E] text-base tracking-tight">{BRAND.clubShort}</h2>
+                        <h2 className="font-bold text-[#111111] text-base tracking-tight">{BRAND.clubShort}</h2>
                         <span className="text-[10px] text-[#757575] font-semibold tracking-widest uppercase">Member Portal</span>
                     </div>
                 </div>
 
                 {/* Main card */}
-                <div className="bg-white border border-[#E0E0E0] shadow-xl shadow-black/5 rounded-2xl p-8">
+                <div className="bg-white border border-[#E0E0E0] shadow-sm shadow-black/5 rounded-sm p-8">
                     {/* Status badge */}
                     <div className="flex items-center justify-center mb-6">
                         <span className="text-[#F57F17] bg-[#FFF8E1] border border-[#F57F17]/20 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-2">
@@ -75,8 +75,8 @@ export default async function PendingPage() {
                     </div>
 
                     {/* Email notification block */}
-                    <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl p-4 mb-8">
-                        <div className="flex items-center gap-2 text-[#1A237E] font-semibold text-xs mb-2 uppercase tracking-wide">
+                    <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm p-4 mb-8">
+                        <div className="flex items-center gap-2 text-[#111111] font-semibold text-xs mb-2 uppercase tracking-wide">
                             <Mail className="h-4 w-4" />
                             Email Notification
                         </div>
@@ -94,7 +94,7 @@ export default async function PendingPage() {
                 {/* Footer */}
                 <p className="mt-8 text-center text-xs text-[#9E9E9E] font-medium">
                     Need Help?{' '}
-                    <a href={`mailto:${BRAND.clubEmail}`} className="text-[#1A237E] hover:underline font-semibold">
+                    <a href={`mailto:${BRAND.clubEmail}`} className="text-[#111111] hover:underline font-semibold">
                         Contact Administration
                     </a>
                 </p>
@@ -105,7 +105,7 @@ export default async function PendingPage() {
 
 function StatusStep({ status, label }: { status: 'complete' | 'pending' | 'locked'; label: string }) {
     return (
-        <div className={`flex items-center gap-3 p-3 rounded-xl border text-sm transition-all ${status === 'complete'
+        <div className={`flex items-center gap-3 p-3 rounded-sm border text-sm transition-all ${status === 'complete'
             ? 'text-[#2E7D32] bg-[#E8F5E9] border-[#2E7D32]/20 font-medium'
             : status === 'pending'
                 ? 'text-[#F57F17] bg-[#FFF8E1] border-[#F57F17]/20 font-medium'

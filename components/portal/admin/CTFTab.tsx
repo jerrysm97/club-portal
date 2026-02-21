@@ -87,7 +87,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
             <div className="flex justify-end">
                 <button
                     onClick={() => setShowForm(!showForm)}
-                    className="bg-[#1A237E] text-white px-8 py-3.5 rounded-xl font-bold uppercase text-xs tracking-widest shadow-md shadow-[#1A237E]/20 flex items-center gap-3 hover:translate-y-[-2px] transition-all hover:bg-[#283593]"
+                    className="bg-[#111111] text-white px-8 py-3.5 rounded-sm font-bold uppercase text-xs tracking-widest shadow-sm shadow-[#111111]/20 flex items-center gap-3 hover:translate-y-[-2px] transition-all hover:bg-[#C8102E]"
                 >
                     {showForm ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
                     {showForm ? 'Cancel' : 'New Arena Challenge'}
@@ -97,7 +97,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
             {/* Challenge Creation Form */}
             {showForm && (
                 <form onSubmit={handleCreateChallenge} className="bg-white p-8 rounded-[2rem] border border-[#E0E0E0] shadow-sm space-y-6">
-                    <h3 className="text-lg font-bold text-[#1A237E] uppercase tracking-wider">New CTF Challenge</h3>
+                    <h3 className="text-lg font-bold text-[#111111] uppercase tracking-wider">New CTF Challenge</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-[#757575] uppercase tracking-widest">Title *</label>
@@ -106,7 +106,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                                 value={form.title}
                                 onChange={e => setForm({ ...form, title: e.target.value })}
                                 placeholder="Web Starter"
-                                className="w-full px-4 py-3 border border-[#E0E0E0] rounded-xl bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#1A237E] focus:ring-1 focus:ring-[#1A237E]"
+                                className="w-full px-4 py-3 border border-[#E0E0E0] rounded-sm bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#111111] focus:ring-1 focus:ring-[#111111]"
                                 required
                             />
                         </div>
@@ -115,7 +115,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                             <select
                                 value={form.category}
                                 onChange={e => setForm({ ...form, category: e.target.value })}
-                                className="w-full px-4 py-3 border border-[#E0E0E0] rounded-xl bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#1A237E]"
+                                className="w-full px-4 py-3 border border-[#E0E0E0] rounded-sm bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#111111]"
                             >
                                 <option value="web">Web</option>
                                 <option value="forensics">Forensics</option>
@@ -131,7 +131,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                             <select
                                 value={form.difficulty}
                                 onChange={e => setForm({ ...form, difficulty: e.target.value })}
-                                className="w-full px-4 py-3 border border-[#E0E0E0] rounded-xl bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#1A237E]"
+                                className="w-full px-4 py-3 border border-[#E0E0E0] rounded-sm bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#111111]"
                             >
                                 <option value="easy">Easy</option>
                                 <option value="medium">Medium</option>
@@ -146,7 +146,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                                 value={form.points}
                                 onChange={e => setForm({ ...form, points: e.target.value })}
                                 placeholder="100"
-                                className="w-full px-4 py-3 border border-[#E0E0E0] rounded-xl bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#1A237E]"
+                                className="w-full px-4 py-3 border border-[#E0E0E0] rounded-sm bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#111111]"
                                 required
                             />
                         </div>
@@ -158,7 +158,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                             value={form.flag}
                             onChange={e => setForm({ ...form, flag: e.target.value })}
                             placeholder="ICEHC{your_flag_here}"
-                            className="w-full px-4 py-3 border border-[#30363D] rounded-xl bg-[#0D1117] text-[#3FB950] font-mono focus:outline-none focus:border-[#3FB950] focus:ring-1 focus:ring-[#3FB950]"
+                            className="w-full px-4 py-3 border border-[#30363D] rounded-sm bg-[#0D1117] text-[#3FB950] font-mono focus:outline-none focus:border-[#3FB950] focus:ring-1 focus:ring-[#3FB950]"
                             required
                         />
                     </div>
@@ -169,7 +169,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                             value={form.hint}
                             onChange={e => setForm({ ...form, hint: e.target.value })}
                             placeholder="Optional hint for struggling members"
-                            className="w-full px-4 py-3 border border-[#E0E0E0] rounded-xl bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#1A237E]"
+                            className="w-full px-4 py-3 border border-[#E0E0E0] rounded-sm bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#111111]"
                         />
                     </div>
                     <div className="space-y-2">
@@ -179,7 +179,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                             onChange={e => setForm({ ...form, description: e.target.value })}
                             placeholder="Challenge description (supports Markdown)"
                             rows={4}
-                            className="w-full px-4 py-3 border border-[#E0E0E0] rounded-xl bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#1A237E] resize-none"
+                            className="w-full px-4 py-3 border border-[#E0E0E0] rounded-sm bg-[#F8F9FA] text-[#212121] focus:outline-none focus:border-[#111111] resize-none"
                             required
                         />
                     </div>
@@ -196,7 +196,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="bg-[#E53935] text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-[#C62828] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-[#E53935] text-white px-8 py-3 rounded-sm font-bold text-sm hover:bg-[#C62828] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {submitting ? 'Creating...' : 'Deploy Challenge'}
                     </button>
@@ -230,9 +230,9 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">
                                             <div className={cn(
-                                                "p-3.5 rounded-xl border group-hover:shadow-sm transition-all",
+                                                "p-3.5 rounded-sm border group-hover:shadow-sm transition-all",
                                                 chal.is_active
-                                                    ? "bg-[#1A237E] text-white border-[#1A237E]"
+                                                    ? "bg-[#111111] text-white border-[#111111]"
                                                     : "bg-[#F5F5F5] text-[#BDBDBD] border-[#E0E0E0]"
                                             )}>
                                                 {getIcon(chal.category)}
@@ -245,7 +245,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border shadow-sm",
+                                            "px-3.5 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-widest border shadow-sm",
                                             chal.is_active ? "bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]" : "bg-[#F5F5F5] text-[#9E9E9E] border-[#E0E0E0]"
                                         )}>
                                             {chal.is_active ? 'Active' : 'Offline'}
@@ -253,7 +253,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border shadow-sm",
+                                            "px-3.5 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-widest border shadow-sm",
                                             chal.difficulty === 'hard' || chal.difficulty === 'expert' ? "bg-[#FFEBEE] text-[#D32F2F] border-[#FFCDD2]" :
                                                 chal.difficulty === 'medium' ? "bg-[#FFF8E1] text-[#F57F17] border-[#FFECB3]" :
                                                     "bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB]"
@@ -264,12 +264,12 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                                     <td className="px-8 py-5 text-center">
                                         <span className={cn(
                                             "text-sm font-bold tracking-wide",
-                                            chal.is_active ? "text-[#1A237E]" : "text-[#BDBDBD]"
+                                            chal.is_active ? "text-[#111111]" : "text-[#BDBDBD]"
                                         )}>{chal.points}</span>
                                     </td>
                                     <td className="px-8 py-5 text-center">
                                         <div className="flex items-center justify-center gap-2 text-[#9E9E9E] text-xs font-bold">
-                                            <BarChart3 className={cn("h-4 w-4", chal.is_active ? "opacity-70 text-[#1A237E]" : "opacity-30")} />
+                                            <BarChart3 className={cn("h-4 w-4", chal.is_active ? "opacity-70 text-[#111111]" : "opacity-30")} />
                                             {chal.solves_count || 0}
                                         </div>
                                     </td>
@@ -279,7 +279,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                                                 onClick={() => handleToggleStatus(chal.id, chal.is_active)}
                                                 disabled={!!isLoading}
                                                 className={cn(
-                                                    "p-2.5 rounded-xl transition-all shadow-sm border",
+                                                    "p-2.5 rounded-sm transition-all shadow-sm border",
                                                     chal.is_active
                                                         ? "bg-[#212121] border-[#424242] text-white hover:bg-black"
                                                         : "bg-[#E8F5E9] border-[#C8E6C9] text-[#2E7D32] hover:bg-[#4CAF50] hover:text-white"
@@ -288,7 +288,7 @@ export default function CTFTab({ challenges, refresh }: { challenges: any[], ref
                                             >
                                                 {chal.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                             </button>
-                                            <button className="p-2.5 bg-white border border-[#E0E0E0] text-[#1A237E] hover:bg-[#E8EAF6] hover:border-[#C5CAE9] rounded-xl transition-all shadow-sm">
+                                            <button className="p-2.5 bg-white border border-[#E0E0E0] text-[#111111] hover:bg-[#FAFAFA] hover:border-[#E5E5E5] rounded-sm transition-all shadow-sm">
                                                 <Edit2 className="h-4 w-4" />
                                             </button>
                                         </div>

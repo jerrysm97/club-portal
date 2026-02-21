@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
     const supabase = createServerClient()
 
     // The user's member ID is linked via user_id
-    const { data: member, error: fetchErr } = await supabase
-        .from('members')
+    const { data: member, error: fetchErr } = await (supabase
+        .from('members' as any) as any)
         .select('id')
         .eq('user_id', session.user.id)
         .single()
@@ -22,12 +22,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'MEMBER_NOT_FOUND' }, { status: 404 })
     }
 
-    const { error: updateErr } = await supabase
-        .from('members')
+    const { error: updateErr } = await (supabase
+        .from('members' as any) as any)
         .update({
             deactivation_requested_at: new Date().toISOString(),
             deactivation_reason: reason || null
-        } as any)
+        })
         .eq('id', member.id)
 
     if (updateErr) {

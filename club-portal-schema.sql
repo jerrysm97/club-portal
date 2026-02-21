@@ -3,6 +3,7 @@
 -- =============================================
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS "pg_net";
 
 -- =============================================
 -- MEMBERS (Combines CONTEXT.md and BACKEND_LOGIC.md rules)
@@ -50,7 +51,9 @@ CREATE TABLE members (
   approved_at   timestamptz,
   approved_by   uuid REFERENCES members(id) ON DELETE SET NULL,
   ban_reason    text,
-  reject_reason text
+  reject_reason text,
+  is_public_profile boolean DEFAULT false,
+  display_order integer DEFAULT 999
 );
 
 -- =============================================
@@ -111,6 +114,8 @@ CREATE TABLE messages (
   conversation_id  uuid NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
   sender_id        uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
   content          text NOT NULL CHECK (length(content) BETWEEN 1 AND 5000),
+  attachment_url   text,
+  attachment_type  text,
   is_deleted       boolean DEFAULT false,
   created_at       timestamptz DEFAULT now()
 );
@@ -159,7 +164,7 @@ CREATE TABLE documents (
   category       text DEFAULT 'general' CHECK (category IN (
     'general', 'study-material', 'writeup', 'presentation', 'report', 'project', 'other'
   )),
-  is_public      boolean DEFAULT false,
+  access_level   text DEFAULT 'public' CHECK (access_level IN ('public', 'members', 'bod', 'admin')),
   download_count integer DEFAULT 0 CHECK (download_count >= 0),
   created_at     timestamptz DEFAULT now()
 );
@@ -448,4 +453,61 @@ BEGIN
       ));
   END IF;
 END $$;
+
+-- 5. Unified Storage Cleanup Trigger Functions
+CREATE OR REPLACE FUNCTION delete_storage_object(bucket_id text, object_path text)
+RETURNS void AS $$
+BEGIN
+  -- We assume standard Supabase storage configuration. 
+  -- Objects are actually recorded in storage.objects, removing them cleans them up for GC.
+  DELETE FROM storage.objects WHERE bucket_id = delete_storage_object.bucket_id AND name = delete_storage_object.object_path;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Suppress errors if storage schema isn't fully linked in this executing context, but log it.
+    RAISE NOTICE 'Failed to delete storage object: %', SQLERRM;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION fn_cleanup_document_file()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_bucket_id text := 'portal_documents';
+  v_object_path text;
+BEGIN
+  -- Assuming file_url is something like "https://.../portal_documents/resources/filename.pdf"
+  -- We extract the path after "portal_documents/"
+  v_object_path := substring(OLD.file_url from 'portal_documents/(.*)$');
+  IF v_object_path IS NOT NULL THEN
+    PERFORM delete_storage_object(v_bucket_id, v_object_path);
+  END IF;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER trg_cleanup_document
+  AFTER DELETE ON documents
+  FOR EACH ROW
+  EXECUTE FUNCTION fn_cleanup_document_file();
+
+CREATE OR REPLACE FUNCTION fn_cleanup_message_attachment()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_bucket_id text := 'portal_documents';
+  v_object_path text;
+BEGIN
+  IF OLD.attachment_url IS NOT NULL THEN
+    v_object_path := substring(OLD.attachment_url from 'portal_documents/(.*)$');
+    IF v_object_path IS NOT NULL THEN
+      PERFORM delete_storage_object(v_bucket_id, v_object_path);
+    END IF;
+  END IF;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER trg_cleanup_message_attachment
+  AFTER DELETE ON messages
+  FOR EACH ROW
+  EXECUTE FUNCTION fn_cleanup_message_attachment();
+
 

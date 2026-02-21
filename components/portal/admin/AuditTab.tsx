@@ -14,7 +14,7 @@ export default function AuditTab({ logs }: { logs: AuditLog[] }) {
                         <h2 className="text-xl font-bold text-[#212121]">System Audit Logs</h2>
                         <p className="text-[#757575] text-sm mt-1">Immutable record of high-level administrative actions.</p>
                     </div>
-                    <div className="h-12 w-12 bg-[#FFEBEE] rounded-2xl flex items-center justify-center border border-[#FFCDD2]">
+                    <div className="h-12 w-12 bg-[#FFEBEE] rounded-sm flex items-center justify-center border border-[#FFCDD2]">
                         <ShieldAlert className="h-6 w-6 text-[#D32F2F]" />
                     </div>
                 </div>
@@ -39,12 +39,12 @@ export default function AuditTab({ logs }: { logs: AuditLog[] }) {
                                         </td>
                                         <td className="px-8 py-5 text-sm font-medium text-[#212121]">
                                             <div className="flex items-center gap-2">
-                                                <User className="w-4 h-4 text-[#1A237E]" />
+                                                <User className="w-4 h-4 text-[#111111]" />
                                                 {log.actor_id || log.admin_id || 'System'}
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">
-                                            <span className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB]">
+                                            <span className="px-3 py-1.5 rounded-sm text-[10px] font-bold uppercase tracking-widest border bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB]">
                                                 {log.action}
                                             </span>
                                         </td>

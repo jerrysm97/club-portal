@@ -64,25 +64,25 @@ export default function LoginForm() {
             <div className="w-full max-w-md relative animate-fade-up">
                 {/* Brand header */}
                 <div className="flex items-center justify-center flex-col gap-4 mb-8">
-                    <div className="h-14 w-14 rounded-2xl bg-[#1A237E] flex items-center justify-center shadow-lg shadow-[#1A237E]/20">
+                    <div className="h-14 w-14 rounded-sm bg-[#111111] flex items-center justify-center shadow-sm shadow-[#111111]/20">
                         <Shield className="h-7 w-7 text-white" />
                     </div>
                     <div className="text-center">
-                        <h2 className="font-bold text-[#1A237E] text-xl tracking-tight">{BRAND.clubShort}</h2>
+                        <h2 className="font-bold text-[#111111] text-xl tracking-tight">{BRAND.clubShort}</h2>
                         <span className="text-xs text-[#757575] font-medium tracking-wide uppercase">Member Portal</span>
                     </div>
                 </div>
 
                 {/* Reason banner */}
                 {reason && reasonMessages[reason] && (
-                    <div className="mb-6 p-4 rounded-xl bg-[#FFF8E1] border border-[#F57F17]/30 flex items-start gap-3 shadow-sm">
+                    <div className="mb-6 p-4 rounded-sm bg-[#FFF8E1] border border-[#F57F17]/30 flex items-start gap-3 shadow-sm">
                         <AlertTriangle className="h-5 w-5 text-[#F57F17] flex-shrink-0 mt-0.5" />
                         <p className="text-[#F57F17] text-sm font-medium">{reasonMessages[reason]}</p>
                     </div>
                 )}
 
                 {/* Main card */}
-                <div className="bg-white rounded-2xl shadow-xl shadow-black/5 p-8 border border-[#E0E0E0]">
+                <div className="bg-white rounded-sm shadow-sm shadow-black/5 p-8 border border-[#E0E0E0]">
                     <div className="mb-8">
                         <h1 className="font-bold text-[#212121] text-2xl mb-2">
                             Sign In
@@ -93,7 +93,7 @@ export default function LoginForm() {
                     </div>
 
                     {error && (
-                        <div className="mb-6 p-3 rounded-xl bg-[#FFEBEE] border border-[#E53935]/20 text-[#C62828] text-sm font-medium animate-slide-in">
+                        <div className="mb-6 p-3 rounded-sm bg-[#FFEBEE] border border-[#E53935]/20 text-[#C62828] text-sm font-medium animate-slide-in">
                             {error}
                         </div>
                     )}
@@ -117,7 +117,7 @@ export default function LoginForm() {
                                     required
                                     autoComplete="email"
                                     autoFocus
-                                    className="block w-full pl-10 pr-3 py-3 border border-[#E0E0E0] rounded-xl focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] placeholder-[#9E9E9E] text-sm transition-all"
+                                    className="block w-full pl-10 pr-3 py-3 border border-[#E0E0E0] rounded-sm focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] placeholder-[#9E9E9E] text-sm transition-all"
                                 />
                             </div>
                         </div>
@@ -140,7 +140,7 @@ export default function LoginForm() {
                                     required
                                     autoComplete="current-password"
                                     minLength={6}
-                                    className="block w-full pl-10 pr-10 py-3 border border-[#E0E0E0] rounded-xl focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] placeholder-[#9E9E9E] text-sm transition-all"
+                                    className="block w-full pl-10 pr-10 py-3 border border-[#E0E0E0] rounded-sm focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] placeholder-[#9E9E9E] text-sm transition-all"
                                 />
                                 <button
                                     type="button"
@@ -156,7 +156,7 @@ export default function LoginForm() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-[#1A237E] text-white font-semibold flex items-center justify-center gap-2 py-3 rounded-xl hover:bg-[#283593] active:bg-[#1A237E] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-[#1A237E]/20"
+                            className="w-full bg-[#111111] text-white font-semibold flex items-center justify-center gap-2 py-3 rounded-sm hover:bg-[#C8102E] active:bg-[#111111] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm shadow-[#111111]/20"
                         >
                             {loading ? (
                                 <>
@@ -176,7 +176,7 @@ export default function LoginForm() {
                     <div className="mt-6 pt-6 border-t border-[#E0E0E0] text-center">
                         <p className="text-[#757575] text-sm">
                             Don&apos;t have an account?{' '}
-                            <Link href="/portal/register" className="text-[#1A237E] font-semibold hover:underline">
+                            <Link href="/portal/register" className="text-[#111111] font-semibold hover:underline">
                                 Register here
                             </Link>
                         </p>
@@ -191,7 +191,7 @@ export default function LoginForm() {
                             href="https://iimscollege.edu.np/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#1A237E] hover:underline font-semibold"
+                            className="text-[#111111] hover:underline font-semibold"
                         >
                             IIMS College
                         </a>

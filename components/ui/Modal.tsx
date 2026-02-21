@@ -45,7 +45,7 @@ export default function Modal({ open, onClose, title, children, size = 'md', cla
             {/* Panel */}
             <div
                 className={cn(
-                    'relative w-full bg-white border border-[#E5E7EB] rounded-xl shadow-xl',
+                    'relative w-full bg-white border border-[#E5E7EB] rounded-sm shadow-sm',
                     sizeMap[size],
                     className
                 )}

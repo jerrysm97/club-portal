@@ -20,8 +20,8 @@ export async function PATCH(req: NextRequest) {
     }
 
     const supabase = createServerClient()
-    const { error } = await supabase
-        .from('site_settings')
+    const { error } = await (supabase
+        .from('site_settings' as any) as any)
         .update({
             value: parsed.data.value,
             updated_by: admin.id,
@@ -31,10 +31,10 @@ export async function PATCH(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
-        admin_id: admin.id,
+    await (supabase.from('audit_logs' as any) as any).insert({
+        actor_id: admin.id,
         action: 'update_setting',
-        meta: parsed.data
+        details: parsed.data
     })
 
     return NextResponse.json({ success: true })

@@ -52,10 +52,10 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
 
     return (
         <div className={cn(
-            "relative p-6 md:p-8 rounded-3xl border transition-all animate-fade-up flex flex-col h-full group overflow-hidden",
+            "relative p-6 md:p-8 rounded-sm border transition-all animate-fade-up flex flex-col h-full group overflow-hidden",
             solved
                 ? "bg-[#161B22] border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
-                : "bg-[#161B22] border-[#30363D] hover:border-[#58A6FF]/40 hover:shadow-[0_0_20px_rgba(88,166,255,0.05)] shadow-xl"
+                : "bg-[#161B22] border-[#30363D] hover:border-[#58A6FF]/40 hover:shadow-[0_0_20px_rgba(88,166,255,0.05)] shadow-sm"
         )}>
             {/* Solved Overlay Decoration */}
             {solved && (
@@ -109,7 +109,7 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
                                     placeholder="Flag format: ICEHC{...}"
                                     value={flagInput}
                                     onChange={(e) => setFlagInput(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm font-mono text-white focus:bg-black/60 focus:ring-1 focus:ring-[#E53935] focus:border-[#E53935] transition-all outline-none placeholder:text-gray-600"
+                                    className="w-full bg-black/40 border border-white/10 rounded-sm pl-11 pr-4 py-3 text-sm font-mono text-white focus:bg-black/60 focus:ring-1 focus:ring-[#E53935] focus:border-[#E53935] transition-all outline-none placeholder:text-gray-600"
                                     disabled={loading}
                                 />
                             </div>
@@ -117,7 +117,7 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
                                 type="submit"
                                 loading={loading}
                                 disabled={!flagInput.trim()}
-                                className="rounded-xl h-12 px-6 bg-[#E53935] hover:bg-[#C62828] text-white border-none font-bold shadow-lg shadow-[#E53935]/20"
+                                className="rounded-sm h-12 px-6 bg-[#E53935] hover:bg-[#C62828] text-white border-none font-bold shadow-sm shadow-[#E53935]/20"
                             >
                                 Capture <ChevronRight className="inline h-4 w-4 ml-1" />
                             </Button>
@@ -127,7 +127,7 @@ export default function CTFChallengeCard({ challenge }: CTFChallengeCardProps) {
                         </div>
                     </form>
                 ) : (
-                    <div className="bg-emerald-500/10 rounded-xl p-4 flex items-center justify-center gap-3 text-emerald-400 border border-emerald-500/20 animate-fade-up">
+                    <div className="bg-emerald-500/10 rounded-sm p-4 flex items-center justify-center gap-3 text-emerald-400 border border-emerald-500/20 animate-fade-up">
                         <ShieldCheck className="h-5 w-5" />
                         <span className="text-xs font-bold uppercase tracking-widest">Target Fully Compromised</span>
                     </div>

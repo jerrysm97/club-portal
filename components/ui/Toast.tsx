@@ -29,7 +29,7 @@ export default function Toast({ toast, onDismiss }: ToastProps) {
         <div
             role="alert"
             className={cn(
-                'flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg border border-[#E5E7EB] min-w-[280px] max-w-sm animate-slide-in',
+                'flex items-start gap-3 px-4 py-3 rounded-sm shadow-sm border border-[#E5E7EB] min-w-[280px] max-w-sm animate-slide-in',
                 bg,
                 border
             )}

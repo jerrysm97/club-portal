@@ -19,7 +19,7 @@ export default async function EventsPage() {
         .eq('is_published', true)
         .order('event_date', { ascending: true })
 
-    const events = (dbEvents ?? []).map((e) => ({
+    const events = (dbEvents ?? []).map((e: any) => ({
         id: e.id,
         title: e.title,
         short_desc: e.description,

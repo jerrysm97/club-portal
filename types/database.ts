@@ -9,10 +9,14 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
-            public_events: { Row: any, Insert: any, Update: any, Relationships: [] }
-            posts: { Row: any, Insert: any, Update: any, Relationships: [] }
-            ctf_challenges: { Row: any, Insert: any, Update: any, Relationships: [] }
-            documents: { Row: any, Insert: any, Update: any, Relationships: [] }
+            public_events: { Row: Record<string, any>, Insert: Record<string, any>, Update: Record<string, any>, Relationships: [] }
+            posts: { Row: Record<string, any>, Insert: Record<string, any>, Update: Record<string, any>, Relationships: [] }
+            ctf_challenges: { Row: Record<string, any>, Insert: Record<string, any>, Update: Record<string, any>, Relationships: [] }
+            documents: { Row: Record<string, any>, Insert: Record<string, any>, Update: Record<string, any>, Relationships: [] }
+            messages: { Row: Record<string, any>, Insert: Record<string, any>, Update: Record<string, any>, Relationships: [] }
+            conversations: { Row: Record<string, any>, Insert: Record<string, any>, Update: Record<string, any>, Relationships: [] }
+            conversation_participants: { Row: Record<string, any>, Insert: Record<string, any>, Update: Record<string, any>, Relationships: [] }
+            gallery_images: { Row: Record<string, any>, Insert: Record<string, any>, Update: Record<string, any>, Relationships: [] }
             members: {
                 Row: {
                     id: string
@@ -32,6 +36,8 @@ export interface Database {
                     created_at: string
                     deactivation_requested_at: string | null
                     deactivation_reason: string | null
+                    is_public_profile: boolean
+                    display_order: number
                 }
                 Insert: {
                     id?: string
@@ -51,6 +57,8 @@ export interface Database {
                     created_at?: string
                     deactivation_requested_at?: string | null
                     deactivation_reason?: string | null
+                    is_public_profile?: boolean
+                    display_order?: number
                 }
                 Update: {
                     id?: string
@@ -70,6 +78,8 @@ export interface Database {
                     created_at?: string
                     deactivation_requested_at?: string | null
                     deactivation_reason?: string | null
+                    is_public_profile?: boolean
+                    display_order?: number
                 }
                 Relationships: []
             }

@@ -34,8 +34,8 @@ export async function getSession() {
  */
 export async function getMember(userId: string): Promise<MemberRow | null> {
     const supabase = createServerClient()
-    const { data, error } = await supabase
-        .from('members')
+    const { data, error } = await (supabase
+        .from('members' as any) as any)
         .select('id, user_id, full_name, email, role, status, club_post, avatar_url, points, program')
         .eq('user_id', userId) // ✅ user_id FK — NEVER .eq('id', userId)
         .single()
@@ -53,8 +53,8 @@ export async function assertRole(minRole: Role): Promise<Pick<MemberRow, 'id' | 
     if (!session) throw new Error('UNAUTHENTICATED')
 
     const supabase = createServerClient()
-    const { data: member, error } = await supabase
-        .from('members')
+    const { data: member, error } = await (supabase
+        .from('members' as any) as any)
         .select('id, role, status, club_post')
         .eq('user_id', session.user.id) // ✅ user_id FK — NEVER .eq('id', ...)
         .single()
@@ -79,8 +79,8 @@ export async function assertSuperadminOrPresident(): Promise<Pick<MemberRow, 'id
     if (!session) throw new Error('UNAUTHENTICATED')
 
     const supabase = createServerClient()
-    const { data: member, error } = await supabase
-        .from('members')
+    const { data: member, error } = await (supabase
+        .from('members' as any) as any)
         .select('id, role, status, club_post')
         .eq('user_id', session.user.id)
         .single()
@@ -103,8 +103,8 @@ export async function assertSuperadmin(): Promise<Pick<MemberRow, 'id' | 'role' 
     if (!session) throw new Error('UNAUTHENTICATED')
 
     const supabase = createServerClient()
-    const { data: member, error } = await supabase
-        .from('members')
+    const { data: member, error } = await (supabase
+        .from('members' as any) as any)
         .select('id, role, status, club_post')
         .eq('user_id', session.user.id)
         .single()
@@ -127,8 +127,8 @@ export async function assertSuperadminOrPresidentOrAdmin(): Promise<Pick<MemberR
     if (!session) throw new Error('UNAUTHENTICATED')
 
     const supabase = createServerClient()
-    const { data: member, error } = await supabase
-        .from('members')
+    const { data: member, error } = await (supabase
+        .from('members' as any) as any)
         .select('id, role, status, club_post')
         .eq('user_id', session.user.id)
         .single()

@@ -75,31 +75,31 @@ export default function EditProfilePage() {
     if (loading) {
         return (
             <div className="flex h-[50vh] items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A237E]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#111111]" />
             </div>
         )
     }
 
     return (
         <div className="max-w-4xl mx-auto space-y-10 animate-fade-up pb-16">
-            <Link href="/portal/profile" className="inline-flex items-center gap-2 text-[#757575] hover:text-[#1A237E] font-bold text-xs uppercase tracking-widest transition-all group">
+            <Link href="/portal/profile" className="inline-flex items-center gap-2 text-[#757575] hover:text-[#111111] font-bold text-xs uppercase tracking-widest transition-all group">
                 <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
                 Return to Profile
             </Link>
 
             <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#E8EAF6] text-[#1A237E] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#C5CAE9]">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-[#FAFAFA] text-[#111111] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#E5E5E5]">
                     <Terminal className="h-3.5 w-3.5" /> Identity Core
                 </div>
                 <h1 className="text-3xl md:text-5xl font-bold text-[#212121] leading-tight flex items-center gap-4">
-                    Update <span className="text-[#1A237E]">Profile</span>
+                    Update <span className="text-[#111111]">Profile</span>
                 </h1>
                 <p className="text-[#757575] font-medium text-sm mt-3 max-w-xl leading-relaxed">
                     Modify your personal directory listing, upload a verified photo, and calibrate your technical expertise matrix.
                 </p>
             </div>
 
-            <div className="bg-white rounded-[2rem] p-8 md:p-12 border border-[#E0E0E0] shadow-xl relative overflow-hidden">
+            <div className="bg-white rounded-[2rem] p-8 md:p-12 border border-[#E0E0E0] shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#F8F9FA] rounded-bl-[4rem] -z-10" />
 
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
@@ -116,7 +116,7 @@ export default function EditProfilePage() {
                             <button
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={uploading}
-                                className="absolute bottom-4 right-4 p-3 bg-[#E53935] hover:bg-[#D32F2F] text-white rounded-xl shadow-lg shadow-black/20 hover:scale-105 transition-all focus:outline-none focus:ring-4 focus:ring-[#E53935]/30 disabled:opacity-50"
+                                className="absolute bottom-4 right-4 p-3 bg-[#E53935] hover:bg-[#D32F2F] text-white rounded-sm shadow-sm shadow-black/20 hover:scale-105 transition-all focus:outline-none focus:ring-4 focus:ring-[#E53935]/30 disabled:opacity-50"
                             >
                                 {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
                             </button>
@@ -143,7 +143,7 @@ export default function EditProfilePage() {
                             required
                         />
 
-                        <div className="space-y-1.5 focus-within:text-[#1A237E]">
+                        <div className="space-y-1.5 focus-within:text-[#111111]">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-[#757575] ml-1 transition-colors">
                                 Professional Biography
                             </label>
@@ -151,7 +151,7 @@ export default function EditProfilePage() {
                                 name="bio"
                                 defaultValue={member?.bio || ''}
                                 rows={4}
-                                className="w-full bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl px-4 py-3 text-sm font-medium focus:bg-white focus:border-[#1A237E]/30 focus:ring-4 focus:ring-[#1A237E]/10 transition-all outline-none resize-none text-[#212121]"
+                                className="w-full bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm px-4 py-3 text-sm font-medium focus:bg-white focus:border-[#111111]/30 focus:ring-4 focus:ring-[#111111]/10 transition-all outline-none resize-none text-[#212121]"
                                 placeholder="Write a short summary about yourself..."
                             />
                         </div>
@@ -173,7 +173,7 @@ export default function EditProfilePage() {
                             />
                         </div>
 
-                        <div className="space-y-1.5 focus-within:text-[#1A237E]">
+                        <div className="space-y-1.5 focus-within:text-[#111111]">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-[#757575] ml-1 flex items-center gap-2">
                                 <Zap className="h-3 w-3" /> Technical Expertise
                             </label>
@@ -181,7 +181,7 @@ export default function EditProfilePage() {
                                 name="skills"
                                 type="text"
                                 defaultValue={(member?.skills || []).join(', ')}
-                                className="w-full bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl px-4 py-3.5 text-sm font-semibold focus:bg-white focus:border-[#1A237E]/30 focus:ring-4 focus:ring-[#1A237E]/10 transition-all outline-none text-[#212121]"
+                                className="w-full bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm px-4 py-3.5 text-sm font-semibold focus:bg-white focus:border-[#111111]/30 focus:ring-4 focus:ring-[#111111]/10 transition-all outline-none text-[#212121]"
                                 placeholder="React, Node.js, Python, Penetration Testing (Comma separated)"
                             />
                         </div>
@@ -192,7 +192,7 @@ export default function EditProfilePage() {
                                     Cancel
                                 </Button>
                             </Link>
-                            <Button type="submit" disabled={saving} className="bg-[#1A237E] hover:bg-[#283593] shadow-md shadow-[#1A237E]/20 h-[52px] px-8 border-transparent">
+                            <Button type="submit" disabled={saving} className="bg-[#111111] hover:bg-[#C8102E] shadow-sm shadow-[#111111]/20 h-[52px] px-8 border-transparent">
                                 {saving ? (
                                     <>
                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />

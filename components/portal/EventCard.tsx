@@ -35,9 +35,9 @@ export default function EventCard({ event }: EventCardProps) {
     }
 
     return (
-        <div className="group bg-white rounded-3xl border border-[#E0E0E0] p-6 md:p-8 shadow-sm hover:shadow-xl hover:border-[#1A237E]/20 transition-all animate-fade-up flex flex-col md:flex-row gap-6 md:gap-8">
+        <div className="group bg-white rounded-sm border border-[#E0E0E0] p-6 md:p-8 shadow-sm hover:shadow-sm hover:border-[#111111]/20 transition-all animate-fade-up flex flex-col md:flex-row gap-6 md:gap-8">
             {/* Visual Indicator / Date */}
-            <div className="flex-shrink-0 w-full md:w-32 h-32 rounded-2xl bg-[#F8F9FA] flex flex-col items-center justify-center text-center border border-[#E0E0E0] group-hover:bg-[#1A237E] group-hover:text-white transition-all">
+            <div className="flex-shrink-0 w-full md:w-32 h-32 rounded-sm bg-[#F8F9FA] flex flex-col items-center justify-center text-center border border-[#E0E0E0] group-hover:bg-[#111111] group-hover:text-white transition-all">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#9E9E9E] group-hover:text-white/70 mb-1">
                     {new Date(eventDate).toLocaleString('default', { month: 'short' })}
                 </span>
@@ -68,7 +68,7 @@ export default function EventCard({ event }: EventCardProps) {
                 </div>
 
                 <Link href={`/portal/events/${event.id}`} className="block">
-                    <h3 className="text-2xl font-bold text-[#212121] group-hover:text-[#1A237E] transition-colors leading-tight">
+                    <h3 className="text-2xl font-bold text-[#212121] group-hover:text-[#111111] transition-colors leading-tight">
                         {event.title}
                     </h3>
                 </Link>
@@ -94,10 +94,10 @@ export default function EventCard({ event }: EventCardProps) {
                 <button
                     onClick={() => handleRsvp('going')}
                     className={cn(
-                        "w-full h-12 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm focus:ring-4 focus:ring-[#1A237E]/20",
+                        "w-full h-12 rounded-sm text-xs font-bold uppercase tracking-widest transition-all shadow-sm focus:ring-4 focus:ring-[#111111]/20",
                         rsvpStatus === 'going'
-                            ? "bg-[#1A237E] text-white shadow-[#1A237E]/30"
-                            : "bg-white text-[#1A237E] border-2 border-[#1A237E] hover:bg-[#E8EAF6]"
+                            ? "bg-[#111111] text-white shadow-[#111111]/30"
+                            : "bg-white text-[#111111] border-2 border-[#111111] hover:bg-[#FAFAFA]"
                     )}
                 >
                     {rsvpStatus === 'going' ? 'Registered' : 'Register Now'}
@@ -106,7 +106,7 @@ export default function EventCard({ event }: EventCardProps) {
                 <button
                     onClick={() => handleRsvp(rsvpStatus === 'maybe' ? 'not_going' : 'maybe')}
                     className={cn(
-                        "w-full h-12 rounded-xl text-xs font-bold uppercase tracking-widest transition-all focus:ring-4 focus:ring-[#E0E0E0]",
+                        "w-full h-12 rounded-sm text-xs font-bold uppercase tracking-widest transition-all focus:ring-4 focus:ring-[#E0E0E0]",
                         rsvpStatus === 'maybe'
                             ? "bg-[#FFF8E1] text-[#F57F17] border-2 border-[#FFE082]"
                             : "bg-[#F5F5F5] text-[#757575] hover:bg-[#EEEEEE] hover:text-[#424242]"
@@ -117,7 +117,7 @@ export default function EventCard({ event }: EventCardProps) {
 
                 <Link
                     href={`/portal/events/${event.id}`}
-                    className="flex items-center justify-center gap-2 text-[#9E9E9E] font-bold text-[10px] uppercase tracking-widest mt-2 hover:text-[#1A237E] transition-colors group/link"
+                    className="flex items-center justify-center gap-2 text-[#9E9E9E] font-bold text-[10px] uppercase tracking-widest mt-2 hover:text-[#111111] transition-colors group/link"
                 >
                     Event Details <ChevronRight className="h-3.5 w-3.5 group-hover/link:translate-x-1 transition-transform" />
                 </Link>

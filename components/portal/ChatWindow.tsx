@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Send, Loader2, MoreVertical, ShieldCheck, ChevronDown, CheckCheck, Lock } from 'lucide-react'
+import { Send, Loader2, MoreVertical, ShieldCheck, ChevronDown, CheckCheck, Lock, Paperclip, FileText, Download } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import { createClient } from '@/lib/supabase/client'
 import { sendMessage } from '@/app/portal/(protected)/messages/actions'
@@ -20,6 +20,9 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
     const [messages, setMessages] = useState<any[]>(initialMessages)
     const [input, setInput] = useState('')
     const [sending, setSending] = useState(false)
+    const [uploading, setUploading] = useState(false)
+    const [attachment, setAttachment] = useState<{ url: string, type: string } | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
     const scrollRef = useRef<HTMLDivElement>(null)
 
     const supabase = createClient()
@@ -61,17 +64,22 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
 
     async function handleSend(e: React.FormEvent) {
         e.preventDefault()
-        if (!input.trim() || sending) return
+        if ((!input.trim() && !attachment) || sending || uploading) return
 
         const content = input
+        const currentAttachment = attachment
+
         setInput('')
+        setAttachment(null)
         setSending(true)
 
         // Optimistic update
         const tempId = crypto.randomUUID()
         const optimisticMsg = {
             id: tempId,
-            content,
+            content: content || 'File transmission',
+            attachment_url: currentAttachment?.url || null,
+            attachment_type: currentAttachment?.type || null,
             sender_id: currentUser.id,
             conversation_id: conversationId,
             created_at: new Date().toISOString(),
@@ -81,7 +89,7 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
         setMessages(prev => [...prev, optimisticMsg])
 
         // Server Action
-        const res = await sendMessage(otherUser.id, content)
+        const res = await sendMessage(otherUser.id, content, currentAttachment?.url || undefined, currentAttachment?.type || undefined)
         setSending(false)
 
         if (res?.error) {
@@ -91,12 +99,43 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
         }
     }
 
+    async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File exceeds 10MB limit')
+            return
+        }
+
+        setUploading(true)
+        const formData = new FormData()
+        formData.append('file', file)
+
+        try {
+            const res = await fetch('/api/messages/upload', {
+                method: 'POST',
+                body: formData
+            })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Upload failed')
+
+            setAttachment({ url: data.url, type: data.type })
+        } catch (err: any) {
+            console.error('File upload err:', err)
+            alert(err.message || 'Upload failed')
+        } finally {
+            setUploading(false)
+            if (fileInputRef.current) fileInputRef.current.value = ''
+        }
+    }
+
     return (
         <div className="flex flex-col h-full bg-white relative">
             {/* Dynamic Header */}
             <header className="h-[72px] md:h-20 flex items-center justify-between px-6 md:px-8 border-b border-[#E0E0E0] bg-white/90 backdrop-blur-md sticky top-0 z-10 shrink-0">
                 <div className="flex items-center gap-4">
-                    <Link href="/portal/messages" className="lg:hidden p-2 -ml-2 text-[#9E9E9E] hover:bg-[#F5F5F5] rounded-lg">
+                    <Link href="/portal/messages" className="lg:hidden p-2 -ml-2 text-[#9E9E9E] hover:bg-[#F5F5F5] rounded-sm">
                         <ChevronDown className="h-5 w-5 rotate-90" />
                     </Link>
                     <div className="relative">
@@ -107,7 +146,7 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
                         <h3 className="text-[#212121] font-bold text-sm leading-none flex items-center gap-2">
                             {otherUser.name}
                             {['admin', 'superadmin'].includes(otherUser.role) && (
-                                <ShieldCheck className="h-4 w-4 text-[#1A237E]" />
+                                <ShieldCheck className="h-4 w-4 text-[#111111]" />
                             )}
                         </h3>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-[#9E9E9E] mt-1.5 block">
@@ -117,7 +156,7 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button className="p-2.5 rounded-xl text-[#9E9E9E] hover:text-[#1A237E] hover:bg-[#F8F9FA] transition-all">
+                    <button className="p-2.5 rounded-sm text-[#9E9E9E] hover:text-[#111111] hover:bg-[#F8F9FA] transition-all">
                         <MoreVertical className="h-5 w-5" />
                     </button>
                 </div>
@@ -126,7 +165,7 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
             {/* Message Stream */}
             <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 md:space-y-8 bg-[#F8F9FA]/30 custom-scrollbar" ref={scrollRef}>
                 <div className="py-8 text-center">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#1A237E]/5 border border-[#1A237E]/10 text-[10px] font-bold text-[#1A237E] uppercase tracking-widest">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#111111]/5 border border-[#111111]/10 text-[10px] font-bold text-[#111111] uppercase tracking-widest">
                         <Lock className="h-3 w-3" /> End-to-End Encrypted Session
                     </span>
                 </div>
@@ -151,12 +190,35 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
 
                                 <div className={cn("space-y-1.5", isMe ? 'items-end' : 'items-start')}>
                                     <div className={cn(
-                                        "px-5 py-3 rounded-2xl font-medium text-sm leading-relaxed shadow-sm transition-all",
+                                        "px-5 py-3 rounded-sm font-medium text-sm leading-relaxed shadow-sm transition-all",
                                         isMe
-                                            ? 'bg-[#1A237E] text-white rounded-br-sm'
+                                            ? 'bg-[#111111] text-white rounded-br-sm'
                                             : 'bg-white text-[#212121] border border-[#E0E0E0] rounded-bl-sm'
                                     )}>
-                                        {msg.content}
+                                        {msg.attachment_url && (
+                                            <div className="mb-2">
+                                                {msg.attachment_type === 'jpg' || msg.attachment_type === 'jpeg' || msg.attachment_type === 'png' ? (
+                                                    <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer">
+                                                        <img src={msg.attachment_url} alt="Attachment" className="max-w-full rounded-sm max-h-48 object-cover border border-white/20" />
+                                                    </a>
+                                                ) : (
+                                                    <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" className={cn(
+                                                        "flex items-center gap-3 p-3 rounded-sm border transition-all text-left",
+                                                        isMe ? "bg-white/10 border-white/20 hover:bg-white/20" : "bg-[#F5F5F5] border-[#E0E0E0] hover:bg-[#EEEEEE]"
+                                                    )}>
+                                                        <div className={cn("p-2 rounded-sm", isMe ? "bg-white/20" : "bg-white")}>
+                                                            <FileText className="h-5 w-5" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0 pr-4">
+                                                            <div className="font-bold text-xs truncate uppercase tracking-wider text-inherit">Encrypted Document</div>
+                                                            <div className="text-[10px] opacity-70 uppercase tracking-widest mt-0.5">{msg.attachment_type} File</div>
+                                                        </div>
+                                                        <Download className="h-4 w-4 opacity-50" />
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
+                                        {msg.content !== 'File transmission' && msg.content}
                                     </div>
                                     <div className={cn("flex items-center gap-1.5 text-[10px] font-bold text-[#9E9E9E] uppercase tracking-wider px-1", isMe && "flex-row-reverse")}>
                                         {formatDate(msg.created_at)}
@@ -173,24 +235,42 @@ export default function ChatWindow({ initialMessages, currentUser, otherUser, co
 
             {/* Action Bar */}
             <footer className="p-4 md:p-6 bg-white border-t border-[#E0E0E0] sticky bottom-0 z-10 shrink-0">
-                <form onSubmit={handleSend} className="max-w-5xl mx-auto flex gap-3 md:gap-4">
-                    <div className="flex-1 relative">
-                        <input
-                            type="text"
-                            placeholder="Type a message..."
-                            value={input}
-                            onChange={e => setInput(e.target.value)}
-                            className="w-full bg-[#F5F5F5] border-transparent rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-[#212121] font-medium text-sm focus:bg-white focus:border-[#1A237E]/30 focus:ring-4 focus:ring-[#1A237E]/10 transition-all outline-none"
-                            autoFocus
-                        />
+                <form onSubmit={handleSend} className="max-w-5xl mx-auto flex flex-col gap-3">
+                    {attachment && (
+                        <div className="flex items-center gap-3 p-3 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm self-start">
+                            <FileText className="h-5 w-5 text-[#111111]" />
+                            <span className="text-sm font-bold text-[#212121]">File Attached</span>
+                            <button type="button" onClick={() => setAttachment(null)} className="text-xs text-[#E53935] font-bold uppercase tracking-widest hover:underline ml-2">Remove</button>
+                        </div>
+                    )}
+                    <div className="flex gap-3 md:gap-4">
+                        <div className="flex-1 relative flex items-center bg-[#F5F5F5] rounded-sm border-transparent focus-within:bg-white focus-within:border-[#111111]/30 focus-within:ring-4 focus-within:ring-[#111111]/10 transition-all">
+                            <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" />
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={uploading || sending}
+                                className="p-3.5 md:p-4 text-[#9E9E9E] hover:text-[#111111] transition-colors disabled:opacity-50"
+                            >
+                                {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
+                            </button>
+                            <input
+                                type="text"
+                                placeholder="Type a message..."
+                                value={input}
+                                onChange={e => setInput(e.target.value)}
+                                className="flex-1 bg-transparent py-3.5 md:py-4 pr-5 md:pr-6 text-[#212121] font-medium text-sm outline-none"
+                                autoFocus
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={(!input.trim() && !attachment) || sending || uploading}
+                            className="h-12 w-12 md:h-[54px] md:w-[54px] rounded-sm bg-[#E53935] text-white flex items-center justify-center shadow-sm shadow-[#E53935]/20 hover:bg-[#C62828] hover:shadow-sm active:scale-95 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-[#E53935] transition-all shrink-0"
+                        >
+                            {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-1" />}
+                        </button>
                     </div>
-                    <button
-                        type="submit"
-                        disabled={!input.trim() || sending}
-                        className="h-12 w-12 md:h-[54px] md:w-[54px] rounded-2xl bg-[#E53935] text-white flex items-center justify-center shadow-md shadow-[#E53935]/20 hover:bg-[#C62828] hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-[#E53935] transition-all shrink-0"
-                    >
-                        {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-1" />}
-                    </button>
                 </form>
             </footer>
         </div>

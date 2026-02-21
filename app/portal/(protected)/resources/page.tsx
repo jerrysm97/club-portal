@@ -5,13 +5,12 @@ import { redirect } from 'next/navigation'
 import Pagination from '@/components/ui/Pagination'
 import { getSession, getMember } from '@/lib/auth'
 
-export const revalidate = 0
 
-export default async function ResourcesPage({
-    searchParams
-}: {
-    searchParams: { page?: string }
+
+export default async function ResourcesPage(props: {
+    searchParams: Promise<{ page?: string }>
 }) {
+    const searchParams = await props.searchParams
     const session = await getSession()
     if (!session) redirect('/portal/login')
 

@@ -35,14 +35,14 @@ export default function ConfirmModal({
                 <button
                     onClick={onClose}
                     disabled={loading}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-[#374151] bg-[#F3F4F6] hover:bg-[#E5E7EB] transition-colors disabled:opacity-50"
+                    className="px-4 py-2 rounded-sm text-sm font-medium text-[#374151] bg-[#F3F4F6] hover:bg-[#E5E7EB] transition-colors disabled:opacity-50"
                 >
                     Cancel
                 </button>
                 <button
                     onClick={onConfirm}
                     disabled={loading}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${confirmClasses}`}
+                    className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors disabled:opacity-50 ${confirmClasses}`}
                 >
                     {loading ? 'Processing…' : confirmLabel}
                 </button>

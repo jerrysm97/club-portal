@@ -31,7 +31,7 @@ export default function TeamSection({ team }: { team: TeamMember[] }) {
                                         size="lg"
                                         className="w-28 h-28 md:w-36 md:h-36 mx-auto ring-4 ring-white shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
                                     />
-                                    {member.role.toLowerCase().includes('lead') && (
+                                    {(member.club_post?.toLowerCase().includes('lead') || member.club_post?.toLowerCase().includes('president')) && (
                                         <div className="absolute -top-1 -right-1 bg-[#F4C542] p-1.5 rounded-lg shadow-md">
                                             <Star className="h-3.5 w-3.5 text-[#1A1A2E]" />
                                         </div>
@@ -42,7 +42,7 @@ export default function TeamSection({ team }: { team: TeamMember[] }) {
                                 {member.name}
                             </h3>
                             <p className="text-[#757575] text-xs font-semibold tracking-wider uppercase">
-                                {member.role}
+                                {member.club_post || member.role}
                             </p>
                         </div>
                     ))}

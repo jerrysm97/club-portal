@@ -1,10 +1,10 @@
 // app/portal/messages/layout.tsx — IIMS IT Club Messaging Shell (v4.0)
 import { createServerClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
-import ConversationList from '@/components/portal/ConversationList'
+import MessagesShell from '@/components/portal/MessagesShell'
 import { getSession, getMember } from '@/lib/auth'
 
-export const revalidate = 0
+
 
 export default async function MessagesLayout({ children }: { children: React.ReactNode }) {
     const session = await getSession()
@@ -16,8 +16,8 @@ export default async function MessagesLayout({ children }: { children: React.Rea
     const supabase = createServerClient()
 
     // 1. Get all conversations the member is part of
-    const { data: participations } = await supabase
-        .from('conversation_participants')
+    const { data: participations } = await (supabase
+        .from('conversation_participants' as any) as any)
         .select('conversation_id, last_read_at')
         .eq('member_id', member.id)
 
@@ -27,8 +27,8 @@ export default async function MessagesLayout({ children }: { children: React.Rea
 
     if (conversationIds.length > 0) {
         // 2. Fetch those conversations with nested latest messages and other participants
-        const { data: convs } = await supabase
-            .from('conversations')
+        const { data: convs } = await (supabase
+            .from('conversations' as any) as any)
             .select(`
                 id,
                 updated_at,
@@ -64,20 +64,15 @@ export default async function MessagesLayout({ children }: { children: React.Rea
                 },
                 unreadCount: unread ? 1 : 0
             }
-        }).filter(c => c.otherMember?.id)
+        }).filter((c: any) => c.otherMember?.id)
     }
 
     return (
-        <div className="flex bg-white rounded-[2rem] border border-[#E0E0E0] shadow-xl overflow-hidden h-[calc(100vh-140px)] animate-fade-up">
-            <div className="w-80 hidden lg:flex flex-col border-r border-[#E0E0E0] bg-[#F8F9FA] shrink-0">
-                <ConversationList
-                    conversations={formattedConversations as any}
-                    currentMemberId={member.id}
-                />
-            </div>
-            <div className="flex-1 bg-white relative flex flex-col min-w-0">
-                {children}
-            </div>
-        </div>
+        <MessagesShell
+            conversations={formattedConversations as any}
+            memberId={member.id}
+        >
+            {children}
+        </MessagesShell>
     )
 }

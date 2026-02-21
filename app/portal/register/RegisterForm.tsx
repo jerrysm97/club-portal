@@ -85,14 +85,14 @@ export default function RegisterForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-                <div className="p-3 rounded-xl bg-[#FFEBEE] border border-[#E53935]/20 text-[#C62828] text-sm font-medium animate-slide-in">
+                <div className="p-3 rounded-sm bg-[#FFEBEE] border border-[#E53935]/20 text-[#C62828] text-sm font-medium animate-slide-in">
                     {error}
                 </div>
             )}
 
             {/* Account credentials */}
             <div className="space-y-1 mb-2">
-                <h3 className="text-[#1A237E] font-bold text-sm uppercase tracking-wider">Account Credentials</h3>
+                <h3 className="text-[#111111] font-bold text-sm uppercase tracking-wider">Account Credentials</h3>
                 <p className="text-[#9E9E9E] text-xs">Create your login credentials</p>
             </div>
 
@@ -109,7 +109,7 @@ export default function RegisterForm() {
                             required
                             value={form.email}
                             onChange={(e) => setForm({ ...form, email: e.target.value })}
-                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all"
                             placeholder="you@iimscollege.edu.np"
                         />
                     </div>
@@ -129,7 +129,7 @@ export default function RegisterForm() {
                                 minLength={6}
                                 value={form.password}
                                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                                className="block w-full pl-10 pr-10 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                                className="block w-full pl-10 pr-10 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all"
                                 placeholder="••••••••"
                             />
                             <button
@@ -155,7 +155,7 @@ export default function RegisterForm() {
                                 minLength={6}
                                 value={form.confirmPassword}
                                 onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-                                className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                                className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -166,7 +166,7 @@ export default function RegisterForm() {
             {/* Divider */}
             <div className="border-t border-[#E0E0E0] pt-6">
                 <div className="space-y-1 mb-4">
-                    <h3 className="text-[#1A237E] font-bold text-sm uppercase tracking-wider">Academic Information</h3>
+                    <h3 className="text-[#111111] font-bold text-sm uppercase tracking-wider">Academic Information</h3>
                     <p className="text-[#9E9E9E] text-xs">Used for membership verification</p>
                 </div>
             </div>
@@ -183,7 +183,7 @@ export default function RegisterForm() {
                             required
                             value={form.full_name}
                             onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all"
                             placeholder="John Doe"
                         />
                     </div>
@@ -200,7 +200,7 @@ export default function RegisterForm() {
                             required
                             value={form.student_id}
                             onChange={(e) => setForm({ ...form, student_id: e.target.value })}
-                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all"
                             placeholder="e.g. 10002345"
                         />
                     </div>
@@ -219,7 +219,7 @@ export default function RegisterForm() {
                             required
                             value={form.program}
                             onChange={(e) => setForm({ ...form, program: e.target.value })}
-                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all appearance-none"
+                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all appearance-none"
                         >
                             {programs.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                         </select>
@@ -237,7 +237,7 @@ export default function RegisterForm() {
                             required
                             value={form.intake}
                             onChange={(e) => setForm({ ...form, intake: e.target.value })}
-                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                            className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all"
                             placeholder="e.g. Autumn 2024"
                         />
                     </div>
@@ -254,7 +254,7 @@ export default function RegisterForm() {
                         id="skills"
                         value={skillsInput}
                         onChange={(e) => setSkillsInput(e.target.value)}
-                        className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all"
+                        className="block w-full pl-10 pr-3 py-2.5 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all"
                         placeholder="React, Python, Penetration Testing, UI/UX"
                     />
                 </div>
@@ -271,7 +271,7 @@ export default function RegisterForm() {
                         rows={3}
                         value={form.bio}
                         onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                        className="block w-full pl-10 pr-3 py-3 bg-[#F8F9FA] border border-[#E0E0E0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] text-[#212121] text-sm transition-all resize-none"
+                        className="block w-full pl-10 pr-3 py-3 bg-[#F8F9FA] border border-[#E0E0E0] rounded-sm focus:bg-white focus:ring-2 focus:ring-[#111111]/20 focus:border-[#111111] text-[#212121] text-sm transition-all resize-none"
                         placeholder="Tell us a bit about yourself..."
                     />
                 </div>
@@ -280,7 +280,7 @@ export default function RegisterForm() {
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#1A237E] text-white font-semibold flex items-center justify-center gap-2 py-3.5 rounded-xl hover:bg-[#283593] active:bg-[#1A237E] disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#1A237E]/20 transition-all mt-4"
+                className="w-full bg-[#111111] text-white font-semibold flex items-center justify-center gap-2 py-3.5 rounded-sm hover:bg-[#C8102E] active:bg-[#111111] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-[#111111]/20 transition-all mt-4"
             >
                 {loading ? (
                     <>
@@ -298,7 +298,7 @@ export default function RegisterForm() {
             <div className="text-center pt-2">
                 <p className="text-[#757575] text-sm">
                     Already have an account?{' '}
-                    <Link href="/portal/login" className="text-[#1A237E] font-semibold hover:underline">
+                    <Link href="/portal/login" className="text-[#111111] font-semibold hover:underline">
                         Sign in
                     </Link>
                 </p>

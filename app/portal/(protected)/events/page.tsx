@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { Calendar, Search, Filter, Loader2 } from 'lucide-react'
 import { getSession, getMember } from '@/lib/auth'
 
-export const revalidate = 0
+
 
 export default async function PortalEventsPage() {
     const session = await getSession()
@@ -42,7 +42,7 @@ export default async function PortalEventsPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#E8EAF6] text-[#1A237E] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#C5CAE9]">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-[#FAFAFA] text-[#111111] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#E5E5E5]">
                         <Calendar className="h-3 w-3" /> Registry
                     </div>
                     <h1 className="text-3xl md:text-5xl font-bold text-[#212121] leading-tight">
@@ -59,10 +59,10 @@ export default async function PortalEventsPage() {
                         <input
                             type="text"
                             placeholder="Search events..."
-                            className="bg-white border border-[#E0E0E0] rounded-xl py-2.5 pl-10 pr-4 text-sm font-semibold focus:ring-4 focus:ring-[#1A237E]/10 focus:border-[#1A237E]/30 transition-all outline-none text-[#212121] placeholder:text-[#9E9E9E]"
+                            className="bg-white border border-[#E0E0E0] rounded-sm py-2.5 pl-10 pr-4 text-sm font-semibold focus:ring-4 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all outline-none text-[#212121] placeholder:text-[#9E9E9E]"
                         />
                     </div>
-                    <button className="p-2.5 bg-white border border-[#E0E0E0] rounded-xl text-[#757575] hover:text-[#1A237E] hover:bg-[#F8F9FA] transition-all">
+                    <button className="p-2.5 bg-white border border-[#E0E0E0] rounded-sm text-[#757575] hover:text-[#111111] hover:bg-[#F8F9FA] transition-all">
                         <Filter className="h-5 w-5" />
                     </button>
                 </div>
@@ -75,8 +75,8 @@ export default async function PortalEventsPage() {
                         <EventCard key={event.id} event={event} />
                     ))
                 ) : (
-                    <div className="py-24 rounded-3xl border border-dashed border-[#E0E0E0] bg-[#F8F9FA] shadow-sm text-center">
-                        <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
+                    <div className="py-24 rounded-sm border border-dashed border-[#E0E0E0] bg-[#F8F9FA] shadow-sm text-center">
+                        <div className="h-16 w-16 bg-white rounded-sm flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
                             <Loader2 className="h-8 w-8 text-[#BDBDBD]" />
                         </div>
                         <p className="text-[#424242] font-bold text-lg uppercase tracking-widest">Calendar Empty</p>

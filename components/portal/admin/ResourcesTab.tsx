@@ -31,10 +31,10 @@ export default function ResourcesTab({ resources, refresh }: { resources: any[],
                     <input
                         type="text"
                         placeholder="Search document archives..."
-                        className="w-full pl-14 pr-6 py-3.5 bg-white border border-[#E0E0E0] rounded-xl text-sm font-semibold text-[#212121] focus:ring-4 focus:ring-[#1A237E]/10 focus:border-[#1A237E]/30 transition-all outline-none shadow-sm"
+                        className="w-full pl-14 pr-6 py-3.5 bg-white border border-[#E0E0E0] rounded-sm text-sm font-semibold text-[#212121] focus:ring-4 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all outline-none shadow-sm"
                     />
                 </div>
-                <button className="w-full md:w-auto bg-[#1A237E] text-white px-8 py-3.5 rounded-xl font-bold uppercase text-xs tracking-widest shadow-md shadow-[#1A237E]/20 flex items-center justify-center gap-3 hover:bg-[#283593] transition-all shrink-0">
+                <button className="w-full md:w-auto bg-[#111111] text-white px-8 py-3.5 rounded-sm font-bold uppercase text-xs tracking-widest shadow-sm shadow-[#111111]/20 flex items-center justify-center gap-3 hover:bg-[#C8102E] transition-all shrink-0">
                     <Plus className="h-5 w-5" /> Ingest Document
                 </button>
             </div>
@@ -55,11 +55,11 @@ export default function ResourcesTab({ resources, refresh }: { resources: any[],
                                 <tr key={res.id} className="group hover:bg-[#F8F9FA] transition-all">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">
-                                            <div className="p-3.5 rounded-xl bg-[#F8F9FA] text-[#9E9E9E] border border-[#E0E0E0] group-hover:bg-[#E8EAF6] group-hover:border-[#C5CAE9] group-hover:text-[#1A237E] transition-colors shadow-sm">
+                                            <div className="p-3.5 rounded-sm bg-[#F8F9FA] text-[#9E9E9E] border border-[#E0E0E0] group-hover:bg-[#FAFAFA] group-hover:border-[#E5E5E5] group-hover:text-[#111111] transition-colors shadow-sm">
                                                 <FileText className="h-5 w-5" />
                                             </div>
                                             <div className="min-w-0">
-                                                <div className="text-sm font-bold truncate text-[#212121] group-hover:text-[#1A237E] transition-colors">{res.title}</div>
+                                                <div className="text-sm font-bold truncate text-[#212121] group-hover:text-[#111111] transition-colors">{res.title}</div>
                                                 <div className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest truncate mt-1">Uploaded by {res.uploader?.name || res.uploader?.full_name || 'System'}</div>
                                             </div>
                                         </div>
@@ -76,7 +76,7 @@ export default function ResourcesTab({ resources, refresh }: { resources: any[],
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border shadow-sm",
+                                            "px-3.5 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-widest border shadow-sm",
                                             res.is_public ? "bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]" : "bg-[#FFEBEE] text-[#D32F2F] border-[#FFCDD2]"
                                         )}>
                                             {res.is_public ? 'Public Access' : 'Classified'}
@@ -87,7 +87,7 @@ export default function ResourcesTab({ resources, refresh }: { resources: any[],
                                             <a
                                                 href={res.file_url}
                                                 target="_blank"
-                                                className="p-2.5 bg-white border border-[#E0E0E0] text-[#757575] hover:bg-[#1A237E] hover:border-[#1A237E] hover:text-white rounded-xl transition-all shadow-sm"
+                                                className="p-2.5 bg-white border border-[#E0E0E0] text-[#757575] hover:bg-[#111111] hover:border-[#111111] hover:text-white rounded-sm transition-all shadow-sm"
                                                 title="Extract Asset"
                                             >
                                                 <Download className="h-4 w-4" />
@@ -95,7 +95,7 @@ export default function ResourcesTab({ resources, refresh }: { resources: any[],
                                             <button
                                                 onClick={() => handleDelete(res.id)}
                                                 disabled={!!isLoading}
-                                                className="p-2.5 bg-white border border-[#E0E0E0] text-[#D32F2F] hover:bg-[#FFEBEE] hover:border-[#FFCDD2] rounded-xl transition-all shadow-sm"
+                                                className="p-2.5 bg-white border border-[#E0E0E0] text-[#D32F2F] hover:bg-[#FFEBEE] hover:border-[#FFCDD2] rounded-sm transition-all shadow-sm"
                                                 title="Purge Intel"
                                             >
                                                 <Trash2 className="h-4 w-4" />

@@ -2,6 +2,23 @@
 /* IIMS College Official Theme: light, professional, navy/crimson */
 @import "tailwindcss";
 
+@theme {
+  --color-icehc-red: #C8102E;
+  --color-icehc-dark: #111111;
+  --color-icehc-gray: #F5F5F5;
+  --color-icehc-text: #4A4A4A;
+
+  /* Enforce max 4px border radius for institutional clean look */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius-full: 4px;
+  /* We still allow full rounded where strictly necessary but override the presets */
+}
+
 /* ─── Custom Scrollbar (navy thumb — IIMS brand) ─── */
 ::-webkit-scrollbar {
   width: 6px;

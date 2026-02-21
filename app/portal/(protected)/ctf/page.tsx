@@ -4,7 +4,7 @@ import CTFClient from '@/components/portal/CTFClient'
 import { redirect } from 'next/navigation'
 import { getSession, getMember } from '@/lib/auth'
 
-export const revalidate = 0
+
 
 export default async function CTFPage() {
     const session = await getSession()

@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
         const supabaseAdmin = createServerClient()
 
         // Fetch challenge details
-        const { data: challenge } = await supabaseAdmin
-            .from('ctf_challenges')
+        const { data: challenge } = await (supabaseAdmin
+            .from('ctf_challenges' as any) as any)
             .select('id, flag_hash, is_active')
             .eq('id', challenge_id)
             .single()
@@ -60,8 +60,8 @@ export async function POST(req: NextRequest) {
         await new Promise(r => setTimeout(r, 50))
 
         // 6. Check for duplicate submissions
-        const { data: existingSolve } = await supabaseAdmin
-            .from('ctf_solves')
+        const { data: existingSolve } = await (supabaseAdmin
+            .from('ctf_solves' as any) as any)
             .select('id')
             .eq('challenge_id', challenge_id)
             .eq('member_id', member.id)
@@ -72,8 +72,8 @@ export async function POST(req: NextRequest) {
         }
 
         // 7. Record Solve (Points are awarded automatically by DB trigger: trg_ctf_solve)
-        const { error: insertError } = await supabaseAdmin
-            .from('ctf_solves')
+        const { error: insertError } = await (supabaseAdmin
+            .from('ctf_solves' as any) as any)
             .insert({
                 challenge_id,
                 member_id: member.id,

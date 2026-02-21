@@ -8,13 +8,12 @@ import Pagination from '@/components/ui/Pagination'
 import { cn } from '@/lib/utils'
 import { getSession } from '@/lib/auth'
 
-export const revalidate = 60
 
-export default async function LeaderboardPage({
-    searchParams
-}: {
-    searchParams: { page?: string }
+
+export default async function LeaderboardPage(props: {
+    searchParams: Promise<{ page?: string }>
 }) {
+    const searchParams = await props.searchParams
     const session = await getSession()
     if (!session) redirect('/portal/login')
 
@@ -26,15 +25,15 @@ export default async function LeaderboardPage({
     const supabase = createServerClient()
 
     // Get current member for highlighting
-    const { data: currentMember } = await supabase
-        .from('members')
+    const { data: currentMember } = await (supabase
+        .from('members' as any) as any)
         .select('id, points')
         .eq('user_id', session.user.id)
         .single()
 
     // Fetch paginated members
-    const { data, count } = await supabase
-        .from('members')
+    const { data, count } = await (supabase
+        .from('members' as any) as any)
         .select('id, full_name, avatar_url, points, role, club_post', { count: 'exact' })
         .eq('status', 'approved')
         .order('points', { ascending: false })
@@ -48,7 +47,7 @@ export default async function LeaderboardPage({
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#161B22] text-[#D29922] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#30363D] shadow-sm">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-[#161B22] text-[#D29922] font-bold text-[10px] uppercase tracking-widest mb-3 border border-[#30363D] shadow-sm">
                             <Trophy className="h-3.5 w-3.5" /> High Performance Log
                         </div>
                         <h1 className="text-3xl md:text-5xl font-bold text-[#E6EDF3] leading-tight">
@@ -59,8 +58,8 @@ export default async function LeaderboardPage({
                         </p>
                     </div>
 
-                    <div className="bg-[#161B22] rounded-3xl p-6 border border-[#30363D] shadow-sm flex items-center gap-5 group">
-                        <div className="p-3 bg-[#0D1117] rounded-xl text-[#58A6FF] transition-all shadow-inner border border-[#30363D]">
+                    <div className="bg-[#161B22] rounded-sm p-6 border border-[#30363D] shadow-sm flex items-center gap-5 group">
+                        <div className="p-3 bg-[#0D1117] rounded-sm text-[#58A6FF] transition-all shadow-inner border border-[#30363D]">
                             <Zap className="h-5 w-5" />
                         </div>
                         <div>
@@ -71,7 +70,7 @@ export default async function LeaderboardPage({
                 </div>
 
                 {/* Leaderboard Table */}
-                <div className="bg-[#161B22] rounded-[2rem] border border-[#30363D] shadow-xl shadow-black/20 overflow-hidden">
+                <div className="bg-[#161B22] rounded-[2rem] border border-[#30363D] shadow-sm shadow-black/20 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -98,8 +97,8 @@ export default async function LeaderboardPage({
                                         >
                                             <td className="px-6 py-5">
                                                 <div className={cn(
-                                                    "w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all",
-                                                    rank === 1 ? "bg-[#FFF9C4] text-[#F57F17] shadow-lg shadow-[#FFF9C4]/50 scale-110 border border-[#FFF59D]" :
+                                                    "w-10 h-10 rounded-sm flex items-center justify-center font-bold text-sm transition-all",
+                                                    rank === 1 ? "bg-[#FFF9C4] text-[#F57F17] shadow-sm shadow-[#FFF9C4]/50 scale-110 border border-[#FFF59D]" :
                                                         rank === 2 ? "bg-[#F5F5F5] text-[#757575] border border-[#E0E0E0]" :
                                                             rank === 3 ? "bg-[#FFECB3] text-[#FF8F00] border border-[#FFE082]" :
                                                                 "text-[#8B949E] group-hover:text-[#E6EDF3]"
@@ -112,7 +111,7 @@ export default async function LeaderboardPage({
                                                     <Avatar src={m.avatar_url} name={m.full_name || 'Anonymous'} size="sm" className="shadow-sm border border-[#E0E0E0]" />
                                                     <div className="min-w-0">
                                                         <p className={cn(
-                                                            "font-bold text-sm truncate group-hover:text-[#1A237E] transition-colors",
+                                                            "font-bold text-sm truncate group-hover:text-[#111111] transition-colors",
                                                             isMe ? "text-[#58A6FF]" : "text-[#E6EDF3]"
                                                         )}>
                                                             {m.full_name || 'Anonymous Member'} {isMe && "(You)"}
@@ -124,7 +123,7 @@ export default async function LeaderboardPage({
                                                 </Link>
                                             </td>
                                             <td className="px-6 py-5 hidden md:table-cell">
-                                                <span className="text-[10px] font-bold text-[#8B949E] uppercase tracking-widest border border-[#30363D] px-3 py-1.5 rounded-lg bg-[#0D1117]">
+                                                <span className="text-[10px] font-bold text-[#8B949E] uppercase tracking-widest border border-[#30363D] px-3 py-1.5 rounded-sm bg-[#0D1117]">
                                                     {m.club_post || m.role}
                                                 </span>
                                             </td>
@@ -145,7 +144,7 @@ export default async function LeaderboardPage({
 
                     {members.length === 0 && (
                         <div className="py-24 text-center">
-                            <div className="h-16 w-16 bg-[#F8F9FA] rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
+                            <div className="h-16 w-16 bg-[#F8F9FA] rounded-sm flex items-center justify-center mx-auto mb-5 border border-[#E0E0E0]">
                                 <Target className="h-8 w-8 text-[#9E9E9E]" />
                             </div>
                             <p className="text-[#E6EDF3] font-bold text-lg mb-1">Leaderboard Empty</p>

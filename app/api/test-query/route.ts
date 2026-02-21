@@ -5,10 +5,28 @@ export const dynamic = 'force-dynamic'
 
 export async function GET() {
     const supabase = createServerClient()
-    const { data, error } = await supabase
-        .from('members')
-        .select('id, full_name, avatar_url, club_post, role, bio, skills, points, created_at')
-        .eq('status', 'approved')
-        .order('points', { ascending: false })
-    return NextResponse.json({ members: data, error })
+
+    // Test member relation with disambiguated relationship
+    const idMember = '12ddd69e-1b31-4272-9560-79fff44259da'
+    const memQuery = await supabase.from('members').select('id, full_name, skill_endorsements(id)').eq('id', idMember).maybeSingle()
+
+    // Also test direct skill_endorsements
+    const directSkills = await supabase.from('skill_endorsements').select('*').limit(1)
+
+    // Test post relation with specific failing UUID
+    const idPost = '70ef33e9-54fa-4347-80c5-be79bfc500b9'
+    const postQuery = await supabase.from('posts').select(`
+            *,
+            author:members!posts_author_id_fkey (id, full_name, avatar_url, role, club_post),
+            post_reactions (*),
+            post_comments (
+                id, content, created_at,
+                author:members!post_comments_author_id_fkey (id, full_name, avatar_url, role, club_post)
+            )
+        `).eq('id', idPost).maybeSingle()
+
+    // Test direct reaction columns
+    const reactions = await supabase.from('post_reactions').select('*').limit(1)
+
+    return NextResponse.json({ memQuery, directSkills, postQuery, reactions })
 }

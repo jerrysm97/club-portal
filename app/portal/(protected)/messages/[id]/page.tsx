@@ -4,7 +4,7 @@ import ChatWindow from '@/components/portal/ChatWindow'
 import { redirect, notFound } from 'next/navigation'
 import { getSession, getMember } from '@/lib/auth'
 
-export const revalidate = 0
+
 
 export default async function MessageThreadPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params
@@ -19,8 +19,8 @@ export default async function MessageThreadPage(props: { params: Promise<{ id: s
     const supabase = createServerClient()
 
     // Identify 'other' member
-    const { data: otherUser } = await supabase
-        .from('members')
+    const { data: otherUser } = await (supabase
+        .from('members' as any) as any)
         .select('id, full_name, avatar_url, role, club_post')
         .eq('id', id)
         .single()
@@ -28,8 +28,8 @@ export default async function MessageThreadPage(props: { params: Promise<{ id: s
     if (!otherUser) return notFound()
 
     // Find the conversation ID between these two members
-    const { data: participations } = await supabase
-        .from('conversation_participants')
+    const { data: participations } = await (supabase
+        .from('conversation_participants' as any) as any)
         .select('conversation_id')
         .in('member_id', [member.id, otherUser.id])
 
@@ -45,8 +45,8 @@ export default async function MessageThreadPage(props: { params: Promise<{ id: s
     let messages: any[] = []
 
     if (activeConvId) {
-        const { data: msgs } = await supabase
-            .from('messages')
+        const { data: msgs } = await (supabase
+            .from('messages' as any) as any)
             .select('*')
             .eq('conversation_id', activeConvId)
             .order('created_at', { ascending: true })
@@ -54,8 +54,8 @@ export default async function MessageThreadPage(props: { params: Promise<{ id: s
         messages = msgs || []
 
         // Update my participant record as read since I just opened the thread
-        await supabase
-            .from('conversation_participants')
+        await (supabase
+            .from('conversation_participants' as any) as any)
             .update({ last_read_at: new Date().toISOString() })
             .eq('conversation_id', activeConvId)
             .eq('member_id', member.id)

@@ -28,12 +28,12 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
         <div className="space-y-8 animate-fade-up">
             <div className="grid grid-cols-1 gap-6">
                 {posts.map(post => (
-                    <div key={post.id} className="bg-white p-8 rounded-[2rem] border border-[#E0E0E0] shadow-sm hover:shadow-xl hover:border-[#1A237E]/20 transition-all group flex flex-col md:flex-row gap-8 items-start">
+                    <div key={post.id} className="bg-white p-8 rounded-[2rem] border border-[#E0E0E0] shadow-sm hover:shadow-sm hover:border-[#111111]/20 transition-all group flex flex-col md:flex-row gap-8 items-start">
                         <div className="flex-1 space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <span className={cn(
-                                        "px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
+                                        "px-3 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-widest border",
                                         post.type === 'announcement' ? "bg-[#FFF8E1] text-[#F57F17] border-[#FFECB3]" : "bg-[#F8F9FA] text-[#757575] border-[#E0E0E0]"
                                     )}>
                                         {post.type || 'Standard'} Directive
@@ -46,7 +46,7 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="text-xl font-bold text-[#212121] group-hover:text-[#1A237E] transition-colors leading-tight">
+                                <h3 className="text-xl font-bold text-[#212121] group-hover:text-[#111111] transition-colors leading-tight">
                                     {post.title || 'Untitled Transmission'}
                                 </h3>
                                 <p className="text-[#757575] font-medium text-sm line-clamp-2 leading-relaxed">
@@ -57,7 +57,7 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
                             <div className="flex items-center gap-4 pt-4">
                                 <Avatar src={post.author?.avatar_url} name={post.author?.full_name || post.author?.name} size="xs" />
                                 <div className="text-[10px] font-bold text-[#9E9E9E] uppercase tracking-widest">
-                                    Relayed by <span className="text-[#1A237E]">{post.author?.full_name || post.author?.name || 'System'}</span>
+                                    Relayed by <span className="text-[#111111]">{post.author?.full_name || post.author?.name || 'System'}</span>
                                 </div>
                             </div>
                         </div>
@@ -66,7 +66,7 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
                             <button
                                 onClick={() => handleDelete(post.id)}
                                 disabled={!!isLoading}
-                                className="flex-1 md:w-14 h-14 bg-white hover:bg-[#FFEBEE] text-[#BDBDBD] hover:text-[#D32F2F] rounded-xl flex items-center justify-center transition-all border border-[#E0E0E0] hover:border-[#FFCDD2] shadow-sm"
+                                className="flex-1 md:w-14 h-14 bg-white hover:bg-[#FFEBEE] text-[#BDBDBD] hover:text-[#D32F2F] rounded-sm flex items-center justify-center transition-all border border-[#E0E0E0] hover:border-[#FFCDD2] shadow-sm"
                                 title="Abort Transmission"
                             >
                                 <Trash className="h-5 w-5" />
@@ -74,7 +74,7 @@ export default function FeedTab({ posts, refresh }: { posts: any[], refresh: () 
                             <a
                                 href={`/portal/feed/${post.id}`}
                                 target="_blank"
-                                className="flex-1 md:w-14 h-14 bg-white hover:bg-[#E8EAF6] text-[#BDBDBD] hover:text-[#1A237E] rounded-xl flex items-center justify-center transition-all border border-[#E0E0E0] hover:border-[#C5CAE9] shadow-sm"
+                                className="flex-1 md:w-14 h-14 bg-white hover:bg-[#FAFAFA] text-[#BDBDBD] hover:text-[#111111] rounded-sm flex items-center justify-center transition-all border border-[#E0E0E0] hover:border-[#E5E5E5] shadow-sm"
                                 title="View Frequency"
                             >
                                 <ExternalLink className="h-5 w-5" />

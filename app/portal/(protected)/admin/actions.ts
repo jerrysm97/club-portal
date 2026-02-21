@@ -12,8 +12,8 @@ export async function updateMemberStatus(id: string, status: string, role?: stri
     if (role) updates.role = role
     if (club_post !== undefined) updates.club_post = club_post
 
-    const { error } = await supabase
-        .from('members' as any)
+    const { error } = await (supabase
+        .from('members' as any) as any)
         .update(updates)
         .eq('id', id)
 
@@ -38,8 +38,8 @@ export async function deleteMember(id: string) {
 // Event Management
 export async function toggleEventStatus(id: string, is_published: boolean) {
     const supabase = createAdminSupabaseClient()
-    const { error } = await supabase
-        .from('public_events' as any)
+    const { error } = await (supabase
+        .from('public_events' as any) as any)
         .update({ status: is_published ? 'upcoming' : null })
         .eq('id', id)
 
@@ -53,8 +53,8 @@ export async function toggleEventStatus(id: string, is_published: boolean) {
 // CTF Management
 export async function updateChallengeStatus(id: string, is_active: boolean) {
     const supabase = createAdminSupabaseClient()
-    const { error } = await supabase
-        .from('ctf_challenges' as any)
+    const { error } = await (supabase
+        .from('ctf_challenges' as any) as any)
         .update({ is_active })
         .eq('id', id)
 

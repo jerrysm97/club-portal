@@ -26,16 +26,16 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createServerClient()
-    const { error } = await supabase.from('posts').insert({
+    const { error } = await (supabase.from('posts' as any) as any).insert({
         ...parsed.data,
         author_id: admin.id,
     })
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
-        admin_id: admin.id,
+    await (supabase.from('audit_logs' as any) as any).insert({
+        actor_id: admin.id,
         action: 'create_post',
-        meta: { title: parsed.data.title, type: parsed.data.type }
+        details: { title: parsed.data.title, type: parsed.data.type }
     })
 
     return NextResponse.json({ success: true })
@@ -51,14 +51,14 @@ export async function PATCH(req: NextRequest) {
 
     const { id, ...fields } = parsed.data
     const supabase = createServerClient()
-    const { error } = await supabase.from('posts').update(fields).eq('id', id)
+    const { error } = await (supabase.from('posts' as any) as any).update(fields).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
-        admin_id: admin.id,
+    await (supabase.from('audit_logs' as any) as any).insert({
+        actor_id: admin.id,
         action: 'update_post',
         target_id: id,
-        meta: fields
+        details: fields
     })
 
     return NextResponse.json({ success: true })
@@ -70,11 +70,11 @@ export async function DELETE(req: NextRequest) {
     const { id } = z.object({ id: z.string().uuid() }).parse(body)
 
     const supabase = createServerClient()
-    const { error } = await supabase.from('posts').delete().eq('id', id)
+    const { error } = await (supabase.from('posts' as any) as any).delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
-        admin_id: admin.id,
+    await (supabase.from('audit_logs' as any) as any).insert({
+        actor_id: admin.id,
         action: 'delete_post',
         target_id: id,
     })

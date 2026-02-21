@@ -12,7 +12,7 @@ export default function DeactivateAccountButton({ requestedAt }: { requestedAt: 
 
     if (requestedAt) {
         return (
-            <div className="bg-[#FFEBEE] border border-[#FFCDD2] p-6 rounded-2xl flex items-start gap-4 animate-fade-in mt-8">
+            <div className="bg-[#FFEBEE] border border-[#FFCDD2] p-6 rounded-sm flex items-start gap-4 animate-fade-in mt-8">
                 <AlertOctagon className="w-6 h-6 text-[#D32F2F] shrink-0 mt-0.5" />
                 <div>
                     <h4 className="text-[#D32F2F] font-bold text-sm tracking-widest uppercase mb-1">Deactivation Requested</h4>
@@ -53,7 +53,7 @@ export default function DeactivateAccountButton({ requestedAt }: { requestedAt: 
         <div className="mt-8">
             <button
                 onClick={() => setIsOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-[#D32F2F] border border-[#FFCDD2] text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-[#FFEBEE] transition-all group"
+                className="flex items-center gap-2 px-4 py-2 bg-white text-[#D32F2F] border border-[#FFCDD2] text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-[#FFEBEE] transition-all group"
             >
                 <AlertOctagon className="w-4 h-4 group-hover:scale-110 transition-transform" />
                 Request Account Deactivation
@@ -61,14 +61,14 @@ export default function DeactivateAccountButton({ requestedAt }: { requestedAt: 
 
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B0F19]/80 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-[#E0E0E0] animate-scale-up">
+                    <div className="bg-white rounded-sm w-full max-w-md overflow-hidden shadow-sm border border-[#E0E0E0] animate-scale-up">
                         <div className="p-6 border-b border-[#EEEEEE] flex justify-between items-center bg-[#FFEBEE]">
                             <div>
                                 <h3 className="text-lg font-bold text-[#D32F2F] flex items-center gap-2">
                                     <AlertOctagon className="w-5 h-5" /> Deactivate Account
                                 </h3>
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="text-[#D32F2F] hover:bg-[#FFCDD2] p-1 rounded-lg transition-colors">
+                            <button onClick={() => setIsOpen(false)} className="text-[#D32F2F] hover:bg-[#FFCDD2] p-1 rounded-sm transition-colors">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
@@ -83,21 +83,21 @@ export default function DeactivateAccountButton({ requestedAt }: { requestedAt: 
                                     name="reason"
                                     rows={3}
                                     placeholder="Please let us know why you are leaving..."
-                                    className="w-full bg-[#F5F5F5] border border-[#E0E0E0] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#D32F2F] focus:ring-1 focus:ring-[#D32F2F] transition-all resize-none"
+                                    className="w-full bg-[#F5F5F5] border border-[#E0E0E0] rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-[#D32F2F] focus:ring-1 focus:ring-[#D32F2F] transition-all resize-none"
                                 />
                             </div>
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={() => setIsOpen(false)}
-                                    className="flex-1 px-4 py-3 bg-[#F5F5F5] hover:bg-[#E0E0E0] text-[#757575] rounded-xl font-bold tracking-widest text-xs uppercase transition-all"
+                                    className="flex-1 px-4 py-3 bg-[#F5F5F5] hover:bg-[#E0E0E0] text-[#757575] rounded-sm font-bold tracking-widest text-xs uppercase transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#D32F2F] hover:bg-[#B71C1C] text-white rounded-xl font-bold tracking-widest text-xs uppercase shadow-md shadow-[#D32F2F]/20 transition-all disabled:opacity-50"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#D32F2F] hover:bg-[#B71C1C] text-white rounded-sm font-bold tracking-widest text-xs uppercase shadow-sm shadow-[#D32F2F]/20 transition-all disabled:opacity-50"
                                 >
                                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit Request'}
                                 </button>

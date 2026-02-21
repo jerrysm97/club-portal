@@ -16,14 +16,14 @@ export async function PATCH(req: NextRequest) {
     }
 
     const supabase = createServerClient()
-    const { error } = await supabase
-        .from('contact_messages')
+    const { error } = await (supabase
+        .from('contact_messages' as any) as any)
         .update({ is_read: parsed.data.is_read })
         .eq('id', parsed.data.id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
-        admin_id: admin.id,
+    await (supabase.from('audit_logs' as any) as any).insert({
+        actor_id: admin.id,
         action: parsed.data.is_read ? 'mark_contact_read' : 'mark_contact_unread',
         target_id: parsed.data.id,
     })
@@ -37,11 +37,11 @@ export async function DELETE(req: NextRequest) {
     const { id } = z.object({ id: z.string().uuid() }).parse(body)
 
     const supabase = createServerClient()
-    const { error } = await supabase.from('contact_messages').delete().eq('id', id)
+    const { error } = await (supabase.from('contact_messages' as any) as any).delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
-        admin_id: admin.id,
+    await (supabase.from('audit_logs' as any) as any).insert({
+        actor_id: admin.id,
         action: 'delete_contact_message',
         target_id: id,
     })

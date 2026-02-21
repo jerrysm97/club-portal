@@ -61,8 +61,8 @@ export async function POST(req: NextRequest) {
         //    Wait briefly for trigger to execute, then update with profile data.
         await new Promise(r => setTimeout(r, 500))
 
-        const { error: updateError } = await supabase
-            .from('members')
+        const { error: updateError } = await (supabase
+            .from('members' as any) as any)
             .update({
                 full_name,
                 student_id: student_id || null,

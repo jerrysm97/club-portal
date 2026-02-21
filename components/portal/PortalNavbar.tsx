@@ -23,108 +23,99 @@ const NAV_ITEMS = [
     { href: '/portal/profile', label: 'Profile', icon: User },
 ]
 
-export default function PortalNavbar({ member }: { member: Member }) {
-    const [isOpen, setIsOpen] = useState(false)
+export default function PortalNavbar({ member, unreadMessages = 0 }: { member: Member, unreadMessages?: number }) {
     const pathname = usePathname()
-    const router = useRouter()
 
     const isAdmin = member.role === 'admin' || member.role === 'superadmin'
 
-    async function handleSignOut() {
-        const supabase = createClient()
-        await supabase.auth.signOut()
-        router.push('/portal/login')
-        router.refresh()
-    }
-
+    // Minimal top layout: Brand + Profile
     return (
-        <nav className="md:hidden sticky top-0 z-[60] bg-white border-b border-[#E0E0E0] shadow-sm">
-            <div className="flex items-center justify-between px-5 h-14">
-                <Link href="/portal/dashboard" className="flex items-center gap-2.5">
-                    <div className="h-8 w-8 rounded-lg bg-[#1A237E] flex items-center justify-center">
-                        <GraduationCap className="h-4 w-4 text-white" />
-                    </div>
-                    <span className="font-bold text-[#212121] text-sm">{BRAND.clubShort}</span>
-                </Link>
-                <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="text-[#757575] hover:text-[#212121] p-2 rounded-lg hover:bg-[#F5F5F5] transition-all active:scale-95"
-                    aria-label={isOpen ? 'Close menu' : 'Open menu'}
-                >
-                    {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                </button>
-            </div>
-
-            {/* Mobile Menu Overlay */}
-            {isOpen && (
-                <div className="fixed inset-0 top-14 bg-white z-[70] flex flex-col overflow-y-auto">
-                    {/* Identity */}
-                    <div className="flex items-center gap-3 p-5 border-b border-[#E0E0E0] bg-[#F8F9FA]">
-                        <Avatar src={member.avatar_url} name={member.name} size="md" className="ring-2 ring-[#E0E0E0]" />
-                        <div className="min-w-0">
-                            <p className="font-semibold text-[#212121] truncate">{member.name}</p>
-                            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9E9E9E] truncate">
-                                {member.club_post || member.role} • {member.points ?? 0} pts
-                            </p>
+        <>
+            {/* Top Navigation Bar */}
+            <nav className="md:hidden sticky top-0 z-[60] bg-white border-b border-[#E0E0E0] shadow-sm">
+                <div className="flex items-center justify-between px-5 h-14">
+                    <Link href="/portal/dashboard" className="flex items-center gap-2.5">
+                        <div className="h-8 w-8 rounded-sm bg-[#111111] flex items-center justify-center shadow-inner">
+                            <GraduationCap className="h-4 w-4 text-white" />
                         </div>
-                    </div>
+                        <span className="font-bold text-[#212121] text-sm tracking-tight">{BRAND.clubShort}</span>
+                    </Link>
 
-                    {/* Navigation Links */}
-                    <div className="flex-1 p-4 space-y-0.5">
-                        <p className="text-[#9E9E9E] text-[10px] font-semibold uppercase tracking-widest px-3 py-2">Navigation</p>
-
-                        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-                            const active = pathname === href || pathname.startsWith(href + '/')
-                            return (
-                                <Link
-                                    key={href}
-                                    href={href}
-                                    onClick={() => setIsOpen(false)}
-                                    className={cn(
-                                        'flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-all',
-                                        active
-                                            ? 'bg-[#E53935]/8 text-[#E53935] font-medium'
-                                            : 'text-[#757575] hover:bg-[#F5F5F5] hover:text-[#212121]'
-                                    )}
-                                >
-                                    <Icon className="h-4 w-4 flex-shrink-0" />
-                                    <span>{label}</span>
-                                </Link>
-                            )
-                        })}
-
-                        {isAdmin && (
-                            <div className="mt-4 pt-4 border-t border-[#E0E0E0]">
-                                <p className="text-[#9E9E9E] text-[10px] font-semibold uppercase tracking-widest px-3 pb-2">Administration</p>
-                                <Link
-                                    href="/portal/admin"
-                                    onClick={() => setIsOpen(false)}
-                                    className={cn(
-                                        'flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-all font-semibold',
-                                        pathname.startsWith('/portal/admin')
-                                            ? 'bg-[#1A237E] text-white'
-                                            : 'text-[#1A237E] hover:bg-[#1A237E]/8'
-                                    )}
-                                >
-                                    <ShieldCheck className="h-4 w-4 flex-shrink-0" />
-                                    <span>Admin Panel</span>
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Sign Out */}
-                    <div className="p-4 border-t border-[#E0E0E0]">
-                        <button
-                            onClick={handleSignOut}
-                            className="flex w-full items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm text-[#9E9E9E] bg-[#F5F5F5] hover:bg-[#FFEBEE] hover:text-[#B71C1C] transition-all"
-                        >
-                            <LogOut className="h-4 w-4" />
-                            <span>Sign Out</span>
-                        </button>
+                    <div className="flex items-center gap-3">
+                        <Link href="/portal/notifications" className={cn(
+                            "p-2 rounded-full transition-colors relative",
+                            pathname.includes('/notifications') ? "bg-[#FAFAFA] text-[#111111]" : "text-[#757575] hover:bg-[#F5F5F5]"
+                        )}>
+                            <Bell className="h-5 w-5" />
+                        </Link>
+                        <Link href="/portal/profile">
+                            <Avatar src={member.avatar_url} name={member.name} size="sm" className="ring-2 ring-[#E0E0E0]" />
+                        </Link>
                     </div>
                 </div>
-            )}
-        </nav>
+
+                {/* Secondary Horizontal Scroll Menu */}
+                <div className="flex overflow-x-auto hide-scrollbar px-4 py-2 gap-2 border-t border-[#F5F5F5] bg-[#F8F9FA]">
+                    {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+                        const active = pathname === href || pathname.startsWith(href + '/')
+                        // Exclude bottom nav items from top scroll (Dashboard, Feed, Messages, Resources)
+                        if (['/portal/dashboard', '/portal/feed', '/portal/messages', '/portal/resources'].includes(href)) return null
+
+                        return (
+                            <Link
+                                key={href}
+                                href={href}
+                                className={cn(
+                                    'whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all',
+                                    active
+                                        ? 'bg-[#111111] text-white shadow-sm shadow-[#111111]/20'
+                                        : 'bg-white text-[#757575] border border-[#E0E0E0]'
+                                )}
+                            >
+                                <Icon className="h-3.5 w-3.5" />
+                                {label}
+                            </Link>
+                        )
+                    })}
+                    {isAdmin && (
+                        <Link href="/portal/admin" className="whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#FFEBEE] text-[#D32F2F] border border-[#FFCDD2] shadow-sm">
+                            <ShieldCheck className="h-3.5 w-3.5" /> Admin
+                        </Link>
+                    )}
+                </div>
+            </nav>
+
+            {/* Sticky Bottom Action Bar */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-[#E0E0E0] pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                <div className="flex items-center justify-around h-16 px-2">
+                    {[
+                        { href: '/portal/dashboard', label: 'Home', icon: LayoutDashboard },
+                        { href: '/portal/feed', label: 'Feed', icon: Rss },
+                        { href: '/portal/messages', label: 'Chat', icon: MessageSquare },
+                        { href: '/portal/resources', label: 'Docs', icon: FileText }
+                    ].map(({ href, label, icon: Icon }) => {
+                        const active = pathname === href || pathname.startsWith(href + '/')
+                        return (
+                            <Link
+                                key={href}
+                                href={href}
+                                className={cn(
+                                    'flex flex-col items-center justify-center w-16 h-full gap-1 transition-all',
+                                    active ? 'text-[#111111]' : 'text-[#9E9E9E] hover:text-[#757575]'
+                                )}
+                            >
+                                <div className={cn("p-1.5 rounded-sm transition-all relative", active ? 'bg-[#FAFAFA]' : '')}>
+                                    <Icon className={cn("h-5 w-5", active && "fill-[#111111]/10")} />
+                                    {href === '/portal/messages' && unreadMessages > 0 && (
+                                        <span className="absolute top-1 right-1 h-2 w-2 bg-[#E53935] rounded-full ring-2 ring-white"></span>
+                                    )}
+                                </div>
+                                <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
+                            </Link>
+                        )
+                    })}
+                </div>
+            </div>
+        </>
     )
 }

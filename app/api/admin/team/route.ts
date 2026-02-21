@@ -25,14 +25,14 @@ export async function PATCH(req: NextRequest) {
 
     const { id, ...fields } = parsed.data
     const supabase = createServerClient()
-    const { error } = await supabase.from('members').update(fields).eq('id', id)
+    const { error } = await (supabase.from('members' as any) as any).update(fields).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
-        admin_id: admin.id,
+    await (supabase.from('audit_logs' as any) as any).insert({
+        actor_id: admin.id,
         action: 'update_member_role',
         target_id: id,
-        meta: fields
+        details: fields
     })
 
     return NextResponse.json({ success: true })

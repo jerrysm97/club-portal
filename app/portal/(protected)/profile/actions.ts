@@ -43,8 +43,8 @@ export async function updateProfile(formData: FormData) {
 
         const supabase = createServerClient()
 
-        const { error } = await supabase
-            .from('members')
+        const { error } = await (supabase
+            .from('members' as any) as any)
             .update(updatePayload)
             .eq('user_id', session.user.id)
 
@@ -97,8 +97,8 @@ export async function uploadAvatar(formData: FormData) {
         .getPublicUrl(filePath)
 
     // Update member record
-    const { error: updateError } = await supabase
-        .from('members')
+    const { error: updateError } = await (supabase
+        .from('members' as any) as any)
         .update({ avatar_url: publicUrl })
         .eq('user_id', session.user.id)
 

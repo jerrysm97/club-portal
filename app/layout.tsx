@@ -1,5 +1,5 @@
 // app/layout.tsx — Root Layout: IIMS IT Club Portal (v4.0)
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '@/components/ui/ToastProvider'
@@ -35,10 +35,16 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="font-sans bg-[#F8F9FA] text-[#212121] min-h-screen antialiased">
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+      <body className="font-sans bg-[#F8F9FA] text-[#212121] min-h-screen antialiased" suppressHydrationWarning>
         <ToastProvider>
           {children}
         </ToastProvider>

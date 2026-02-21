@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { assertRole, assertSuperadminOrPresident, assertSuperadminOrPresidentOrAdmin } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase-server'
+import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 const updateMemberSchema = z.object({
@@ -11,6 +12,8 @@ const updateMemberSchema = z.object({
     club_post: z.string().nullable().optional(),
     reject_reason: z.string().max(500).optional(),
     ban_reason: z.string().max(500).optional(),
+    is_public_profile: z.boolean().optional(),
+    display_order: z.number().int().min(1).optional(),
 })
 
 export async function GET() {
@@ -18,12 +21,12 @@ export async function GET() {
     const supabase = createServerClient()
 
     const [members, posts, events, challenges, resources, auditLogs] = await Promise.all([
-        supabase.from('members').select('*').order('joined_at', { ascending: false }),
-        supabase.from('posts').select('*, author:members(full_name, avatar_url)').order('created_at', { ascending: false }),
-        supabase.from('public_events').select('*').order('event_date', { ascending: false }),
-        supabase.from('ctf_challenges').select('id, title, category, difficulty, points, is_active, hint, created_at, solves_count').order('points', { ascending: true }),
-        supabase.from('documents').select('*, uploader:members(full_name)').order('created_at', { ascending: false }),
-        admin.role === 'superadmin' ? supabase.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(100) : Promise.resolve({ data: [] }),
+        (supabase.from('members' as any) as any).select('*').order('joined_at', { ascending: false }),
+        (supabase.from('posts' as any) as any).select('*, author:members(full_name, avatar_url)').order('created_at', { ascending: false }),
+        (supabase.from('public_events' as any) as any).select('*').order('event_date', { ascending: false }),
+        (supabase.from('ctf_challenges' as any) as any).select('id, title, category, difficulty, points, is_active, hint, created_at, solves_count').order('points', { ascending: true }),
+        (supabase.from('documents' as any) as any).select('*, uploader:members(full_name)').order('created_at', { ascending: false }),
+        admin.role === 'superadmin' ? (supabase.from('audit_logs' as any) as any).select('*').order('created_at', { ascending: false }).limit(100) : Promise.resolve({ data: [] }),
     ])
 
     return NextResponse.json({
@@ -48,19 +51,11 @@ export async function PATCH(req: NextRequest) {
     const { id, ...fields } = parsed.data
 
     if (fields.role !== undefined || fields.club_post !== undefined) {
-        if (admin.role !== 'superadmin' && admin.club_post !== 'President') {
-            return NextResponse.json({ error: 'Only Superadmin or President can assign roles and posts.' }, { status: 403 })
+        if (admin.role !== 'superadmin' && admin.role !== 'admin' && admin.club_post !== 'President') {
+            return NextResponse.json({ error: 'Only Admins or President can assign roles and posts.' }, { status: 403 })
         }
 
-        // Strict limits for President
-        if (admin.role !== 'superadmin') {
-            if (fields.role === 'admin' || fields.role === 'superadmin') {
-                return NextResponse.json({ error: 'President cannot assign admin or superadmin roles.' }, { status: 403 })
-            }
-            if (fields.club_post && fields.club_post.toLowerCase() === 'president') {
-                return NextResponse.json({ error: 'President cannot re-assign the President post.' }, { status: 403 })
-            }
-        }
+        // Remove the restrictive president checks that prevent them from updating themselves or existing admins
     }
 
     const supabase = createServerClient()
@@ -72,17 +67,21 @@ export async function PATCH(req: NextRequest) {
         updateData.approved_by = admin.id
     }
 
-    const { error } = await supabase.from('members').update(updateData).eq('id', id)
+    const { error } = await (supabase.from('members' as any) as any).update(updateData).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     // Audit log
     const actionName = (fields.role || fields.club_post) ? 'member_designation_update' : `member_${fields.status || 'update'}`
-    await supabase.from('audit_logs').insert({
+    await (supabase.from('audit_logs' as any) as any).insert({
         actor_id: admin.id,
         action: actionName,
         target_id: id,
-        details: parsed.data
+        details: parsed.data as any
     })
+
+    // Immediately flush Next.js caches so Homepage rendering resolves active targets properly
+    revalidatePath('/')
+    revalidatePath('/about')
 
     return NextResponse.json({ success: true })
 }
@@ -93,10 +92,10 @@ export async function DELETE(req: NextRequest) {
     const { id } = z.object({ id: z.string().uuid() }).parse(body)
 
     const supabase = createServerClient()
-    const { error } = await supabase.from('members').delete().eq('id', id)
+    const { error } = await (supabase.from('members' as any) as any).delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
+    await (supabase.from('audit_logs' as any) as any).insert({
         actor_id: admin.id,
         action: 'member_delete',
         target_id: id,

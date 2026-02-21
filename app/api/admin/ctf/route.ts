@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const flag_hash = hashFlag(flag)
 
     const supabase = createServerClient()
-    const { error } = await supabase.from('ctf_challenges').insert({
+    const { error } = await (supabase.from('ctf_challenges' as any) as any).insert({
         ...challengeData,
         flag_hash,
         created_by: admin.id,
@@ -38,10 +38,10 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('audit_logs').insert({
-        admin_id: admin.id,
+    await (supabase.from('audit_logs' as any) as any).insert({
+        actor_id: admin.id,
         action: 'create_challenge',
-        meta: { title: challengeData.title, category: challengeData.category, points: challengeData.points }
+        details: { title: challengeData.title, category: challengeData.category, points: challengeData.points }
     })
 
     return NextResponse.json({ success: true })
