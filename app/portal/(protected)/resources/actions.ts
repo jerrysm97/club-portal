@@ -61,7 +61,9 @@ export async function uploadDocument(prevState: any, formData: FormData) {
         description,
         file_url: urlData.publicUrl,
         category,
-        is_public: true
+        visibility: formData.get('visibility') as string || 'all',
+        is_public: (formData.get('visibility') as string || 'all') === 'all',
+        deleted_at: null
     })
 
     if (error) return { error: 'Archive Database write failed' }
@@ -82,7 +84,7 @@ export async function deleteDocument(id: string) {
         .eq('user_id', session.user.id)
         .single()
 
-    // Enforce Ownership/Access Control
+    // Enforce Tiered Logic
     const { data: doc } = await (supabase
         .from('documents' as any) as any)
         .select('uploader_id, file_url')
@@ -91,25 +93,57 @@ export async function deleteDocument(id: string) {
 
     if (!doc) return { error: 'Document not found' }
 
-    // Superadmins/Admins can delete anything. Authors can delete their own.
-    const isAuthor = doc.uploader_id === (member as any).id
-    const isPrivileged = ['admin', 'superadmin', 'president'].includes((member as any).role)
+    const role = (member as any).role
+    const isOwner = doc.uploader_id === (member as any).id
+    const isTopTier = ['admin', 'superadmin', 'president'].includes(role)
 
-    if (!isAuthor && !isPrivileged) {
-        return { error: 'Insufficient clearance to redact other members\' documents' }
+    if (isTopTier) {
+        // PERMANENT PURGE (Hard Delete)
+        // Purge from Storage
+        const fileUrlStr = doc.file_url || ''
+        const match = fileUrlStr.match(/portal_documents\/(.+)$/)
+        if (match && match[1]) {
+            await supabase.storage.from('portal_documents').remove([match[1]])
+        }
+        // Delete Record
+        const { error } = await (supabase.from('documents' as any) as any).delete().eq('id', id)
+        if (error) return { error: 'Database Redaction failed' }
+    } else if (role === 'bod' && isOwner) {
+        // SOFT DELETE
+        const { error } = await (supabase.from('documents' as any) as any)
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('id', id)
+        if (error) return { error: 'Soft-redaction failed' }
+    } else {
+        return { error: 'Insufficient clearance to redact this asset' }
     }
-
-    // Attempt to purge from Storage Bucket
-    const fileUrlStr = doc.file_url || ''
-    const match = fileUrlStr.match(/portal_documents\/(.+)$/)
-    if (match && match[1]) {
-        await supabase.storage.from('portal_documents').remove([match[1]])
-    }
-
-    // Delete Database Record
-    const { error } = await (supabase.from('documents' as any) as any).delete().eq('id', id)
-    if (error) return { error: 'Database Redaction failed' }
 
     revalidatePath('/portal/resources')
+    revalidatePath('/portal/admin')
+    return { success: true }
+}
+
+export async function restoreDocument(id: string) {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: member } = await (supabase.from('members' as any) as any)
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+
+    if (!['admin', 'superadmin', 'president'].includes((member as any).role)) {
+        return { error: 'Only high-level command can restore redacted assets' }
+    }
+
+    const { error } = await (supabase.from('documents' as any) as any)
+        .update({ deleted_at: null })
+        .eq('id', id)
+
+    if (error) return { error: 'Restoration failed' }
+
+    revalidatePath('/portal/resources')
+    revalidatePath('/portal/admin')
     return { success: true }
 }
