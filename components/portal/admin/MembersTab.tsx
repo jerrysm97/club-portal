@@ -186,7 +186,7 @@ export default function MembersTab({ members, currentUser, refresh }: { members:
                                 >
                                     <option value="member">Member</option>
                                     <option value="bod">Board of Directors (BOD)</option>
-                                    {currentUser?.role === 'superadmin' && <option value="admin">Admin</option>}
+                                    {(currentUser?.role === 'superadmin' || currentUser?.role === 'admin' || currentUser?.club_post === 'President') && <option value="admin">Admin</option>}
                                     {currentUser?.role === 'superadmin' && <option value="superadmin">Superadmin</option>}
                                 </select>
                             </div>

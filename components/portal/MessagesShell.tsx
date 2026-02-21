@@ -15,7 +15,7 @@ export default function MessagesShell({ conversations, memberId, children }: Mes
     const activeChatId = params.id as string
 
     return (
-        <div className="flex bg-white rounded-[2rem] border border-[#E0E0E0] shadow-sm overflow-hidden h-[calc(100vh-140px)] animate-fade-up">
+        <div className="flex bg-white rounded-sm border border-[#E0E0E0] overflow-hidden h-[calc(100vh-140px)] animate-fade-up">
             {/* Sidebar / Conversation List */}
             <div className={cn(
                 "flex-col border-r border-[#E0E0E0] bg-[#F8F9FA] shrink-0",

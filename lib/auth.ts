@@ -3,6 +3,7 @@
 import 'server-only'
 import { createServerClient } from '@/lib/supabase-server'
 import { cookies } from 'next/headers'
+import { cache } from 'react'
 import { createServerClient as createSSRClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
@@ -10,7 +11,7 @@ type Role = 'member' | 'bod' | 'admin' | 'superadmin'
 type MemberRow = Database['public']['Tables']['members']['Row']
 
 /** Get the current session from the request cookies */
-export async function getSession() {
+export const getSession = cache(async () => {
     const cookieStore = await cookies()
     const supabase = createSSRClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,13 +27,13 @@ export async function getSession() {
     const { data: { user } } = await supabase.auth.getUser()
     const session = user ? { user } : null
     return session
-}
+})
 
 /**
  * Get the current member from the database.
  * Uses user_id FK (auth.users.id) — NEVER id (members.id).
  */
-export async function getMember(userId: string): Promise<MemberRow | null> {
+export const getMember = cache(async (userId: string): Promise<MemberRow | null> => {
     const supabase = createServerClient()
     const { data, error } = await (supabase
         .from('members' as any) as any)
@@ -42,7 +43,7 @@ export async function getMember(userId: string): Promise<MemberRow | null> {
 
     if (error || !data) return null
     return data as unknown as MemberRow
-}
+})
 
 /**
  * assertRole — MUST be the first call in every admin API route.

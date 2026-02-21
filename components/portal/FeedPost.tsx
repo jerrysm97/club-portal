@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Avatar from '@/components/ui/Avatar'
 import { formatDate, cn } from '@/lib/utils'
-import { MessageSquare, Heart, Share2, MoreHorizontal, Megaphone, FileText, ShieldCheck, ChevronRight, GraduationCap } from 'lucide-react'
+import { MessageSquare, Heart, Share2, MoreHorizontal, Megaphone, FileText, ShieldCheck, ChevronRight, GraduationCap, Maximize2, Download } from 'lucide-react'
 import { toggleReaction } from '@/app/portal/(protected)/feed/actions'
 import { createClient } from '@/lib/supabase'
 
@@ -153,12 +153,29 @@ export default function FeedPost({ post, currentMemberId }: FeedPostProps) {
                     {post.content.split('\n\n[IMAGE: ')[0]}
                 </div>
                 {post.content.includes('\n\n[IMAGE: ') && (
-                    <div className="mt-4 rounded-sm overflow-hidden border border-[#E0E0E0]">
+                    <div className="mt-4 relative group rounded-sm overflow-hidden border border-[#E0E0E0]">
                         <img
                             src={post.content.split('\n\n[IMAGE: ')[1].replace(']', '')}
                             alt="Post attached image"
-                            className="w-full h-auto object-cover max-h-[500px]"
+                            className="w-full h-auto object-cover max-h-[500px] transition-transform group-hover:scale-105"
                         />
+                        <div className="absolute inset-0 bg-[#111111]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
+                            <a
+                                href={post.content.split('\n\n[IMAGE: ')[1].replace(']', '')}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-3 bg-white text-[#212121] hover:bg-[#C8102E] hover:text-white rounded-sm transition-colors shadow-lg flex items-center gap-2 text-xs font-bold uppercase tracking-widest"
+                            >
+                                <Maximize2 className="h-4 w-4" /> Preview
+                            </a>
+                            <a
+                                href={post.content.split('\n\n[IMAGE: ')[1].replace(']', '')}
+                                download="icehc-attachment.jpg"
+                                className="p-3 bg-white text-[#212121] hover:bg-[#C8102E] hover:text-white rounded-sm transition-colors shadow-lg flex items-center gap-2 text-xs font-bold uppercase tracking-widest"
+                            >
+                                <Download className="h-4 w-4" /> Download
+                            </a>
+                        </div>
                     </div>
                 )}
             </div>
