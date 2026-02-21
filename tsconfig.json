@@ -38,6 +38,9 @@
   ],
   "exclude": [
     "node_modules",
-    "stitch-skills"
+    "stitch-skills",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "__tests__/**/*"
   ]
 }

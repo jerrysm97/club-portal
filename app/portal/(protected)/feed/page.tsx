@@ -48,11 +48,11 @@ async function FeedData({ member, currentPage, pageSize }: { member: any, curren
             const commentCountMap = new Map<string, number>()
             const likedPostIds = new Set((userLikesData || []).map((l: any) => l.post_id))
 
-            allReactionsData?.forEach(r => {
+            allReactionsData?.forEach((r: any) => {
                 reactionCountMap.set(r.post_id, (reactionCountMap.get(r.post_id) || 0) + 1)
             })
 
-            allCommentsData?.forEach(c => {
+            allCommentsData?.forEach((c: any) => {
                 commentCountMap.set(c.post_id, (commentCountMap.get(c.post_id) || 0) + 1)
             })
 
